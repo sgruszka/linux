@@ -15,7 +15,7 @@ struct device;
 struct page;
 struct ipu6_hw_variants;
 
-struct ipu6_mmu_info {
+struct ipu_mmu_info {
 	struct device *dev;
 
 	u32 *l1_pt;
@@ -64,10 +64,10 @@ struct ipu6_mmu *ipu6_mmu_init(struct device *dev,
 void ipu6_mmu_cleanup(struct ipu6_mmu *mmu);
 int ipu6_mmu_hw_init(struct ipu6_mmu *mmu);
 void ipu6_mmu_hw_cleanup(struct ipu6_mmu *mmu);
-int ipu6_mmu_map(struct ipu6_mmu_info *mmu_info, unsigned long iova,
+int ipu6_mmu_map(struct ipu_mmu_info *mmu_info, unsigned long iova,
 		 phys_addr_t paddr, size_t size);
-void ipu6_mmu_unmap(struct ipu6_mmu_info *mmu_info, unsigned long iova,
+void ipu6_mmu_unmap(struct ipu_mmu_info *mmu_info, unsigned long iova,
 		    size_t size);
-phys_addr_t ipu6_mmu_iova_to_phys(struct ipu6_mmu_info *mmu_info,
+phys_addr_t ipu6_mmu_iova_to_phys(struct ipu_mmu_info *mmu_info,
 				  dma_addr_t iova);
 #endif

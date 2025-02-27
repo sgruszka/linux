@@ -13,10 +13,10 @@
 
 #include "ipu6-bus.h"
 
-struct ipu6_mmu_info;
+struct ipu_mmu_info;
 
 struct ipu6_dma_mapping {
-	struct ipu6_mmu_info *mmu_info;
+	struct ipu_mmu_info *mmu_info;
 	struct iova_domain iovad;
 };
 

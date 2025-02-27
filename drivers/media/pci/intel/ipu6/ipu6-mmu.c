@@ -88,7 +88,7 @@ static void tlb_invalidate(struct ipu6_mmu *mmu)
 }
 
 #ifdef DEBUG
-static void page_table_dump(struct ipu6_mmu_info *mmu_info)
+static void page_table_dump(struct ipu_mmu_info *mmu_info)
 {
 	u32 l1_idx;
 
@@ -125,7 +125,7 @@ static void page_table_dump(struct ipu6_mmu_info *mmu_info)
 }
 #endif /* DEBUG */
 
-static dma_addr_t map_single(struct ipu6_mmu_info *mmu_info, void *ptr)
+static dma_addr_t map_single(struct ipu_mmu_info *mmu_info, void *ptr)
 {
 	dma_addr_t dma;
 
@@ -136,7 +136,7 @@ static dma_addr_t map_single(struct ipu6_mmu_info *mmu_info, void *ptr)
 	return dma;
 }
 
-static int get_dummy_page(struct ipu6_mmu_info *mmu_info)
+static int get_dummy_page(struct ipu_mmu_info *mmu_info)
 {
 	void *pt = (void *)get_zeroed_page(GFP_ATOMIC | GFP_DMA32);
 	dma_addr_t dma;
@@ -162,7 +162,7 @@ err_free_page:
 	return -ENOMEM;
 }
 
-static void free_dummy_page(struct ipu6_mmu_info *mmu_info)
+static void free_dummy_page(struct ipu_mmu_info *mmu_info)
 {
 	dma_unmap_single(mmu_info->dev,
 			 TBL_PHYS_ADDR(mmu_info->dummy_page_pteval),
@@ -170,7 +170,7 @@ static void free_dummy_page(struct ipu6_mmu_info *mmu_info)
 	free_page((unsigned long)mmu_info->dummy_page);
 }
 
-static int alloc_dummy_l2_pt(struct ipu6_mmu_info *mmu_info)
+static int alloc_dummy_l2_pt(struct ipu_mmu_info *mmu_info)
 {
 	u32 *pt = (u32 *)get_zeroed_page(GFP_ATOMIC | GFP_DMA32);
 	dma_addr_t dma;
@@ -200,7 +200,7 @@ err_free_page:
 	return -ENOMEM;
 }
 
-static void free_dummy_l2_pt(struct ipu6_mmu_info *mmu_info)
+static void free_dummy_l2_pt(struct ipu_mmu_info *mmu_info)
 {
 	dma_unmap_single(mmu_info->dev,
 			 TBL_PHYS_ADDR(mmu_info->dummy_l2_pteval),
@@ -208,7 +208,7 @@ static void free_dummy_l2_pt(struct ipu6_mmu_info *mmu_info)
 	free_page((unsigned long)mmu_info->dummy_l2_pt);
 }
 
-static u32 *alloc_l1_pt(struct ipu6_mmu_info *mmu_info)
+static u32 *alloc_l1_pt(struct ipu_mmu_info *mmu_info)
 {
 	u32 *pt = (u32 *)get_zeroed_page(GFP_ATOMIC | GFP_DMA32);
 	dma_addr_t dma;
@@ -238,7 +238,7 @@ err_free_page:
 	return NULL;
 }
 
-static u32 *alloc_l2_pt(struct ipu6_mmu_info *mmu_info)
+static u32 *alloc_l2_pt(struct ipu_mmu_info *mmu_info)
 {
 	u32 *pt = (u32 *)get_zeroed_page(GFP_ATOMIC | GFP_DMA32);
 	unsigned int i;
@@ -254,7 +254,7 @@ static u32 *alloc_l2_pt(struct ipu6_mmu_info *mmu_info)
 	return pt;
 }
 
-static void l2_unmap(struct ipu6_mmu_info *mmu_info, unsigned long iova,
+static void l2_unmap(struct ipu_mmu_info *mmu_info, unsigned long iova,
 		     phys_addr_t dummy, size_t size)
 {
 	unsigned int l2_entries;
@@ -303,7 +303,7 @@ static void l2_unmap(struct ipu6_mmu_info *mmu_info, unsigned long iova,
 	spin_unlock_irqrestore(&mmu_info->lock, flags);
 }
 
-static int l2_map(struct ipu6_mmu_info *mmu_info, unsigned long iova,
+static int l2_map(struct ipu_mmu_info *mmu_info, unsigned long iova,
 		  phys_addr_t paddr, size_t size)
 {
 	struct device *dev = mmu_info->dev;
@@ -392,7 +392,7 @@ error:
 	return err;
 }
 
-static int __ipu6_mmu_map(struct ipu6_mmu_info *mmu_info, unsigned long iova,
+static int __ipu6_mmu_map(struct ipu_mmu_info *mmu_info, unsigned long iova,
 			  phys_addr_t paddr, size_t size)
 {
 	u32 iova_start = round_down(iova, ISP_PAGE_SIZE);
@@ -405,7 +405,7 @@ static int __ipu6_mmu_map(struct ipu6_mmu_info *mmu_info, unsigned long iova,
 	return l2_map(mmu_info, iova_start, paddr, size);
 }
 
-static void __ipu6_mmu_unmap(struct ipu6_mmu_info *mmu_info,
+static void __ipu6_mmu_unmap(struct ipu_mmu_info *mmu_info,
 			     unsigned long iova, size_t size)
 {
 	l2_unmap(mmu_info, iova, 0, size);
@@ -472,7 +472,7 @@ out_free_iova:
 
 int ipu6_mmu_hw_init(struct ipu6_mmu *mmu)
 {
-	struct ipu6_mmu_info *mmu_info;
+	struct ipu_mmu_info *mmu_info;
 	unsigned long flags;
 	unsigned int i;
 
@@ -544,9 +544,9 @@ int ipu6_mmu_hw_init(struct ipu6_mmu *mmu)
 }
 EXPORT_SYMBOL_NS_GPL(ipu6_mmu_hw_init, "INTEL_IPU6");
 
-static struct ipu6_mmu_info *ipu6_mmu_alloc(struct ipu6_device *isp)
+static struct ipu_mmu_info *ipu6_mmu_alloc(struct ipu6_device *isp)
 {
-	struct ipu6_mmu_info *mmu_info;
+	struct ipu_mmu_info *mmu_info;
 	int ret;
 
 	mmu_info = kzalloc(sizeof(*mmu_info), GFP_KERNEL);
@@ -633,7 +633,7 @@ static struct ipu6_dma_mapping *alloc_dma_mapping(struct ipu6_device *isp)
 	return dmap;
 }
 
-phys_addr_t ipu6_mmu_iova_to_phys(struct ipu6_mmu_info *mmu_info,
+phys_addr_t ipu6_mmu_iova_to_phys(struct ipu_mmu_info *mmu_info,
 				  dma_addr_t iova)
 {
 	phys_addr_t phy_addr;
@@ -649,7 +649,7 @@ phys_addr_t ipu6_mmu_iova_to_phys(struct ipu6_mmu_info *mmu_info,
 	return phy_addr;
 }
 
-void ipu6_mmu_unmap(struct ipu6_mmu_info *mmu_info, unsigned long iova,
+void ipu6_mmu_unmap(struct ipu_mmu_info *mmu_info, unsigned long iova,
 		    size_t size)
 {
 	unsigned int min_pagesz;
@@ -673,7 +673,7 @@ void ipu6_mmu_unmap(struct ipu6_mmu_info *mmu_info, unsigned long iova,
 	__ipu6_mmu_unmap(mmu_info, iova, size);
 }
 
-int ipu6_mmu_map(struct ipu6_mmu_info *mmu_info, unsigned long iova,
+int ipu6_mmu_map(struct ipu_mmu_info *mmu_info, unsigned long iova,
 		 phys_addr_t paddr, size_t size)
 {
 	unsigned int min_pagesz;
@@ -705,7 +705,7 @@ int ipu6_mmu_map(struct ipu6_mmu_info *mmu_info, unsigned long iova,
 static void ipu6_mmu_destroy(struct ipu6_mmu *mmu)
 {
 	struct ipu6_dma_mapping *dmap = mmu->dmap;
-	struct ipu6_mmu_info *mmu_info = dmap->mmu_info;
+	struct ipu_mmu_info *mmu_info = dmap->mmu_info;
 	struct iova *iova;
 	u32 l1_idx;
 

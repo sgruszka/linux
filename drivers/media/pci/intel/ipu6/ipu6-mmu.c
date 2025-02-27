@@ -51,7 +51,7 @@
 
 #define TBL_PHYS_ADDR(a)	((phys_addr_t)(a) << ISP_PADDR_SHIFT)
 
-static void tlb_invalidate(struct ipu6_mmu *mmu)
+static void tlb_invalidate(struct ipu_mmu *mmu)
 {
 	unsigned long flags;
 	unsigned int i;
@@ -411,7 +411,7 @@ static void __ipu6_mmu_unmap(struct ipu_mmu_info *mmu_info,
 	l2_unmap(mmu_info, iova, 0, size);
 }
 
-static int allocate_trash_buffer(struct ipu6_mmu *mmu)
+static int allocate_trash_buffer(struct ipu_mmu *mmu)
 {
 	unsigned int n_pages = PFN_UP(IPU6_MMUV2_TRASH_RANGE);
 	struct iova *iova;
@@ -470,7 +470,7 @@ out_free_iova:
 	return ret;
 }
 
-int ipu6_mmu_hw_init(struct ipu6_mmu *mmu)
+int ipu6_mmu_hw_init(struct ipu_mmu *mmu)
 {
 	struct ipu_mmu_info *mmu_info;
 	unsigned long flags;
@@ -599,7 +599,7 @@ err_free_info:
 	return NULL;
 }
 
-void ipu6_mmu_hw_cleanup(struct ipu6_mmu *mmu)
+void ipu6_mmu_hw_cleanup(struct ipu_mmu *mmu)
 {
 	unsigned long flags;
 
@@ -702,7 +702,7 @@ int ipu6_mmu_map(struct ipu_mmu_info *mmu_info, unsigned long iova,
 	return __ipu6_mmu_map(mmu_info, iova, paddr, size);
 }
 
-static void ipu6_mmu_destroy(struct ipu6_mmu *mmu)
+static void ipu6_mmu_destroy(struct ipu_mmu *mmu)
 {
 	struct ipu6_dma_mapping *dmap = mmu->dmap;
 	struct ipu_mmu_info *mmu_info = dmap->mmu_info;
@@ -745,13 +745,13 @@ static void ipu6_mmu_destroy(struct ipu6_mmu *mmu)
 	kfree(mmu_info);
 }
 
-struct ipu6_mmu *ipu6_mmu_init(struct device *dev,
+struct ipu_mmu *ipu6_mmu_init(struct device *dev,
 			       void __iomem *base, int mmid,
 			       const struct ipu6_hw_variants *hw)
 {
 	struct ipu6_device *isp = pci_get_drvdata(to_pci_dev(dev));
 	struct ipu6_mmu_pdata *pdata;
-	struct ipu6_mmu *mmu;
+	struct ipu_mmu *mmu;
 	unsigned int i;
 
 	if (hw->nr_mmus > IPU6_MMU_MAX_DEVICES)
@@ -794,7 +794,7 @@ struct ipu6_mmu *ipu6_mmu_init(struct device *dev,
 	return mmu;
 }
 
-void ipu6_mmu_cleanup(struct ipu6_mmu *mmu)
+void ipu6_mmu_cleanup(struct ipu_mmu *mmu)
 {
 	struct ipu6_dma_mapping *dmap = mmu->dmap;
 

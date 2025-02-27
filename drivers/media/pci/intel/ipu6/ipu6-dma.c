@@ -26,7 +26,7 @@ struct vm_info {
 	unsigned long size;
 };
 
-static struct vm_info *get_vm_info(struct ipu6_mmu *mmu, dma_addr_t iova)
+static struct vm_info *get_vm_info(struct ipu_mmu *mmu, dma_addr_t iova)
 {
 	struct vm_info *info, *save;
 
@@ -117,7 +117,7 @@ void ipu6_dma_sync_single(struct ipu6_bus_device *sys, dma_addr_t dma_handle,
 	void *vaddr;
 	u32 offset;
 	struct vm_info *info;
-	struct ipu6_mmu *mmu = sys->mmu;
+	struct ipu_mmu *mmu = sys->mmu;
 
 	info = get_vm_info(mmu, dma_handle);
 	if (WARN_ON(!info))
@@ -156,7 +156,7 @@ void *ipu6_dma_alloc(struct ipu6_bus_device *sys, size_t size,
 	struct device *dev = &sys->auxdev.dev;
 	struct pci_dev *pdev = sys->isp->pdev;
 	dma_addr_t pci_dma_addr, ipu6_iova;
-	struct ipu6_mmu *mmu = sys->mmu;
+	struct ipu_mmu *mmu = sys->mmu;
 	struct vm_info *info;
 	unsigned long count;
 	struct page **pages;
@@ -244,7 +244,7 @@ EXPORT_SYMBOL_NS_GPL(ipu6_dma_alloc, "INTEL_IPU6");
 void ipu6_dma_free(struct ipu6_bus_device *sys, size_t size, void *vaddr,
 		   dma_addr_t dma_handle, unsigned long attrs)
 {
-	struct ipu6_mmu *mmu = sys->mmu;
+	struct ipu_mmu *mmu = sys->mmu;
 	struct pci_dev *pdev = sys->isp->pdev;
 	struct iova *iova = find_iova(&mmu->dmap->iovad, PHYS_PFN(dma_handle));
 	dma_addr_t pci_dma_addr, ipu6_iova;
@@ -298,7 +298,7 @@ int ipu6_dma_mmap(struct ipu6_bus_device *sys, struct vm_area_struct *vma,
 		  void *addr, dma_addr_t iova, size_t size,
 		  unsigned long attrs)
 {
-	struct ipu6_mmu *mmu = sys->mmu;
+	struct ipu_mmu *mmu = sys->mmu;
 	size_t count = PFN_UP(size);
 	struct vm_info *info;
 	size_t i;
@@ -332,7 +332,7 @@ void ipu6_dma_unmap_sg(struct ipu6_bus_device *sys, struct scatterlist *sglist,
 		       unsigned long attrs)
 {
 	struct device *dev = &sys->auxdev.dev;
-	struct ipu6_mmu *mmu = sys->mmu;
+	struct ipu_mmu *mmu = sys->mmu;
 	struct iova *iova = find_iova(&mmu->dmap->iovad,
 				      PHYS_PFN(sg_dma_address(sglist)));
 	struct scatterlist *sg;
@@ -376,7 +376,7 @@ int ipu6_dma_map_sg(struct ipu6_bus_device *sys, struct scatterlist *sglist,
 		    unsigned long attrs)
 {
 	struct device *dev = &sys->auxdev.dev;
-	struct ipu6_mmu *mmu = sys->mmu;
+	struct ipu_mmu *mmu = sys->mmu;
 	struct scatterlist *sg;
 	struct iova *iova;
 	size_t npages = 0;
@@ -466,7 +466,7 @@ int ipu6_dma_get_sgtable(struct ipu6_bus_device *sys, struct sg_table *sgt,
 			 unsigned long attrs)
 {
 	struct device *dev = &sys->auxdev.dev;
-	struct ipu6_mmu *mmu = sys->mmu;
+	struct ipu_mmu *mmu = sys->mmu;
 	struct vm_info *info;
 	int n_pages;
 	int ret = 0;

@@ -35,7 +35,7 @@ struct ipu_mmu_info {
 	struct ipu6_dma_mapping *dmap;
 };
 
-struct ipu6_mmu {
+struct ipu_mmu {
 	struct list_head node;
 
 	struct ipu6_mmu_hw *mmu_hw;
@@ -55,15 +55,15 @@ struct ipu6_mmu {
 	bool ready;
 	spinlock_t ready_lock;	/* Serialize access to bool ready */
 
-	void (*tlb_invalidate)(struct ipu6_mmu *mmu);
+	void (*tlb_invalidate)(struct ipu_mmu *mmu);
 };
 
-struct ipu6_mmu *ipu6_mmu_init(struct device *dev,
+struct ipu_mmu *ipu6_mmu_init(struct device *dev,
 			       void __iomem *base, int mmid,
 			       const struct ipu6_hw_variants *hw);
-void ipu6_mmu_cleanup(struct ipu6_mmu *mmu);
-int ipu6_mmu_hw_init(struct ipu6_mmu *mmu);
-void ipu6_mmu_hw_cleanup(struct ipu6_mmu *mmu);
+void ipu6_mmu_cleanup(struct ipu_mmu *mmu);
+int ipu6_mmu_hw_init(struct ipu_mmu *mmu);
+void ipu6_mmu_hw_cleanup(struct ipu_mmu *mmu);
 int ipu6_mmu_map(struct ipu_mmu_info *mmu_info, unsigned long iova,
 		 phys_addr_t paddr, size_t size);
 void ipu6_mmu_unmap(struct ipu_mmu_info *mmu_info, unsigned long iova,

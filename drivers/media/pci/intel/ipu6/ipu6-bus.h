@@ -23,7 +23,7 @@ struct ipu6_bus_device {
 	const struct ipu6_auxdrv_data *auxdrv_data;
 	struct list_head list;
 	void *pdata;
-	struct ipu6_mmu *mmu;
+	struct ipu_mmu *mmu;
 	struct ipu6_device *isp;
 	struct ipu6_buttress_ctrl *ctrl;
 	u64 dma_mask;

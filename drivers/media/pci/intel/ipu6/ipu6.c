@@ -708,8 +708,8 @@ buttress_exit:
 static void ipu6_pci_remove(struct pci_dev *pdev)
 {
 	struct ipu6_device *isp = pci_get_drvdata(pdev);
-	struct ipu6_mmu *isys_mmu = isp->isys->mmu;
-	struct ipu6_mmu *psys_mmu = isp->psys->mmu;
+	struct ipu_mmu *isys_mmu = isp->isys->mmu;
+	struct ipu_mmu *psys_mmu = isp->psys->mmu;
 
 	devm_free_irq(&pdev->dev, pdev->irq, isp);
 	ipu6_cpd_free_pkg_dir(isp->psys);

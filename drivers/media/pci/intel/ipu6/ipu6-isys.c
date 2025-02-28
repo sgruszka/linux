@@ -343,7 +343,7 @@ static void ipu6_isys_csi2_isr(struct ipu6_isys_csi2 *csi2)
 
 irqreturn_t isys_isr(struct ipu_bus_device *adev)
 {
-	struct ipu6_isys *isys = ipu6_bus_get_drvdata(adev);
+	struct ipu6_isys *isys = dev_get_drvdata(&adev->auxdev.dev);
 	void __iomem *base = isys->pdata->base;
 	u32 status_sw, status_csi;
 	u32 ctrl0_status, ctrl0_clear;
@@ -852,7 +852,7 @@ static void isys_unregister_devices(struct ipu6_isys *isys)
 static int isys_runtime_pm_resume(struct device *dev)
 {
 	struct ipu_bus_device *adev = to_ipu_bus_device(dev);
-	struct ipu6_isys *isys = ipu6_bus_get_drvdata(adev);
+	struct ipu6_isys *isys = dev_get_drvdata(&adev->auxdev.dev);
 	struct ipu_device *isp = adev->isp;
 	unsigned long flags;
 	int ret;
@@ -1220,7 +1220,7 @@ static u32 resp_type_to_index(int type)
 
 static int isys_isr_one(struct ipu_bus_device *adev)
 {
-	struct ipu6_isys *isys = ipu6_bus_get_drvdata(adev);
+	struct ipu6_isys *isys = dev_get_drvdata(&adev->auxdev.dev);
 	struct ipu6_fw_isys_resp_info_abi *resp;
 	struct ipu6_isys_stream *stream;
 	struct ipu6_isys_csi2 *csi2 = NULL;
@@ -1292,7 +1292,7 @@ static int isys_isr_one(struct ipu_bus_device *adev)
 		 * firmware only release the capture msg until software
 		 * get pin_data_ready event
 		 */
-		ipu6_put_fw_msg_buf(ipu6_bus_get_drvdata(adev), resp->buf_id);
+		ipu6_put_fw_msg_buf(isys, resp->buf_id);
 		if (resp->pin_id < IPU6_ISYS_OUTPUT_PINS &&
 		    stream->output_pins[resp->pin_id].pin_ready)
 			stream->output_pins[resp->pin_id].pin_ready(stream,

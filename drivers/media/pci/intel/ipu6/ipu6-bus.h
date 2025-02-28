@@ -44,7 +44,6 @@ struct ipu_auxdrv_data {
 	container_of(to_auxiliary_dev(_dev), struct ipu_bus_device, auxdev)
 #define auxdev_to_adev(_auxdev) \
 	container_of(_auxdev, struct ipu_bus_device, auxdev)
-#define ipu6_bus_get_drvdata(adev) dev_get_drvdata(&(adev)->auxdev.dev)
 
 struct ipu_bus_device *
 ipu6_bus_initialize_device(struct pci_dev *pdev, struct device *parent,

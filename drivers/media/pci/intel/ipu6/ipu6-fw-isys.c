@@ -185,7 +185,7 @@ void ipu6_fw_isys_cleanup(struct ipu6_isys *isys)
 
 static void start_sp(struct ipu_bus_device *adev)
 {
-	struct ipu6_isys *isys = ipu6_bus_get_drvdata(adev);
+	struct ipu6_isys *isys = dev_get_drvdata(&adev->auxdev.dev);
 	void __iomem *spc_regs_base = isys->pdata->base +
 		isys->pdata->ipdata->hw_variant.spc_offset;
 	u32 val = IPU6_ISYS_SPC_STATUS_START |
@@ -199,7 +199,7 @@ static void start_sp(struct ipu_bus_device *adev)
 
 static int query_sp(struct ipu_bus_device *adev)
 {
-	struct ipu6_isys *isys = ipu6_bus_get_drvdata(adev);
+	struct ipu6_isys *isys = dev_get_drvdata(&adev->auxdev.dev);
 	void __iomem *spc_regs_base = isys->pdata->base +
 		isys->pdata->ipdata->hw_variant.spc_offset;
 	u32 val;

@@ -5,7 +5,7 @@
 #define IPU6_CPD_H
 
 struct ipu_device;
-struct ipu6_bus_device;
+struct ipu_bus_device;
 
 #define IPU6_CPD_SIZE_OF_FW_ARCH_VERSION	7
 #define IPU6_CPD_SIZE_OF_SYSTEM_VERSION		11
@@ -98,8 +98,8 @@ struct ipu6_cpd_client_pkg_hdr {
 	u32 prog_bin_size;
 } __packed;
 
-int ipu6_cpd_create_pkg_dir(struct ipu6_bus_device *adev, const void *src);
-void ipu6_cpd_free_pkg_dir(struct ipu6_bus_device *adev);
+int ipu6_cpd_create_pkg_dir(struct ipu_bus_device *adev, const void *src);
+void ipu6_cpd_free_pkg_dir(struct ipu_bus_device *adev);
 int ipu6_cpd_validate_cpd_file(struct ipu_device *isp, const void *cpd_file,
 			       unsigned long cpd_file_size);
 #endif /* IPU6_CPD_H */

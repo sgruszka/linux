@@ -316,7 +316,7 @@ ipu6_buttress_ipc_send(struct ipu_device *isp,
 	return ipu6_buttress_ipc_send_bulk(isp, &msg, 1);
 }
 
-static irqreturn_t ipu6_buttress_call_isr(struct ipu6_bus_device *adev)
+static irqreturn_t ipu6_buttress_call_isr(struct ipu_bus_device *adev)
 {
 	irqreturn_t ret = IRQ_WAKE_THREAD;
 
@@ -335,7 +335,7 @@ static irqreturn_t ipu6_buttress_call_isr(struct ipu6_bus_device *adev)
 irqreturn_t ipu6_buttress_isr(int irq, void *isp_ptr)
 {
 	struct ipu_device *isp = isp_ptr;
-	struct ipu6_bus_device *adev[] = { isp->isys, isp->psys };
+	struct ipu_bus_device *adev[] = { isp->isys, isp->psys };
 	struct ipu6_buttress *b = &isp->buttress;
 	u32 reg_irq_sts = BUTTRESS_REG_ISR_STATUS;
 	irqreturn_t ret = IRQ_NONE;
@@ -423,7 +423,7 @@ irqreturn_t ipu6_buttress_isr(int irq, void *isp_ptr)
 irqreturn_t ipu6_buttress_isr_threaded(int irq, void *isp_ptr)
 {
 	struct ipu_device *isp = isp_ptr;
-	struct ipu6_bus_device *adev[] = { isp->isys, isp->psys };
+	struct ipu_bus_device *adev[] = { isp->isys, isp->psys };
 	const struct ipu_auxdrv_data *drv_data = NULL;
 	irqreturn_t ret = IRQ_NONE;
 	unsigned int i;
@@ -446,7 +446,7 @@ irqreturn_t ipu6_buttress_isr_threaded(int irq, void *isp_ptr)
 int ipu6_buttress_power(struct device *dev, struct ipu_buttress_ctrl *ctrl,
 			bool on)
 {
-	struct ipu_device *isp = to_ipu6_bus_device(dev)->isp;
+	struct ipu_device *isp = to_ipu_bus_device(dev)->isp;
 	u32 pwr_sts, val;
 	int ret;
 
@@ -538,7 +538,7 @@ int ipu6_buttress_reset_authentication(struct ipu_device *isp)
 	return 0;
 }
 
-int ipu6_buttress_map_fw_image(struct ipu6_bus_device *sys,
+int ipu6_buttress_map_fw_image(struct ipu_bus_device *sys,
 			       const struct firmware *fw, struct sg_table *sgt)
 {
 	bool is_vmalloc = is_vmalloc_addr(fw->data);
@@ -600,7 +600,7 @@ out:
 }
 EXPORT_SYMBOL_NS_GPL(ipu6_buttress_map_fw_image, "INTEL_IPU6");
 
-void ipu6_buttress_unmap_fw_image(struct ipu6_bus_device *sys,
+void ipu6_buttress_unmap_fw_image(struct ipu_bus_device *sys,
 				  struct sg_table *sgt)
 {
 	struct pci_dev *pdev = sys->isp->pdev;

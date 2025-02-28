@@ -20,7 +20,7 @@
 #include "ipu6-isys-csi2.h"
 #include "ipu6-isys-video.h"
 
-struct ipu6_bus_device;
+struct ipu_bus_device;
 
 #define IPU6_ISYS_ENTITY_PREFIX		"Intel IPU6"
 /* FW support max 16 streams */
@@ -130,7 +130,7 @@ struct sensor_async_sd {
 struct ipu6_isys {
 	struct media_device media_dev;
 	struct v4l2_device v4l2_dev;
-	struct ipu6_bus_device *adev;
+	struct ipu_bus_device *adev;
 
 	int power;
 	spinlock_t power_lock;
@@ -186,7 +186,7 @@ void ipu6_cleanup_fw_msg_bufs(struct ipu6_isys *isys);
 extern const struct v4l2_ioctl_ops ipu6_isys_ioctl_ops;
 
 void isys_setup_hw(struct ipu6_isys *isys);
-irqreturn_t isys_isr(struct ipu6_bus_device *adev);
+irqreturn_t isys_isr(struct ipu_bus_device *adev);
 void update_watermark_setting(struct ipu6_isys *isys);
 
 int ipu6_isys_mcd_phy_set_power(struct ipu6_isys *isys,

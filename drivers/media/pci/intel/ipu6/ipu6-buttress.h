@@ -12,7 +12,7 @@
 struct device;
 struct firmware;
 struct ipu_device;
-struct ipu6_bus_device;
+struct ipu_bus_device;
 
 #define BUTTRESS_PS_FREQ_STEP		25U
 #define BUTTRESS_MIN_FORCE_PS_FREQ	(BUTTRESS_PS_FREQ_STEP * 8)
@@ -61,10 +61,10 @@ struct ipu6_ipc_buttress_bulk_msg {
 
 int ipu6_buttress_ipc_reset(struct ipu_device *isp,
 			    struct ipu6_buttress_ipc *ipc);
-int ipu6_buttress_map_fw_image(struct ipu6_bus_device *sys,
+int ipu6_buttress_map_fw_image(struct ipu_bus_device *sys,
 			       const struct firmware *fw,
 			       struct sg_table *sgt);
-void ipu6_buttress_unmap_fw_image(struct ipu6_bus_device *sys,
+void ipu6_buttress_unmap_fw_image(struct ipu_bus_device *sys,
 				  struct sg_table *sgt);
 int ipu6_buttress_power(struct device *dev, struct ipu_buttress_ctrl *ctrl,
 			bool on);

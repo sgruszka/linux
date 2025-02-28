@@ -5,7 +5,7 @@
 #define IPU6_FW_COM_H
 
 struct ipu6_fw_com_context;
-struct ipu6_bus_device;
+struct ipu_bus_device;
 
 struct ipu6_fw_syscom_queue_config {
 	unsigned int queue_size;	/* tokens per queue */
@@ -25,14 +25,14 @@ struct ipu6_fw_com_cfg {
 	/* firmware-specific configuration data */
 	void *specific_addr;
 	unsigned int specific_size;
-	int (*cell_ready)(struct ipu6_bus_device *adev);
-	void (*cell_start)(struct ipu6_bus_device *adev);
+	int (*cell_ready)(struct ipu_bus_device *adev);
+	void (*cell_start)(struct ipu_bus_device *adev);
 
 	unsigned int buttress_boot_offset;
 };
 
 void *ipu6_fw_com_prepare(struct ipu6_fw_com_cfg *cfg,
-			  struct ipu6_bus_device *adev, void __iomem *base);
+			  struct ipu_bus_device *adev, void __iomem *base);
 
 int ipu6_fw_com_open(struct ipu6_fw_com_context *ctx);
 bool ipu6_fw_com_ready(struct ipu6_fw_com_context *ctx);

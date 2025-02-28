@@ -302,7 +302,7 @@ static u16 get_hsfreq_by_mbps(u32 mbps)
 static int ipu6_isys_dwc_phy_config(struct ipu6_isys *isys,
 				    u32 phy_id, u32 mbps)
 {
-	struct ipu6_bus_device *adev = isys->adev;
+	struct ipu_bus_device *adev = isys->adev;
 	struct device *dev = &adev->auxdev.dev;
 	struct ipu_device *isp = adev->isp;
 	u32 cfg_clk_freqrange;

@@ -365,13 +365,13 @@ static void ipu6_internal_pdata_init(struct ipu_device *isp)
 	}
 }
 
-static struct ipu6_bus_device *
+static struct ipu_bus_device *
 ipu6_isys_init(struct pci_dev *pdev, struct device *parent,
 	       struct ipu_buttress_ctrl *ctrl, void __iomem *base,
 	       const struct ipu6_isys_internal_pdata *ipdata)
 {
 	struct device *dev = &pdev->dev;
-	struct ipu6_bus_device *isys_adev;
+	struct ipu_bus_device *isys_adev;
 	struct ipu6_isys_pdata *pdata;
 	int ret;
 
@@ -416,12 +416,12 @@ ipu6_isys_init(struct pci_dev *pdev, struct device *parent,
 	return isys_adev;
 }
 
-static struct ipu6_bus_device *
+static struct ipu_bus_device *
 ipu6_psys_init(struct pci_dev *pdev, struct device *parent,
 	       struct ipu_buttress_ctrl *ctrl, void __iomem *base,
 	       const struct ipu6_psys_internal_pdata *ipdata)
 {
-	struct ipu6_bus_device *psys_adev;
+	struct ipu_bus_device *psys_adev;
 	struct ipu6_psys_pdata *pdata;
 	int ret;
 

@@ -100,7 +100,7 @@ enum ltr_did_type {
 
 #define ISYS_PM_QOS_VALUE	300
 
-static int isys_isr_one(struct ipu6_bus_device *adev);
+static int isys_isr_one(struct ipu_bus_device *adev);
 
 static int
 isys_complete_ext_device_registration(struct ipu6_isys *isys,
@@ -341,7 +341,7 @@ static void ipu6_isys_csi2_isr(struct ipu6_isys_csi2 *csi2)
 	}
 }
 
-irqreturn_t isys_isr(struct ipu6_bus_device *adev)
+irqreturn_t isys_isr(struct ipu_bus_device *adev)
 {
 	struct ipu6_isys *isys = ipu6_bus_get_drvdata(adev);
 	void __iomem *base = isys->pdata->base;
@@ -851,7 +851,7 @@ static void isys_unregister_devices(struct ipu6_isys *isys)
 
 static int isys_runtime_pm_resume(struct device *dev)
 {
-	struct ipu6_bus_device *adev = to_ipu6_bus_device(dev);
+	struct ipu_bus_device *adev = to_ipu_bus_device(dev);
 	struct ipu6_isys *isys = ipu6_bus_get_drvdata(adev);
 	struct ipu_device *isp = adev->isp;
 	unsigned long flags;
@@ -883,7 +883,7 @@ static int isys_runtime_pm_resume(struct device *dev)
 
 static int isys_runtime_pm_suspend(struct device *dev)
 {
-	struct ipu6_bus_device *adev = to_ipu6_bus_device(dev);
+	struct ipu_bus_device *adev = to_ipu_bus_device(dev);
 	struct ipu6_isys *isys;
 	unsigned long flags;
 
@@ -1044,7 +1044,7 @@ static int isys_probe(struct auxiliary_device *auxdev,
 		      const struct auxiliary_device_id *auxdev_id)
 {
 	const struct ipu6_isys_internal_csi2_pdata *csi2_pdata;
-	struct ipu6_bus_device *adev = auxdev_to_adev(auxdev);
+	struct ipu_bus_device *adev = auxdev_to_adev(auxdev);
 	struct ipu_device *isp = adev->isp;
 	const struct firmware *fw;
 	struct ipu6_isys *isys;
@@ -1156,7 +1156,7 @@ release_firmware:
 
 static void isys_remove(struct auxiliary_device *auxdev)
 {
-	struct ipu6_bus_device *adev = auxdev_to_adev(auxdev);
+	struct ipu_bus_device *adev = auxdev_to_adev(auxdev);
 	struct ipu6_isys *isys = dev_get_drvdata(&auxdev->dev);
 	struct ipu_device *isp = adev->isp;
 	unsigned int i;
@@ -1218,7 +1218,7 @@ static u32 resp_type_to_index(int type)
 	return  ARRAY_SIZE(fw_msg) - 1;
 }
 
-static int isys_isr_one(struct ipu6_bus_device *adev)
+static int isys_isr_one(struct ipu_bus_device *adev)
 {
 	struct ipu6_isys *isys = ipu6_bus_get_drvdata(adev);
 	struct ipu6_fw_isys_resp_info_abi *resp;

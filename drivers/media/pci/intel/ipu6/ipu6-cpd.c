@@ -159,7 +159,7 @@ static int ipu6_cpd_parse_module_data(struct ipu_device *isp,
 	return 0;
 }
 
-int ipu6_cpd_create_pkg_dir(struct ipu6_bus_device *adev, const void *src)
+int ipu6_cpd_create_pkg_dir(struct ipu_bus_device *adev, const void *src)
 {
 	dma_addr_t dma_addr_src = sg_dma_address(adev->fw_sgt.sgl);
 	const struct ipu6_cpd_ent *ent, *man_ent, *met_ent;
@@ -218,7 +218,7 @@ int ipu6_cpd_create_pkg_dir(struct ipu6_bus_device *adev, const void *src)
 }
 EXPORT_SYMBOL_NS_GPL(ipu6_cpd_create_pkg_dir, "INTEL_IPU6");
 
-void ipu6_cpd_free_pkg_dir(struct ipu6_bus_device *adev)
+void ipu6_cpd_free_pkg_dir(struct ipu_bus_device *adev)
 {
 	ipu6_dma_free(adev, adev->pkg_dir_size, adev->pkg_dir,
 		      adev->pkg_dir_dma_addr, 0);

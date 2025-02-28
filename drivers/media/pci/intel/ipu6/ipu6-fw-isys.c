@@ -183,7 +183,7 @@ void ipu6_fw_isys_cleanup(struct ipu6_isys *isys)
 	isys->fwcom = NULL;
 }
 
-static void start_sp(struct ipu6_bus_device *adev)
+static void start_sp(struct ipu_bus_device *adev)
 {
 	struct ipu6_isys *isys = ipu6_bus_get_drvdata(adev);
 	void __iomem *spc_regs_base = isys->pdata->base +
@@ -197,7 +197,7 @@ static void start_sp(struct ipu6_bus_device *adev)
 	writel(val, spc_regs_base + IPU6_ISYS_REG_SPC_STATUS_CTRL);
 }
 
-static int query_sp(struct ipu6_bus_device *adev)
+static int query_sp(struct ipu_bus_device *adev)
 {
 	struct ipu6_isys *isys = ipu6_bus_get_drvdata(adev);
 	void __iomem *spc_regs_base = isys->pdata->base +

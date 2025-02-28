@@ -684,7 +684,7 @@ get_sof_sequence_by_timestamp(struct ipu6_isys_stream *stream,
 static u64 get_sof_ns_delta(struct ipu6_isys_video *av,
 			    struct ipu6_fw_isys_resp_info_abi *info)
 {
-	struct ipu6_bus_device *adev = av->isys->adev;
+	struct ipu_bus_device *adev = av->isys->adev;
 	struct ipu_device *isp = adev->isp;
 	u64 delta, tsc_now;
 
@@ -818,7 +818,7 @@ int ipu6_isys_queue_init(struct ipu6_isys_queue *aq)
 {
 	struct ipu6_isys *isys = ipu6_isys_queue_to_video(aq)->isys;
 	struct ipu6_isys_video *av = ipu6_isys_queue_to_video(aq);
-	struct ipu6_bus_device *adev = isys->adev;
+	struct ipu_bus_device *adev = isys->adev;
 	int ret;
 
 	/* no support for userptr */

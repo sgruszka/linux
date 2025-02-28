@@ -81,10 +81,10 @@ struct ipu6_fw_syscom_config {
 };
 
 struct ipu6_fw_com_context {
-	struct ipu6_bus_device *adev;
+	struct ipu_bus_device *adev;
 	void __iomem *dmem_addr;
-	int (*cell_ready)(struct ipu6_bus_device *adev);
-	void (*cell_start)(struct ipu6_bus_device *adev);
+	int (*cell_ready)(struct ipu_bus_device *adev);
+	void (*cell_start)(struct ipu_bus_device *adev);
 
 	void *dma_buffer;
 	dma_addr_t dma_addr;
@@ -155,7 +155,7 @@ static void ipu6_sys_queue_init(struct ipu6_fw_sys_queue *q, unsigned int size,
 }
 
 void *ipu6_fw_com_prepare(struct ipu6_fw_com_cfg *cfg,
-			  struct ipu6_bus_device *adev, void __iomem *base)
+			  struct ipu_bus_device *adev, void __iomem *base)
 {
 	size_t conf_size, inq_size, outq_size, specific_size;
 	struct ipu6_fw_syscom_config *config_host_addr;

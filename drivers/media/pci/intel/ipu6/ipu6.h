@@ -12,7 +12,7 @@
 
 struct firmware;
 struct pci_dev;
-struct ipu6_bus_device;
+struct ipu_bus_device;
 
 #define IPU6_NAME			"intel-ipu6"
 #define IPU6_MEDIA_DEV_MODEL_NAME	"ipu6"
@@ -73,8 +73,8 @@ static inline bool is_ipu6_tgl(u8 hw_ver)
 struct ipu_device {
 	struct pci_dev *pdev;
 	struct list_head devices;
-	struct ipu6_bus_device *isys;
-	struct ipu6_bus_device *psys;
+	struct ipu_bus_device *isys;
+	struct ipu_bus_device *psys;
 	struct ipu6_buttress buttress;
 
 	const struct firmware *cpd_fw;

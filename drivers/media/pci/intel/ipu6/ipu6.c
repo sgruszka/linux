@@ -208,7 +208,7 @@ static struct ipu6_psys_internal_pdata psys_ipdata = {
 	},
 };
 
-static const struct ipu6_buttress_ctrl isys_buttress_ctrl = {
+static const struct ipu_buttress_ctrl isys_buttress_ctrl = {
 	.ratio = IPU6_IS_FREQ_CTL_DEFAULT_RATIO,
 	.qos_floor = IPU6_IS_FREQ_CTL_DEFAULT_QOS_FLOOR_RATIO,
 	.freq_ctl = IPU6_BUTTRESS_REG_IS_FREQ_CTL,
@@ -218,7 +218,7 @@ static const struct ipu6_buttress_ctrl isys_buttress_ctrl = {
 	.pwr_sts_off = IPU6_BUTTRESS_PWR_STATE_DN_DONE,
 };
 
-static const struct ipu6_buttress_ctrl psys_buttress_ctrl = {
+static const struct ipu_buttress_ctrl psys_buttress_ctrl = {
 	.ratio = IPU6_PS_FREQ_CTL_DEFAULT_RATIO,
 	.qos_floor = IPU6_PS_FREQ_CTL_DEFAULT_QOS_FLOOR_RATIO,
 	.freq_ctl = IPU6_BUTTRESS_REG_PS_FREQ_CTL,
@@ -367,7 +367,7 @@ static void ipu6_internal_pdata_init(struct ipu6_device *isp)
 
 static struct ipu6_bus_device *
 ipu6_isys_init(struct pci_dev *pdev, struct device *parent,
-	       struct ipu6_buttress_ctrl *ctrl, void __iomem *base,
+	       struct ipu_buttress_ctrl *ctrl, void __iomem *base,
 	       const struct ipu6_isys_internal_pdata *ipdata)
 {
 	struct device *dev = &pdev->dev;
@@ -418,7 +418,7 @@ ipu6_isys_init(struct pci_dev *pdev, struct device *parent,
 
 static struct ipu6_bus_device *
 ipu6_psys_init(struct pci_dev *pdev, struct device *parent,
-	       struct ipu6_buttress_ctrl *ctrl, void __iomem *base,
+	       struct ipu_buttress_ctrl *ctrl, void __iomem *base,
 	       const struct ipu6_psys_internal_pdata *ipdata)
 {
 	struct ipu6_bus_device *psys_adev;
@@ -502,7 +502,7 @@ static void ipu6_configure_vc_mechanism(struct ipu6_device *isp)
 
 static int ipu6_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 {
-	struct ipu6_buttress_ctrl *isys_ctrl = NULL, *psys_ctrl = NULL;
+	struct ipu_buttress_ctrl *isys_ctrl = NULL, *psys_ctrl = NULL;
 	struct device *dev = &pdev->dev;
 	void __iomem *isys_base = NULL;
 	void __iomem *psys_base = NULL;

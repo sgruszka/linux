@@ -20,7 +20,7 @@ struct ipu_buttress_ctrl;
 struct ipu6_bus_device {
 	struct auxiliary_device auxdev;
 	const struct auxiliary_driver *auxdrv;
-	const struct ipu6_auxdrv_data *auxdrv_data;
+	const struct ipu_auxdrv_data *auxdrv_data;
 	struct list_head list;
 	void *pdata;
 	struct ipu_mmu *mmu;
@@ -34,7 +34,7 @@ struct ipu6_bus_device {
 	unsigned int pkg_dir_size;
 };
 
-struct ipu6_auxdrv_data {
+struct ipu_auxdrv_data {
 	irqreturn_t (*isr)(struct ipu6_bus_device *adev);
 	irqreturn_t (*isr_threaded)(struct ipu6_bus_device *adev);
 	bool wake_isr_thread;

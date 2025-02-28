@@ -424,7 +424,7 @@ irqreturn_t ipu6_buttress_isr_threaded(int irq, void *isp_ptr)
 {
 	struct ipu6_device *isp = isp_ptr;
 	struct ipu6_bus_device *adev[] = { isp->isys, isp->psys };
-	const struct ipu6_auxdrv_data *drv_data = NULL;
+	const struct ipu_auxdrv_data *drv_data = NULL;
 	irqreturn_t ret = IRQ_NONE;
 	unsigned int i;
 

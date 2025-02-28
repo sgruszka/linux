@@ -24,7 +24,7 @@ struct ipu6_bus_device {
 	struct list_head list;
 	void *pdata;
 	struct ipu_mmu *mmu;
-	struct ipu6_device *isp;
+	struct ipu_device *isp;
 	struct ipu_buttress_ctrl *ctrl;
 	u64 dma_mask;
 	const struct firmware *fw;

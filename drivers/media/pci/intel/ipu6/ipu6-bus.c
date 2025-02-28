@@ -87,7 +87,7 @@ ipu6_bus_initialize_device(struct pci_dev *pdev, struct device *parent,
 {
 	struct auxiliary_device *auxdev;
 	struct ipu6_bus_device *adev;
-	struct ipu6_device *isp = pci_get_drvdata(pdev);
+	struct ipu_device *isp = pci_get_drvdata(pdev);
 	int ret;
 
 	adev = kzalloc(sizeof(*adev), GFP_KERNEL);
@@ -143,7 +143,7 @@ int ipu6_bus_add_device(struct ipu6_bus_device *adev)
 
 void ipu6_bus_del_devices(struct pci_dev *pdev)
 {
-	struct ipu6_device *isp = pci_get_drvdata(pdev);
+	struct ipu_device *isp = pci_get_drvdata(pdev);
 	struct ipu6_bus_device *adev, *save;
 
 	mutex_lock(&ipu6_bus_mutex);

@@ -570,7 +570,7 @@ static int ipu6_isys_mcd_phy_ready(struct ipu6_isys *isys, u8 id)
 static void ipu6_isys_mcd_phy_common_init(struct ipu6_isys *isys)
 {
 	struct ipu6_bus_device *adev = isys->adev;
-	struct ipu6_device *isp = adev->isp;
+	struct ipu_device *isp = adev->isp;
 	void __iomem *isp_base = isp->base;
 	struct sensor_async_sd *s_asd;
 	struct v4l2_async_connection *asc;
@@ -624,7 +624,7 @@ static int ipu6_isys_mcd_phy_config(struct ipu6_isys *isys)
 	struct device *dev = &isys->adev->auxdev.dev;
 	struct ipu6_bus_device *adev = isys->adev;
 	const struct phy_reg **phy_config_regs;
-	struct ipu6_device *isp = adev->isp;
+	struct ipu_device *isp = adev->isp;
 	void __iomem *isp_base = isp->base;
 	struct sensor_async_sd *s_asd;
 	struct ipu6_isys_csi2_config cfg;

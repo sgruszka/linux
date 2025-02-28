@@ -70,7 +70,7 @@ static inline bool is_ipu6_tgl(u8 hw_ver)
 /* Virtualization factor to calculate the available virtual pages */
 #define IPU6_DEVICE_GDA_VIRT_FACTOR	32
 
-struct ipu6_device {
+struct ipu_device {
 	struct pci_dev *pdev;
 	struct list_head devices;
 	struct ipu6_bus_device *isys;
@@ -335,7 +335,7 @@ struct ipu6_psys_pdata {
 };
 
 int ipu6_fw_authenticate(void *data, u64 val);
-void ipu6_configure_spc(struct ipu6_device *isp,
+void ipu6_configure_spc(struct ipu_device *isp,
 			const struct ipu6_hw_variants *hw_variant,
 			int pkg_dir_idx, void __iomem *base, u64 *pkg_dir,
 			dma_addr_t pkg_dir_dma_addr);

@@ -685,7 +685,7 @@ static u64 get_sof_ns_delta(struct ipu6_isys_video *av,
 			    struct ipu6_fw_isys_resp_info_abi *info)
 {
 	struct ipu6_bus_device *adev = av->isys->adev;
-	struct ipu6_device *isp = adev->isp;
+	struct ipu_device *isp = adev->isp;
 	u64 delta, tsc_now;
 
 	ipu6_buttress_tsc_read(isp, &tsc_now);

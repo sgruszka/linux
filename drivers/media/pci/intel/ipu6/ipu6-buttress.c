@@ -60,7 +60,7 @@ static const u32 ipu6_adev_irq_mask[2] = {
 	BUTTRESS_ISR_PS_IRQ
 };
 
-int ipu6_buttress_ipc_reset(struct ipu6_device *isp,
+int ipu6_buttress_ipc_reset(struct ipu_device *isp,
 			    struct ipu6_buttress_ipc *ipc)
 {
 	unsigned int retries = BUTTRESS_IPC_RESET_RETRY;
@@ -176,7 +176,7 @@ int ipu6_buttress_ipc_reset(struct ipu6_device *isp,
 	return -ETIMEDOUT;
 }
 
-static void ipu6_buttress_ipc_validity_close(struct ipu6_device *isp,
+static void ipu6_buttress_ipc_validity_close(struct ipu_device *isp,
 					     struct ipu6_buttress_ipc *ipc)
 {
 	writel(BUTTRESS_IU2CSECSR_IPC_PEER_DEASSERTED_REG_VALID_REQ,
@@ -184,7 +184,7 @@ static void ipu6_buttress_ipc_validity_close(struct ipu6_device *isp,
 }
 
 static int
-ipu6_buttress_ipc_validity_open(struct ipu6_device *isp,
+ipu6_buttress_ipc_validity_open(struct ipu_device *isp,
 				struct ipu6_buttress_ipc *ipc)
 {
 	unsigned int mask = BUTTRESS_IU2CSECSR_IPC_PEER_ACKED_REG_VALID;
@@ -206,7 +206,7 @@ ipu6_buttress_ipc_validity_open(struct ipu6_device *isp,
 	return ret;
 }
 
-static void ipu6_buttress_ipc_recv(struct ipu6_device *isp,
+static void ipu6_buttress_ipc_recv(struct ipu_device *isp,
 				   struct ipu6_buttress_ipc *ipc, u32 *ipc_msg)
 {
 	if (ipc_msg)
@@ -214,7 +214,7 @@ static void ipu6_buttress_ipc_recv(struct ipu6_device *isp,
 	writel(0, isp->base + ipc->db0_in);
 }
 
-static int ipu6_buttress_ipc_send_bulk(struct ipu6_device *isp,
+static int ipu6_buttress_ipc_send_bulk(struct ipu_device *isp,
 				       struct ipu6_ipc_buttress_bulk_msg *msgs,
 				       u32 size)
 {
@@ -302,7 +302,7 @@ out:
 }
 
 static int
-ipu6_buttress_ipc_send(struct ipu6_device *isp,
+ipu6_buttress_ipc_send(struct ipu_device *isp,
 		       u32 ipc_msg, u32 size, bool require_resp,
 		       u32 expected_resp)
 {
@@ -334,7 +334,7 @@ static irqreturn_t ipu6_buttress_call_isr(struct ipu6_bus_device *adev)
 
 irqreturn_t ipu6_buttress_isr(int irq, void *isp_ptr)
 {
-	struct ipu6_device *isp = isp_ptr;
+	struct ipu_device *isp = isp_ptr;
 	struct ipu6_bus_device *adev[] = { isp->isys, isp->psys };
 	struct ipu6_buttress *b = &isp->buttress;
 	u32 reg_irq_sts = BUTTRESS_REG_ISR_STATUS;
@@ -422,7 +422,7 @@ irqreturn_t ipu6_buttress_isr(int irq, void *isp_ptr)
 
 irqreturn_t ipu6_buttress_isr_threaded(int irq, void *isp_ptr)
 {
-	struct ipu6_device *isp = isp_ptr;
+	struct ipu_device *isp = isp_ptr;
 	struct ipu6_bus_device *adev[] = { isp->isys, isp->psys };
 	const struct ipu_auxdrv_data *drv_data = NULL;
 	irqreturn_t ret = IRQ_NONE;
@@ -446,7 +446,7 @@ irqreturn_t ipu6_buttress_isr_threaded(int irq, void *isp_ptr)
 int ipu6_buttress_power(struct device *dev, struct ipu_buttress_ctrl *ctrl,
 			bool on)
 {
-	struct ipu6_device *isp = to_ipu6_bus_device(dev)->isp;
+	struct ipu_device *isp = to_ipu6_bus_device(dev)->isp;
 	u32 pwr_sts, val;
 	int ret;
 
@@ -485,7 +485,7 @@ int ipu6_buttress_power(struct device *dev, struct ipu_buttress_ctrl *ctrl,
 	return ret;
 }
 
-bool ipu6_buttress_get_secure_mode(struct ipu6_device *isp)
+bool ipu6_buttress_get_secure_mode(struct ipu_device *isp)
 {
 	u32 val;
 
@@ -494,7 +494,7 @@ bool ipu6_buttress_get_secure_mode(struct ipu6_device *isp)
 	return val & BUTTRESS_SECURITY_CTL_FW_SECURE_MODE;
 }
 
-bool ipu6_buttress_auth_done(struct ipu6_device *isp)
+bool ipu6_buttress_auth_done(struct ipu_device *isp)
 {
 	u32 val;
 
@@ -508,7 +508,7 @@ bool ipu6_buttress_auth_done(struct ipu6_device *isp)
 }
 EXPORT_SYMBOL_NS_GPL(ipu6_buttress_auth_done, "INTEL_IPU6");
 
-int ipu6_buttress_reset_authentication(struct ipu6_device *isp)
+int ipu6_buttress_reset_authentication(struct ipu_device *isp)
 {
 	int ret;
 	u32 val;
@@ -611,7 +611,7 @@ void ipu6_buttress_unmap_fw_image(struct ipu6_bus_device *sys,
 }
 EXPORT_SYMBOL_NS_GPL(ipu6_buttress_unmap_fw_image, "INTEL_IPU6");
 
-int ipu6_buttress_authenticate(struct ipu6_device *isp)
+int ipu6_buttress_authenticate(struct ipu_device *isp)
 {
 	struct ipu6_buttress *b = &isp->buttress;
 	struct ipu6_psys_pdata *psys_pdata;
@@ -724,7 +724,7 @@ out_unlock:
 	return ret;
 }
 
-static int ipu6_buttress_send_tsc_request(struct ipu6_device *isp)
+static int ipu6_buttress_send_tsc_request(struct ipu_device *isp)
 {
 	u32 val, mask, done;
 	int ret;
@@ -751,7 +751,7 @@ static int ipu6_buttress_send_tsc_request(struct ipu6_device *isp)
 	return ret;
 }
 
-int ipu6_buttress_start_tsc_sync(struct ipu6_device *isp)
+int ipu6_buttress_start_tsc_sync(struct ipu_device *isp)
 {
 	unsigned int i;
 
@@ -776,7 +776,7 @@ int ipu6_buttress_start_tsc_sync(struct ipu6_device *isp)
 }
 EXPORT_SYMBOL_NS_GPL(ipu6_buttress_start_tsc_sync, "INTEL_IPU6");
 
-void ipu6_buttress_tsc_read(struct ipu6_device *isp, u64 *val)
+void ipu6_buttress_tsc_read(struct ipu_device *isp, u64 *val)
 {
 	u32 tsc_hi_1, tsc_hi_2, tsc_lo;
 	unsigned long flags;
@@ -798,7 +798,7 @@ void ipu6_buttress_tsc_read(struct ipu6_device *isp, u64 *val)
 }
 EXPORT_SYMBOL_NS_GPL(ipu6_buttress_tsc_read, "INTEL_IPU6");
 
-u64 ipu6_buttress_tsc_ticks_to_ns(u64 ticks, const struct ipu6_device *isp)
+u64 ipu6_buttress_tsc_ticks_to_ns(u64 ticks, const struct ipu_device *isp)
 {
 	u64 ns = ticks * 10000;
 
@@ -813,7 +813,7 @@ u64 ipu6_buttress_tsc_ticks_to_ns(u64 ticks, const struct ipu6_device *isp)
 }
 EXPORT_SYMBOL_NS_GPL(ipu6_buttress_tsc_ticks_to_ns, "INTEL_IPU6");
 
-void ipu6_buttress_restore(struct ipu6_device *isp)
+void ipu6_buttress_restore(struct ipu_device *isp)
 {
 	struct ipu6_buttress *b = &isp->buttress;
 
@@ -822,7 +822,7 @@ void ipu6_buttress_restore(struct ipu6_device *isp)
 	writel(b->wdt_cached_value, isp->base + BUTTRESS_REG_WDT);
 }
 
-int ipu6_buttress_init(struct ipu6_device *isp)
+int ipu6_buttress_init(struct ipu_device *isp)
 {
 	int ret, ipc_reset_retry = BUTTRESS_CSE_IPC_RESET_RETRY;
 	struct ipu6_buttress *b = &isp->buttress;
@@ -899,7 +899,7 @@ int ipu6_buttress_init(struct ipu6_device *isp)
 	return ret;
 }
 
-void ipu6_buttress_exit(struct ipu6_device *isp)
+void ipu6_buttress_exit(struct ipu_device *isp)
 {
 	struct ipu6_buttress *b = &isp->buttress;
 

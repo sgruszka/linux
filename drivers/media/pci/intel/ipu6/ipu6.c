@@ -229,7 +229,7 @@ static const struct ipu_buttress_ctrl psys_buttress_ctrl = {
 };
 
 static void
-ipu6_pkg_dir_configure_spc(struct ipu6_device *isp,
+ipu6_pkg_dir_configure_spc(struct ipu_device *isp,
 			   const struct ipu6_hw_variants *hw_variant,
 			   int pkg_dir_idx, void __iomem *base,
 			   u64 *pkg_dir, dma_addr_t pkg_dir_vied_address)
@@ -262,7 +262,7 @@ ipu6_pkg_dir_configure_spc(struct ipu6_device *isp,
 	writel(pkg_dir_vied_address, base + hw_variant->dmem_offset);
 }
 
-void ipu6_configure_spc(struct ipu6_device *isp,
+void ipu6_configure_spc(struct ipu_device *isp,
 			const struct ipu6_hw_variants *hw_variant,
 			int pkg_dir_idx, void __iomem *base, u64 *pkg_dir,
 			dma_addr_t pkg_dir_dma_addr)
@@ -288,7 +288,7 @@ EXPORT_SYMBOL_NS_GPL(ipu6_configure_spc, "INTEL_IPU6");
 #define IPU6_TGL_ISYS_CSI2_NPORTS	8
 #define IPU6EP_MTL_ISYS_CSI2_NPORTS	6
 
-static void ipu6_internal_pdata_init(struct ipu6_device *isp)
+static void ipu6_internal_pdata_init(struct ipu_device *isp)
 {
 	u8 hw_ver = isp->hw_ver;
 
@@ -483,7 +483,7 @@ static int ipu6_pci_config_setup(struct pci_dev *dev, u8 hw_ver)
 	return 0;
 }
 
-static void ipu6_configure_vc_mechanism(struct ipu6_device *isp)
+static void ipu6_configure_vc_mechanism(struct ipu_device *isp)
 {
 	u32 val = readl(isp->base + BUTTRESS_REG_BTRS_CTRL);
 
@@ -506,7 +506,7 @@ static int ipu6_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	struct device *dev = &pdev->dev;
 	void __iomem *isys_base = NULL;
 	void __iomem *psys_base = NULL;
-	struct ipu6_device *isp;
+	struct ipu_device *isp;
 	phys_addr_t phys;
 	u32 val, version, sku_id;
 	int ret;
@@ -707,7 +707,7 @@ buttress_exit:
 
 static void ipu6_pci_remove(struct pci_dev *pdev)
 {
-	struct ipu6_device *isp = pci_get_drvdata(pdev);
+	struct ipu_device *isp = pci_get_drvdata(pdev);
 	struct ipu_mmu *isys_mmu = isp->isys->mmu;
 	struct ipu_mmu *psys_mmu = isp->psys->mmu;
 
@@ -730,14 +730,14 @@ static void ipu6_pci_remove(struct pci_dev *pdev)
 
 static void ipu6_pci_reset_prepare(struct pci_dev *pdev)
 {
-	struct ipu6_device *isp = pci_get_drvdata(pdev);
+	struct ipu_device *isp = pci_get_drvdata(pdev);
 
 	pm_runtime_forbid(&isp->pdev->dev);
 }
 
 static void ipu6_pci_reset_done(struct pci_dev *pdev)
 {
-	struct ipu6_device *isp = pci_get_drvdata(pdev);
+	struct ipu_device *isp = pci_get_drvdata(pdev);
 
 	ipu6_buttress_restore(isp);
 	if (isp->secure_mode)
@@ -762,7 +762,7 @@ static int ipu6_suspend(struct device *dev)
 static int ipu6_resume(struct device *dev)
 {
 	struct pci_dev *pdev = to_pci_dev(dev);
-	struct ipu6_device *isp = pci_get_drvdata(pdev);
+	struct ipu_device *isp = pci_get_drvdata(pdev);
 	struct ipu6_buttress *b = &isp->buttress;
 	int ret;
 
@@ -797,7 +797,7 @@ static int ipu6_resume(struct device *dev)
 static int ipu6_runtime_resume(struct device *dev)
 {
 	struct pci_dev *pdev = to_pci_dev(dev);
-	struct ipu6_device *isp = pci_get_drvdata(pdev);
+	struct ipu_device *isp = pci_get_drvdata(pdev);
 	int ret;
 
 	ipu6_configure_vc_mechanism(isp);

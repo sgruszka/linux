@@ -63,7 +63,7 @@ static inline const struct ipu6_cpd_ent *ipu6_cpd_get_entry(const void *cpd,
 #define ipu6_cpd_get_moduledata(cpd) ipu6_cpd_get_entry(cpd, MODULEDATA_IDX)
 
 static const struct ipu6_cpd_metadata_cmpnt_hdr *
-ipu6_cpd_metadata_get_cmpnt(struct ipu6_device *isp, const void *metadata,
+ipu6_cpd_metadata_get_cmpnt(struct ipu_device *isp, const void *metadata,
 			    unsigned int metadata_size, u8 idx)
 {
 	size_t extn_size = sizeof(struct ipu6_cpd_metadata_extn);
@@ -80,7 +80,7 @@ ipu6_cpd_metadata_get_cmpnt(struct ipu6_device *isp, const void *metadata,
 	return metadata + extn_size + idx * isp->cpd_metadata_cmpnt_size;
 }
 
-static u32 ipu6_cpd_metadata_cmpnt_version(struct ipu6_device *isp,
+static u32 ipu6_cpd_metadata_cmpnt_version(struct ipu_device *isp,
 					   const void *metadata,
 					   unsigned int metadata_size, u8 idx)
 {
@@ -93,7 +93,7 @@ static u32 ipu6_cpd_metadata_cmpnt_version(struct ipu6_device *isp,
 	return cmpnt->ver;
 }
 
-static int ipu6_cpd_metadata_get_cmpnt_id(struct ipu6_device *isp,
+static int ipu6_cpd_metadata_get_cmpnt_id(struct ipu_device *isp,
 					  const void *metadata,
 					  unsigned int metadata_size, u8 idx)
 {
@@ -106,7 +106,7 @@ static int ipu6_cpd_metadata_get_cmpnt_id(struct ipu6_device *isp,
 	return cmpnt->id;
 }
 
-static int ipu6_cpd_parse_module_data(struct ipu6_device *isp,
+static int ipu6_cpd_parse_module_data(struct ipu_device *isp,
 				      const void *module_data,
 				      unsigned int module_data_size,
 				      dma_addr_t dma_addr_module_data,
@@ -163,7 +163,7 @@ int ipu6_cpd_create_pkg_dir(struct ipu6_bus_device *adev, const void *src)
 {
 	dma_addr_t dma_addr_src = sg_dma_address(adev->fw_sgt.sgl);
 	const struct ipu6_cpd_ent *ent, *man_ent, *met_ent;
-	struct ipu6_device *isp = adev->isp;
+	struct ipu_device *isp = adev->isp;
 	unsigned int man_sz, met_sz;
 	void *pkg_dir_pos;
 	int ret;
@@ -225,7 +225,7 @@ void ipu6_cpd_free_pkg_dir(struct ipu6_bus_device *adev)
 }
 EXPORT_SYMBOL_NS_GPL(ipu6_cpd_free_pkg_dir, "INTEL_IPU6");
 
-static int ipu6_cpd_validate_cpd(struct ipu6_device *isp, const void *cpd,
+static int ipu6_cpd_validate_cpd(struct ipu_device *isp, const void *cpd,
 				 unsigned long cpd_size,
 				 unsigned long data_size)
 {
@@ -261,7 +261,7 @@ static int ipu6_cpd_validate_cpd(struct ipu6_device *isp, const void *cpd,
 	return 0;
 }
 
-static int ipu6_cpd_validate_moduledata(struct ipu6_device *isp,
+static int ipu6_cpd_validate_moduledata(struct ipu_device *isp,
 					const void *moduledata,
 					u32 moduledata_size)
 {
@@ -287,7 +287,7 @@ static int ipu6_cpd_validate_moduledata(struct ipu6_device *isp,
 	return 0;
 }
 
-static int ipu6_cpd_validate_metadata(struct ipu6_device *isp,
+static int ipu6_cpd_validate_metadata(struct ipu_device *isp,
 				      const void *metadata, u32 meta_size)
 {
 	const struct ipu6_cpd_metadata_extn *extn = metadata;
@@ -316,7 +316,7 @@ static int ipu6_cpd_validate_metadata(struct ipu6_device *isp,
 	return 0;
 }
 
-int ipu6_cpd_validate_cpd_file(struct ipu6_device *isp, const void *cpd_file,
+int ipu6_cpd_validate_cpd_file(struct ipu_device *isp, const void *cpd_file,
 			       unsigned long cpd_file_size)
 {
 	const struct ipu6_cpd_hdr *hdr = cpd_file;

@@ -451,7 +451,7 @@ static void set_iwake_ltrdid(struct ipu6_isys *isys, u16 ltr, u16 did,
 	struct device *dev = &isys->adev->auxdev.dev;
 	u16 ltr_val, ltr_scale = LTR_SCALE_1024NS;
 	u16 did_val, did_scale = DID_SCALE_1US;
-	struct ipu6_device *isp = isys->adev->isp;
+	struct ipu_device *isp = isys->adev->isp;
 	union fabric_ctrl fc;
 
 	switch (use) {
@@ -716,7 +716,7 @@ static const struct v4l2_async_notifier_operations isys_async_ops = {
 #define ISYS_MAX_PORTS 8
 static int isys_notifier_init(struct ipu6_isys *isys)
 {
-	struct ipu6_device *isp = isys->adev->isp;
+	struct ipu_device *isp = isys->adev->isp;
 	struct device *dev = &isp->pdev->dev;
 	unsigned int i;
 	int ret;
@@ -853,7 +853,7 @@ static int isys_runtime_pm_resume(struct device *dev)
 {
 	struct ipu6_bus_device *adev = to_ipu6_bus_device(dev);
 	struct ipu6_isys *isys = ipu6_bus_get_drvdata(adev);
-	struct ipu6_device *isp = adev->isp;
+	struct ipu_device *isp = adev->isp;
 	unsigned long flags;
 	int ret;
 
@@ -1045,7 +1045,7 @@ static int isys_probe(struct auxiliary_device *auxdev,
 {
 	const struct ipu6_isys_internal_csi2_pdata *csi2_pdata;
 	struct ipu6_bus_device *adev = auxdev_to_adev(auxdev);
-	struct ipu6_device *isp = adev->isp;
+	struct ipu_device *isp = adev->isp;
 	const struct firmware *fw;
 	struct ipu6_isys *isys;
 	unsigned int i;
@@ -1158,7 +1158,7 @@ static void isys_remove(struct auxiliary_device *auxdev)
 {
 	struct ipu6_bus_device *adev = auxdev_to_adev(auxdev);
 	struct ipu6_isys *isys = dev_get_drvdata(&auxdev->dev);
-	struct ipu6_device *isp = adev->isp;
+	struct ipu_device *isp = adev->isp;
 	unsigned int i;
 
 	free_fw_msg_bufs(isys);

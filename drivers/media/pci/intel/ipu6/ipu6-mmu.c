@@ -544,7 +544,7 @@ int ipu6_mmu_hw_init(struct ipu_mmu *mmu)
 }
 EXPORT_SYMBOL_NS_GPL(ipu6_mmu_hw_init, "INTEL_IPU6");
 
-static struct ipu_mmu_info *ipu6_mmu_alloc(struct ipu6_device *isp)
+static struct ipu_mmu_info *ipu6_mmu_alloc(struct ipu_device *isp)
 {
 	struct ipu_mmu_info *mmu_info;
 	int ret;
@@ -609,7 +609,7 @@ void ipu6_mmu_hw_cleanup(struct ipu_mmu *mmu)
 }
 EXPORT_SYMBOL_NS_GPL(ipu6_mmu_hw_cleanup, "INTEL_IPU6");
 
-static struct ipu6_dma_mapping *alloc_dma_mapping(struct ipu6_device *isp)
+static struct ipu6_dma_mapping *alloc_dma_mapping(struct ipu_device *isp)
 {
 	struct ipu6_dma_mapping *dmap;
 
@@ -749,7 +749,7 @@ struct ipu_mmu *ipu6_mmu_init(struct device *dev,
 			       void __iomem *base, int mmid,
 			       const struct ipu6_hw_variants *hw)
 {
-	struct ipu6_device *isp = pci_get_drvdata(to_pci_dev(dev));
+	struct ipu_device *isp = pci_get_drvdata(to_pci_dev(dev));
 	struct ipu6_mmu_pdata *pdata;
 	struct ipu_mmu *mmu;
 	unsigned int i;

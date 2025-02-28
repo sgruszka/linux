@@ -11,7 +11,7 @@
 
 struct device;
 struct firmware;
-struct ipu6_device;
+struct ipu_device;
 struct ipu6_bus_device;
 
 #define BUTTRESS_PS_FREQ_STEP		25U
@@ -59,7 +59,7 @@ struct ipu6_ipc_buttress_bulk_msg {
 	u8 cmd_size;
 };
 
-int ipu6_buttress_ipc_reset(struct ipu6_device *isp,
+int ipu6_buttress_ipc_reset(struct ipu_device *isp,
 			    struct ipu6_buttress_ipc *ipc);
 int ipu6_buttress_map_fw_image(struct ipu6_bus_device *sys,
 			       const struct firmware *fw,
@@ -68,19 +68,19 @@ void ipu6_buttress_unmap_fw_image(struct ipu6_bus_device *sys,
 				  struct sg_table *sgt);
 int ipu6_buttress_power(struct device *dev, struct ipu_buttress_ctrl *ctrl,
 			bool on);
-bool ipu6_buttress_get_secure_mode(struct ipu6_device *isp);
-int ipu6_buttress_authenticate(struct ipu6_device *isp);
-int ipu6_buttress_reset_authentication(struct ipu6_device *isp);
-bool ipu6_buttress_auth_done(struct ipu6_device *isp);
-int ipu6_buttress_start_tsc_sync(struct ipu6_device *isp);
-void ipu6_buttress_tsc_read(struct ipu6_device *isp, u64 *val);
-u64 ipu6_buttress_tsc_ticks_to_ns(u64 ticks, const struct ipu6_device *isp);
+bool ipu6_buttress_get_secure_mode(struct ipu_device *isp);
+int ipu6_buttress_authenticate(struct ipu_device *isp);
+int ipu6_buttress_reset_authentication(struct ipu_device *isp);
+bool ipu6_buttress_auth_done(struct ipu_device *isp);
+int ipu6_buttress_start_tsc_sync(struct ipu_device *isp);
+void ipu6_buttress_tsc_read(struct ipu_device *isp, u64 *val);
+u64 ipu6_buttress_tsc_ticks_to_ns(u64 ticks, const struct ipu_device *isp);
 
 irqreturn_t ipu6_buttress_isr(int irq, void *isp_ptr);
 irqreturn_t ipu6_buttress_isr_threaded(int irq, void *isp_ptr);
-int ipu6_buttress_init(struct ipu6_device *isp);
-void ipu6_buttress_exit(struct ipu6_device *isp);
-void ipu6_buttress_csi_port_config(struct ipu6_device *isp,
+int ipu6_buttress_init(struct ipu_device *isp);
+void ipu6_buttress_exit(struct ipu_device *isp);
+void ipu6_buttress_csi_port_config(struct ipu_device *isp,
 				   u32 legacy, u32 combo);
-void ipu6_buttress_restore(struct ipu6_device *isp);
+void ipu6_buttress_restore(struct ipu_device *isp);
 #endif /* IPU6_BUTTRESS_H */

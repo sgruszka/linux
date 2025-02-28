@@ -304,7 +304,7 @@ static int ipu6_isys_dwc_phy_config(struct ipu6_isys *isys,
 {
 	struct ipu6_bus_device *adev = isys->adev;
 	struct device *dev = &adev->auxdev.dev;
-	struct ipu6_device *isp = adev->isp;
+	struct ipu_device *isp = adev->isp;
 	u32 cfg_clk_freqrange;
 	u32 osc_freq_target;
 	u32 index;

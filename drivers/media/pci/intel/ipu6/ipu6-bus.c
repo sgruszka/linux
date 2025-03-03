@@ -121,7 +121,7 @@ ipu_bus_initialize_device(struct pci_dev *pdev, struct device *parent,
 	return adev;
 }
 
-int ipu6_bus_add_device(struct ipu_bus_device *adev)
+int ipu_bus_add_device(struct ipu_bus_device *adev)
 {
 	struct auxiliary_device *auxdev = &adev->auxdev;
 	int ret;
@@ -141,7 +141,7 @@ int ipu6_bus_add_device(struct ipu_bus_device *adev)
 	return 0;
 }
 
-void ipu6_bus_del_devices(struct pci_dev *pdev)
+void ipu_bus_del_devices(struct pci_dev *pdev)
 {
 	struct ipu_device *isp = pci_get_drvdata(pdev);
 	struct ipu_bus_device *adev, *save;

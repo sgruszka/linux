@@ -407,7 +407,7 @@ ipu6_isys_init(struct pci_dev *pdev, struct device *parent,
 
 	isys_adev->mmu->dev = &isys_adev->auxdev.dev;
 
-	ret = ipu6_bus_add_device(isys_adev);
+	ret = ipu_bus_add_device(isys_adev);
 	if (ret) {
 		kfree(pdata);
 		return ERR_PTR(ret);
@@ -451,7 +451,7 @@ ipu6_psys_init(struct pci_dev *pdev, struct device *parent,
 
 	psys_adev->mmu->dev = &psys_adev->auxdev.dev;
 
-	ret = ipu6_bus_add_device(psys_adev);
+	ret = ipu_bus_add_device(psys_adev);
 	if (ret) {
 		kfree(pdata);
 		return ERR_PTR(ret);
@@ -697,7 +697,7 @@ out_ipu6_bus_del_devices:
 		ipu6_mmu_cleanup(isp->psys->mmu);
 	if (!IS_ERR_OR_NULL(isp->isys) && !IS_ERR_OR_NULL(isp->isys->mmu))
 		ipu6_mmu_cleanup(isp->isys->mmu);
-	ipu6_bus_del_devices(pdev);
+	ipu_bus_del_devices(pdev);
 	release_firmware(isp->cpd_fw);
 buttress_exit:
 	ipu6_buttress_exit(isp);
@@ -717,7 +717,7 @@ static void ipu6_pci_remove(struct pci_dev *pdev)
 	ipu6_buttress_unmap_fw_image(isp->psys, &isp->psys->fw_sgt);
 	ipu6_buttress_exit(isp);
 
-	ipu6_bus_del_devices(pdev);
+	ipu_bus_del_devices(pdev);
 
 	pm_runtime_forbid(&pdev->dev);
 	pm_runtime_get_noresume(&pdev->dev);

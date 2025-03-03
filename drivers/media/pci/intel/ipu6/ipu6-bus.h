@@ -49,7 +49,7 @@ struct ipu_bus_device *
 ipu_bus_initialize_device(struct pci_dev *pdev, struct device *parent,
 			   void *pdata, struct ipu_buttress_ctrl *ctrl,
 			   char *name);
-int ipu6_bus_add_device(struct ipu_bus_device *adev);
-void ipu6_bus_del_devices(struct pci_dev *pdev);
+int ipu_bus_add_device(struct ipu_bus_device *adev);
+void ipu_bus_del_devices(struct pci_dev *pdev);
 
 #endif

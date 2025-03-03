@@ -46,7 +46,7 @@ struct ipu_auxdrv_data {
 	container_of(_auxdev, struct ipu_bus_device, auxdev)
 
 struct ipu_bus_device *
-ipu6_bus_initialize_device(struct pci_dev *pdev, struct device *parent,
+ipu_bus_initialize_device(struct pci_dev *pdev, struct device *parent,
 			   void *pdata, struct ipu_buttress_ctrl *ctrl,
 			   char *name);
 int ipu6_bus_add_device(struct ipu_bus_device *adev);

@@ -81,7 +81,7 @@ static void ipu6_bus_release(struct device *dev)
 }
 
 struct ipu_bus_device *
-ipu6_bus_initialize_device(struct pci_dev *pdev, struct device *parent,
+ipu_bus_initialize_device(struct pci_dev *pdev, struct device *parent,
 			   void *pdata, struct ipu_buttress_ctrl *ctrl,
 			   char *name)
 {

@@ -388,7 +388,7 @@ ipu6_isys_init(struct pci_dev *pdev, struct device *parent,
 	pdata->base = base;
 	pdata->ipdata = ipdata;
 
-	isys_adev = ipu6_bus_initialize_device(pdev, parent, pdata, ctrl,
+	isys_adev = ipu_bus_initialize_device(pdev, parent, pdata, ctrl,
 					       IPU6_ISYS_NAME);
 	if (IS_ERR(isys_adev)) {
 		kfree(pdata);
@@ -432,7 +432,7 @@ ipu6_psys_init(struct pci_dev *pdev, struct device *parent,
 	pdata->base = base;
 	pdata->ipdata = ipdata;
 
-	psys_adev = ipu6_bus_initialize_device(pdev, parent, pdata, ctrl,
+	psys_adev = ipu_bus_initialize_device(pdev, parent, pdata, ctrl,
 					       IPU6_PSYS_NAME);
 	if (IS_ERR(psys_adev)) {
 		kfree(pdata);

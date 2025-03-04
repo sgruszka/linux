@@ -11,7 +11,7 @@
 #include <linux/scatterlist.h>
 #include <linux/types.h>
 
-#include "ipu6-bus.h"
+#include "../ipu/ipu.h"
 
 struct ipu_mmu_info;
 

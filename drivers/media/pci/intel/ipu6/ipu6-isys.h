@@ -16,12 +16,11 @@
 #include <media/v4l2-device.h>
 
 #include "ipu6.h"
-#include "ipu6-bus.h"
 #include "ipu6-fw-isys.h"
 #include "ipu6-isys-csi2.h"
 #include "ipu6-isys-video.h"
 
-struct ipu_bus_device;
+#include "../ipu/ipu.h"
 
 #define IPU6_ISYS_ENTITY_PREFIX		"Intel IPU6"
 /* FW support max 16 streams */

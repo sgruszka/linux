@@ -63,7 +63,7 @@ static void ipu6_isys_csi2_phy_config_by_port(struct ipu6_isys *isys,
 					      unsigned int port,
 					      unsigned int nlanes)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	void __iomem *base = isys->adev->isp->base;
 	unsigned int bbnum;
 	u32 val, reg, i;
@@ -139,7 +139,7 @@ static void ipu6_isys_csi2_rx_control(struct ipu6_isys *isys)
 static int ipu6_isys_csi2_set_port_cfg(struct ipu6_isys *isys,
 				       unsigned int port, unsigned int nlanes)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	unsigned int sip = port / 2;
 	unsigned int index;
 
@@ -171,7 +171,7 @@ ipu6_isys_csi2_set_timing(struct ipu6_isys *isys,
 			  const struct ipu6_isys_csi2_timing *timing,
 			  unsigned int port, unsigned int nlanes)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	void __iomem *reg;
 	u32 port_base;
 	u32 i;
@@ -207,7 +207,7 @@ int ipu6_isys_jsl_phy_set_power(struct ipu6_isys *isys,
 				const struct ipu6_isys_csi2_timing *timing,
 				bool on)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	void __iomem *isys_base = isys->pdata->base;
 	int ret = 0;
 	u32 nlanes;

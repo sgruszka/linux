@@ -107,7 +107,7 @@ isys_complete_ext_device_registration(struct ipu6_isys *isys,
 				      struct v4l2_subdev *sd,
 				      struct ipu6_isys_csi2_config *csi2)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	unsigned int i;
 	int ret;
 
@@ -198,7 +198,7 @@ static int isys_csi2_create_media_links(struct ipu6_isys *isys)
 {
 	const struct ipu6_isys_internal_csi2_pdata *csi2_pdata =
 		&isys->pdata->ipdata->csi2;
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	unsigned int i, j;
 	int ret;
 
@@ -418,7 +418,7 @@ static void get_lut_ltrdid(struct ipu6_isys *isys, struct ltr_did *pltr_did)
 
 static int set_iwake_register(struct ipu6_isys *isys, u32 index, u32 value)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	u32 req_id = index;
 	u32 offset = 0;
 	int ret;
@@ -448,7 +448,7 @@ static int set_iwake_register(struct ipu6_isys *isys, u32 index, u32 value)
 static void set_iwake_ltrdid(struct ipu6_isys *isys, u16 ltr, u16 did,
 			     enum ltr_did_type use)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	u16 ltr_val, ltr_scale = LTR_SCALE_1024NS;
 	u16 did_val, did_scale = DID_SCALE_1US;
 	struct ipu_device *isp = isys->adev->isp;
@@ -532,7 +532,7 @@ void update_watermark_setting(struct ipu6_isys *isys)
 {
 	struct isys_iwake_watermark *iwake_watermark = &isys->iwake_watermark;
 	u32 iwake_threshold, iwake_critical_threshold, page_num;
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	u32 calc_fill_time_us = 0, ltr = 0, did = 0;
 	struct video_stream_watermark *p_watermark;
 	enum ltr_did_type ltr_did_type;
@@ -680,18 +680,18 @@ static int isys_notifier_bound(struct v4l2_async_notifier *notifier,
 	int ret;
 
 	if (s_asd->csi2.port >= isys->pdata->ipdata->csi2.nports) {
-		dev_err(&isys->adev->auxdev.dev, "invalid csi2 port %u\n",
+		dev_err(isys_to_dev(isys), "invalid csi2 port %u\n",
 			s_asd->csi2.port);
 		return -EINVAL;
 	}
 
 	ret = ipu_bridge_instantiate_vcm(sd->dev);
 	if (ret) {
-		dev_err(&isys->adev->auxdev.dev, "instantiate vcm failed\n");
+		dev_err(isys_to_dev(isys), "instantiate vcm failed\n");
 		return ret;
 	}
 
-	dev_dbg(&isys->adev->auxdev.dev, "bind %s nlanes is %d port is %d\n",
+	dev_dbg(isys_to_dev(isys), "bind %s nlanes is %d port is %d\n",
 		sd->name, s_asd->csi2.nlanes, s_asd->csi2.port);
 	ret = isys_complete_ext_device_registration(isys, sd, &s_asd->csi2);
 	if (ret)
@@ -782,7 +782,7 @@ static void isys_notifier_cleanup(struct ipu6_isys *isys)
 
 static int isys_register_devices(struct ipu6_isys *isys)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	struct pci_dev *pdev = isys->adev->isp->pdev;
 	int ret;
 
@@ -985,7 +985,7 @@ static int alloc_fw_msg_bufs(struct ipu6_isys *isys, int amount)
 struct isys_fw_msgs *ipu6_get_fw_msg_buf(struct ipu6_isys_stream *stream)
 {
 	struct ipu6_isys *isys = stream->isys;
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	struct isys_fw_msgs *msg;
 	unsigned long flags;
 	int ret;

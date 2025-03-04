@@ -63,7 +63,7 @@ enum phy_fsm_state {
 static void dwc_dphy_write(struct ipu6_isys *isys, u32 phy_id, u32 addr,
 			   u32 data)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	void __iomem *isys_base = isys->pdata->base;
 	void __iomem *base = isys_base + IPU6_DWC_DPHY_BASE(phy_id);
 
@@ -74,7 +74,7 @@ static void dwc_dphy_write(struct ipu6_isys *isys, u32 phy_id, u32 addr,
 
 static u32 dwc_dphy_read(struct ipu6_isys *isys, u32 phy_id, u32 addr)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	void __iomem *isys_base = isys->pdata->base;
 	void __iomem *base = isys_base + IPU6_DWC_DPHY_BASE(phy_id);
 	u32 data;
@@ -112,7 +112,7 @@ static u32 __maybe_unused dwc_dphy_read_mask(struct ipu6_isys *isys, u32 phy_id,
 static int dwc_dphy_ifc_read(struct ipu6_isys *isys, u32 phy_id, u32 addr,
 			     u32 *val)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	void __iomem *isys_base = isys->pdata->base;
 	void __iomem *base = isys_base + IPU6_DWC_DPHY_BASE(phy_id);
 	void __iomem *reg;
@@ -139,7 +139,7 @@ static int dwc_dphy_ifc_read(struct ipu6_isys *isys, u32 phy_id, u32 addr,
 static int dwc_dphy_ifc_write(struct ipu6_isys *isys, u32 phy_id, u32 addr,
 			      u32 data)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	void __iomem *isys_base = isys->pdata->base;
 	void __iomem *base = isys_base + IPU6_DWC_DPHY_BASE(phy_id);
 	void __iomem *reg;
@@ -189,7 +189,7 @@ static u32 dwc_dphy_ifc_read_mask(struct ipu6_isys *isys, u32 phy_id, u32 addr,
 
 static int dwc_dphy_pwr_up(struct ipu6_isys *isys, u32 phy_id)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	u32 fsm_state;
 	int ret;
 
@@ -401,7 +401,7 @@ static void ipu6_isys_dwc_phy_aggr_setup(struct ipu6_isys *isys, u32 master,
 #define PHY_E	4
 static int ipu6_isys_dwc_phy_powerup_ack(struct ipu6_isys *isys, u32 phy_id)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	u32 rescal_done;
 	int ret;
 
@@ -434,7 +434,7 @@ static int ipu6_isys_dwc_phy_powerup_ack(struct ipu6_isys *isys, u32 phy_id)
 
 static void ipu6_isys_dwc_phy_reset(struct ipu6_isys *isys, u32 phy_id)
 {
-	dev_dbg(&isys->adev->auxdev.dev, "Reset phy %u", phy_id);
+	dev_dbg(isys_to_dev(isys), "Reset phy %u", phy_id);
 
 	dwc_dphy_write(isys, phy_id, IPU6_DWC_DPHY_SHUTDOWNZ, 0);
 	dwc_dphy_write(isys, phy_id, IPU6_DWC_DPHY_RSTZ, 0);
@@ -449,7 +449,7 @@ int ipu6_isys_dwc_phy_set_power(struct ipu6_isys *isys,
 				const struct ipu6_isys_csi2_timing *timing,
 				bool on)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	void __iomem *isys_base = isys->pdata->base;
 	u32 phy_id, primary, secondary;
 	u32 nlanes, port, mbps;

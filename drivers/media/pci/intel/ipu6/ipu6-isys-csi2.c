@@ -86,7 +86,7 @@ s64 ipu6_isys_csi2_get_link_freq(struct ipu6_isys_csi2 *csi2)
 	if (!csi2)
 		return -EINVAL;
 
-	dev = &csi2->isys->adev->auxdev.dev;
+	dev = isys_to_dev(csi2->isys);
 	src_pad = media_entity_remote_source_pad_unique(&csi2->asd.sd.entity);
 	if (IS_ERR(src_pad)) {
 		dev_err(dev, "can't get source pad of %s (%ld)\n",
@@ -106,7 +106,7 @@ static int csi2_subscribe_event(struct v4l2_subdev *sd, struct v4l2_fh *fh,
 {
 	struct ipu6_isys_subdev *asd = to_ipu6_isys_subdev(sd);
 	struct ipu6_isys_csi2 *csi2 = to_ipu6_isys_csi2(asd);
-	struct device *dev = &csi2->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(csi2->isys);
 
 	dev_dbg(dev, "csi2 subscribe event(type %u id %u)\n",
 		sub->type, sub->id);
@@ -170,7 +170,7 @@ static int
 ipu6_isys_csi2_calc_timing(struct ipu6_isys_csi2 *csi2,
 			   struct ipu6_isys_csi2_timing *timing, s32 accinv)
 {
-	struct device *dev = &csi2->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(csi2->isys);
 	s64 link_freq;
 
 	link_freq = ipu6_isys_csi2_get_link_freq(csi2);
@@ -212,7 +212,7 @@ void ipu6_isys_register_errors(struct ipu6_isys_csi2 *csi2)
 
 void ipu6_isys_csi2_error(struct ipu6_isys_csi2 *csi2)
 {
-	struct device *dev = &csi2->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(csi2->isys);
 	const struct ipu6_csi2_error *errors;
 	u32 status;
 	u32 i;
@@ -237,7 +237,7 @@ static int ipu6_isys_csi2_set_stream(struct v4l2_subdev *sd,
 	struct ipu6_isys_subdev *asd = to_ipu6_isys_subdev(sd);
 	struct ipu6_isys_csi2 *csi2 = to_ipu6_isys_csi2(asd);
 	struct ipu6_isys *isys = csi2->isys;
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	struct ipu6_isys_csi2_config cfg;
 	unsigned int nports;
 	int ret = 0;
@@ -409,7 +409,7 @@ static int ipu6_isys_csi2_set_sel(struct v4l2_subdev *sd,
 				  struct v4l2_subdev_selection *sel)
 {
 	struct ipu6_isys_subdev *asd = to_ipu6_isys_subdev(sd);
-	struct device *dev = &asd->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(asd->isys);
 	struct v4l2_mbus_framefmt *sink_ffmt;
 	struct v4l2_mbus_framefmt *src_ffmt;
 	struct v4l2_rect *crop;
@@ -530,7 +530,7 @@ int ipu6_isys_csi2_init(struct ipu6_isys_csi2 *csi2,
 			struct ipu6_isys *isys,
 			void __iomem *base, unsigned int index)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	int ret;
 
 	csi2->isys = isys;
@@ -572,7 +572,7 @@ fail:
 void ipu6_isys_csi2_sof_event_by_stream(struct ipu6_isys_stream *stream)
 {
 	struct video_device *vdev = stream->asd->sd.devnode;
-	struct device *dev = &stream->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(stream->isys);
 	struct ipu6_isys_csi2 *csi2 = ipu6_isys_subdev_to_csi2(stream->asd);
 	struct v4l2_event ev = {
 		.type = V4L2_EVENT_FRAME_SYNC,
@@ -587,7 +587,7 @@ void ipu6_isys_csi2_sof_event_by_stream(struct ipu6_isys_stream *stream)
 
 void ipu6_isys_csi2_eof_event_by_stream(struct ipu6_isys_stream *stream)
 {
-	struct device *dev = &stream->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(stream->isys);
 	struct ipu6_isys_csi2 *csi2 = ipu6_isys_subdev_to_csi2(stream->asd);
 	u32 frame_sequence = atomic_read(&stream->sequence);
 
@@ -601,7 +601,7 @@ int ipu6_isys_csi2_get_remote_desc(u32 source_stream,
 				   struct v4l2_mbus_frame_desc_entry *entry)
 {
 	struct v4l2_mbus_frame_desc_entry *desc_entry = NULL;
-	struct device *dev = &csi2->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(csi2->isys);
 	struct v4l2_mbus_frame_desc desc;
 	struct v4l2_subdev *source;
 	struct media_pad *pad;

@@ -28,7 +28,7 @@ static const char send_msg_types[N_IPU6_FW_ISYS_SEND_TYPE][32] = {
 
 static int handle_proxy_response(struct ipu6_isys *isys, unsigned int req_id)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	struct ipu6_fw_isys_proxy_resp_info_abi *resp;
 	int ret;
 
@@ -53,7 +53,7 @@ int ipu6_fw_isys_send_proxy_token(struct ipu6_isys *isys,
 				  unsigned int offset, u32 value)
 {
 	struct ipu6_fw_com_context *ctx = isys->fwcom;
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	struct ipu6_fw_proxy_send_queue_token *token;
 	unsigned int timeout = 1000;
 	int ret;
@@ -97,7 +97,7 @@ int ipu6_fw_isys_complex_cmd(struct ipu6_isys *isys,
 			     size_t size, u16 send_type)
 {
 	struct ipu6_fw_com_context *ctx = isys->fwcom;
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	struct ipu6_fw_send_queue_token *token;
 
 	if (send_type >= N_IPU6_FW_ISYS_SEND_TYPE)
@@ -135,7 +135,7 @@ int ipu6_fw_isys_simple_cmd(struct ipu6_isys *isys,
 
 int ipu6_fw_isys_close(struct ipu6_isys *isys)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	int retry = IPU6_ISYS_CLOSE_RETRY;
 	unsigned long flags;
 	void *fwcom;
@@ -178,7 +178,7 @@ void ipu6_fw_isys_cleanup(struct ipu6_isys *isys)
 
 	ret = ipu6_fw_com_release(isys->fwcom, 1);
 	if (ret < 0)
-		dev_warn(&isys->adev->auxdev.dev,
+		dev_warn(isys_to_dev(isys),
 			 "Device busy, fw_com release failed.");
 	isys->fwcom = NULL;
 }
@@ -218,7 +218,7 @@ static int ipu6_isys_fwcom_cfg_init(struct ipu6_isys *isys,
 	unsigned int max_send_queues, max_sram_blocks, max_devq_size;
 	struct ipu6_fw_syscom_queue_config *input_queue_cfg;
 	struct ipu6_fw_syscom_queue_config *output_queue_cfg;
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	int type_proxy = IPU6_FW_ISYS_QUEUE_TYPE_PROXY;
 	int type_dev = IPU6_FW_ISYS_QUEUE_TYPE_DEV;
 	int type_msg = IPU6_FW_ISYS_QUEUE_TYPE_MSG;
@@ -323,7 +323,7 @@ static int ipu6_isys_fwcom_cfg_init(struct ipu6_isys *isys,
 
 int ipu6_fw_isys_init(struct ipu6_isys *isys, unsigned int num_streams)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	int retry = IPU6_ISYS_OPEN_RETRY;
 	struct ipu6_fw_com_cfg fwcom = {
 		.cell_start = start_sp,

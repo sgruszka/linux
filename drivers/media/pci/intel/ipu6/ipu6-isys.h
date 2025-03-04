@@ -16,6 +16,7 @@
 #include <media/v4l2-device.h>
 
 #include "ipu6.h"
+#include "ipu6-bus.h"
 #include "ipu6-fw-isys.h"
 #include "ipu6-isys-csi2.h"
 #include "ipu6-isys-video.h"
@@ -178,6 +179,11 @@ struct isys_fw_msgs {
 	struct list_head head;
 	dma_addr_t dma_addr;
 };
+
+static inline struct device *isys_to_dev(struct ipu6_isys *isys)
+{
+	return &isys->adev->auxdev.dev;
+}
 
 struct isys_fw_msgs *ipu6_get_fw_msg_buf(struct ipu6_isys_stream *stream);
 void ipu6_put_fw_msg_buf(struct ipu6_isys *isys, uintptr_t data);

@@ -11,7 +11,6 @@
 #include <linux/slab.h>
 #include <linux/types.h>
 
-#include "ipu6-bus.h"
 #include "ipu6-dma.h"
 #include "ipu6-fw-com.h"
 

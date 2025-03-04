@@ -10,7 +10,6 @@
 #include <linux/spinlock.h>
 #include <linux/types.h>
 
-#include "ipu6-bus.h"
 #include "ipu6-fw-com.h"
 #include "ipu6-isys.h"
 #include "ipu6-platform-isys-csi2-reg.h"

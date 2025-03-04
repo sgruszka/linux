@@ -13,7 +13,6 @@
 #include <linux/types.h>
 
 #include "ipu6.h"
-#include "ipu6-bus.h"
 #include "ipu6-cpd.h"
 #include "ipu6-dma.h"
 

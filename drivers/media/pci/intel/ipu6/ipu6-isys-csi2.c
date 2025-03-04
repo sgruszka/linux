@@ -19,7 +19,6 @@
 #include <media/v4l2-event.h>
 #include <media/v4l2-subdev.h>
 
-#include "ipu6-bus.h"
 #include "ipu6-isys.h"
 #include "ipu6-isys-csi2.h"
 #include "ipu6-isys-subdev.h"

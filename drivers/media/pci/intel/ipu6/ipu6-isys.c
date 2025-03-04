@@ -32,7 +32,6 @@
 #include <media/v4l2-device.h>
 #include <media/v4l2-fwnode.h>
 
-#include "ipu6-bus.h"
 #include "ipu6-cpd.h"
 #include "ipu6-dma.h"
 #include "ipu6-isys.h"

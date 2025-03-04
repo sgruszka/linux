@@ -23,7 +23,6 @@
 #include <linux/time64.h>
 
 #include "ipu6.h"
-#include "ipu6-bus.h"
 #include "ipu6-dma.h"
 #include "ipu6-buttress.h"
 #include "ipu6-platform-buttress-regs.h"

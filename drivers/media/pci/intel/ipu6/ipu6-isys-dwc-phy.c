@@ -10,7 +10,6 @@
 #include <linux/iopoll.h>
 #include <linux/math64.h>
 
-#include "ipu6-bus.h"
 #include "ipu6-isys.h"
 #include "ipu6-platform-isys-csi2-reg.h"
 

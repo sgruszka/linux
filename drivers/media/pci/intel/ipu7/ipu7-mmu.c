@@ -53,7 +53,7 @@
 
 #define MMU_TLB_INVALIDATE_TIMEOUT	2000
 
-static __maybe_unused void mmu_irq_handler(struct ipu7_mmu *mmu)
+static __maybe_unused void mmu_irq_handler(struct ipu_mmu *mmu)
 {
 	unsigned int i;
 	u32 irq_cause;
@@ -66,7 +66,7 @@ static __maybe_unused void mmu_irq_handler(struct ipu7_mmu *mmu)
 	}
 }
 
-static void tlb_invalidate(struct ipu7_mmu *mmu)
+static void tlb_invalidate(struct ipu_mmu *mmu)
 {
 	unsigned long flags;
 	unsigned int i;
@@ -394,7 +394,7 @@ static void __ipu7_mmu_unmap(struct ipu7_mmu_info *mmu_info,
 	l2_unmap(mmu_info, iova, 0, size);
 }
 
-static int allocate_trash_buffer(struct ipu7_mmu *mmu)
+static int allocate_trash_buffer(struct ipu_mmu *mmu)
 {
 	unsigned int n_pages = PFN_UP(IPU_MMUV2_TRASH_RANGE);
 	unsigned long iova_addr;
@@ -453,7 +453,7 @@ out_free_iova:
 	return ret;
 }
 
-static void __mmu_at_init(struct ipu7_mmu *mmu)
+static void __mmu_at_init(struct ipu_mmu *mmu)
 {
 	struct ipu7_mmu_info *mmu_info;
 	unsigned int i;
@@ -507,7 +507,7 @@ static void __mmu_at_init(struct ipu7_mmu *mmu)
 	}
 }
 
-static void __mmu_zlx_init(struct ipu7_mmu *mmu)
+static void __mmu_zlx_init(struct ipu_mmu *mmu)
 {
 	unsigned int i;
 
@@ -543,7 +543,7 @@ static void __mmu_zlx_init(struct ipu7_mmu *mmu)
 	}
 }
 
-int ipu7_mmu_hw_init(struct ipu7_mmu *mmu)
+int ipu7_mmu_hw_init(struct ipu_mmu *mmu)
 {
 	unsigned long flags;
 
@@ -639,7 +639,7 @@ err_free_info:
 	return NULL;
 }
 
-void ipu7_mmu_hw_cleanup(struct ipu7_mmu *mmu)
+void ipu7_mmu_hw_cleanup(struct ipu_mmu *mmu)
 {
 	unsigned long flags;
 
@@ -747,7 +747,7 @@ int ipu7_mmu_map(struct ipu7_mmu_info *mmu_info, unsigned long iova,
 	return __ipu7_mmu_map(mmu_info, iova, paddr, size);
 }
 
-static void ipu7_mmu_destroy(struct ipu7_mmu *mmu)
+static void ipu7_mmu_destroy(struct ipu_mmu *mmu)
 {
 	struct ipu7_dma_mapping *dmap = mmu->dmap;
 	struct ipu7_mmu_info *mmu_info = dmap->mmu_info;
@@ -790,13 +790,13 @@ static void ipu7_mmu_destroy(struct ipu7_mmu *mmu)
 	kfree(mmu_info);
 }
 
-struct ipu7_mmu *ipu7_mmu_init(struct device *dev,
+struct ipu_mmu *ipu7_mmu_init(struct device *dev,
 			       void __iomem *base, int mmid,
 			       const struct ipu7_hw_variants *hw)
 {
 	struct ipu_device *isp = pci_get_drvdata(to_pci_dev(dev));
 	struct ipu7_mmu_pdata *pdata;
-	struct ipu7_mmu *mmu;
+	struct ipu_mmu *mmu;
 	unsigned int i;
 
 	if (hw->nr_mmus > IPU_MMU_MAX_NUM)
@@ -841,7 +841,7 @@ struct ipu7_mmu *ipu7_mmu_init(struct device *dev,
 	return mmu;
 }
 
-void ipu7_mmu_cleanup(struct ipu7_mmu *mmu)
+void ipu7_mmu_cleanup(struct ipu_mmu *mmu)
 {
 	struct ipu7_dma_mapping *dmap = mmu->dmap;
 

@@ -14,7 +14,7 @@
 struct device;
 struct page;
 struct ipu7_hw_variants;
-struct ipu7_mmu;
+struct ipu_mmu;
 struct ipu7_mmu_info;
 
 #define ISYS_MMID 1
@@ -376,7 +376,7 @@ struct ipu7_mmu_info {
 	struct ipu7_dma_mapping *dmap;
 };
 
-struct ipu7_mmu {
+struct ipu_mmu {
 	struct list_head node;
 
 	struct ipu7_mmu_hw *mmu_hw;
@@ -396,15 +396,15 @@ struct ipu7_mmu {
 	bool ready;
 	spinlock_t ready_lock;	/* Serialize access to bool ready */
 
-	void (*tlb_invalidate)(struct ipu7_mmu *mmu);
+	void (*tlb_invalidate)(struct ipu_mmu *mmu);
 };
 
-struct ipu7_mmu *ipu7_mmu_init(struct device *dev,
+struct ipu_mmu *ipu7_mmu_init(struct device *dev,
 			       void __iomem *base, int mmid,
 			       const struct ipu7_hw_variants *hw);
-void ipu7_mmu_cleanup(struct ipu7_mmu *mmu);
-int ipu7_mmu_hw_init(struct ipu7_mmu *mmu);
-void ipu7_mmu_hw_cleanup(struct ipu7_mmu *mmu);
+void ipu7_mmu_cleanup(struct ipu_mmu *mmu);
+int ipu7_mmu_hw_init(struct ipu_mmu *mmu);
+void ipu7_mmu_hw_cleanup(struct ipu_mmu *mmu);
 int ipu7_mmu_map(struct ipu7_mmu_info *mmu_info, unsigned long iova,
 		 phys_addr_t paddr, size_t size);
 void ipu7_mmu_unmap(struct ipu7_mmu_info *mmu_info, unsigned long iova,

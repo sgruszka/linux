@@ -20,7 +20,7 @@
 
 struct pci_dev;
 struct ipu_buttress_ctrl;
-struct ipu7_mmu;
+struct ipu_mmu;
 struct ipu_device;
 
 enum ipu7_subsys {
@@ -36,7 +36,7 @@ struct ipu_bus_device {
 	struct list_head list;
 	enum ipu7_subsys subsys;
 	void *pdata;
-	struct ipu7_mmu *mmu;
+	struct ipu_mmu *mmu;
 	struct ipu_device *isp;
 	const struct ipu_buttress_ctrl *ctrl;
 	u64 dma_mask;

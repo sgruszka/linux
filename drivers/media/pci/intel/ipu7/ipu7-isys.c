@@ -719,7 +719,7 @@ static int isys_probe(struct auxiliary_device *auxdev,
 		return ret;
 
 	adev->auxdrv_data =
-		(const struct ipu7_auxdrv_data *)auxdev_id->driver_data;
+		(const struct ipu_auxdrv_data *)auxdev_id->driver_data;
 	adev->auxdrv = to_auxiliary_drv(auxdev->dev.driver);
 	isys->adev = adev;
 	isys->pdata = adev->pdata;
@@ -1134,7 +1134,7 @@ irqreturn_t isys_isr(struct ipu_bus_device *adev)
 	return IRQ_HANDLED;
 }
 
-static const struct ipu7_auxdrv_data ipu7_isys_auxdrv_data = {
+static const struct ipu_auxdrv_data ipu7_isys_auxdrv_data = {
 	.isr = isys_isr,
 	.isr_threaded = NULL,
 	.wake_isr_thread = false,

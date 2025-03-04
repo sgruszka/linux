@@ -32,7 +32,7 @@ enum ipu7_subsys {
 struct ipu_bus_device {
 	struct auxiliary_device auxdev;
 	const struct auxiliary_driver *auxdrv;
-	const struct ipu7_auxdrv_data *auxdrv_data;
+	const struct ipu_auxdrv_data *auxdrv_data;
 	struct list_head list;
 	enum ipu7_subsys subsys;
 	void *pdata;
@@ -48,7 +48,7 @@ struct ipu_bus_device {
 	u32 boot_config_size;
 };
 
-struct ipu7_auxdrv_data {
+struct ipu_auxdrv_data {
 	irqreturn_t (*isr)(struct ipu_bus_device *adev);
 	irqreturn_t (*isr_threaded)(struct ipu_bus_device *adev);
 	bool wake_isr_thread;

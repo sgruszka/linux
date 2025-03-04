@@ -579,7 +579,7 @@ int ipu7_mmu_hw_init(struct ipu7_mmu *mmu)
 }
 EXPORT_SYMBOL_NS_GPL(ipu7_mmu_hw_init, "INTEL_IPU7");
 
-static struct ipu7_mmu_info *ipu7_mmu_alloc(struct ipu7_device *isp)
+static struct ipu7_mmu_info *ipu7_mmu_alloc(struct ipu_device *isp)
 {
 	struct ipu7_mmu_info *mmu_info;
 	int ret;
@@ -649,7 +649,7 @@ void ipu7_mmu_hw_cleanup(struct ipu7_mmu *mmu)
 }
 EXPORT_SYMBOL_NS_GPL(ipu7_mmu_hw_cleanup, "INTEL_IPU7");
 
-static struct ipu7_dma_mapping *alloc_dma_mapping(struct ipu7_device *isp)
+static struct ipu7_dma_mapping *alloc_dma_mapping(struct ipu_device *isp)
 {
 	struct ipu7_dma_mapping *dmap;
 	unsigned long base_pfn;
@@ -794,7 +794,7 @@ struct ipu7_mmu *ipu7_mmu_init(struct device *dev,
 			       void __iomem *base, int mmid,
 			       const struct ipu7_hw_variants *hw)
 {
-	struct ipu7_device *isp = pci_get_drvdata(to_pci_dev(dev));
+	struct ipu_device *isp = pci_get_drvdata(to_pci_dev(dev));
 	struct ipu7_mmu_pdata *pdata;
 	struct ipu7_mmu *mmu;
 	unsigned int i;

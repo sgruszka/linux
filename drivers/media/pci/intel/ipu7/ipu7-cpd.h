@@ -6,7 +6,7 @@
 #ifndef IPU7_CPD_H
 #define IPU7_CPD_H
 
-struct ipu7_device;
+struct ipu_device;
 
 struct ipu7_cpd_hdr {
 	u32 hdr_mark;
@@ -53,7 +53,7 @@ struct ipu7_cpd_metadata {
 	struct ipu7_cpd_metadata_ipl ipl;
 } __packed;
 
-int ipu7_cpd_validate_cpd_file(struct ipu7_device *isp,
+int ipu7_cpd_validate_cpd_file(struct ipu_device *isp,
 			       const void *cpd_file,
 			       unsigned long cpd_file_size);
 

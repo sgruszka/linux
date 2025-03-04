@@ -21,7 +21,7 @@
 struct pci_dev;
 struct ipu_buttress_ctrl;
 struct ipu7_mmu;
-struct ipu7_device;
+struct ipu_device;
 
 enum ipu7_subsys {
 	IPU_IS = 0,
@@ -37,7 +37,7 @@ struct ipu_bus_device {
 	enum ipu7_subsys subsys;
 	void *pdata;
 	struct ipu7_mmu *mmu;
-	struct ipu7_device *isp;
+	struct ipu_device *isp;
 	const struct ipu_buttress_ctrl *ctrl;
 	u64 dma_mask;
 	struct sg_table fw_sgt;

@@ -99,7 +99,7 @@ static const struct v4l2_subdev_core_ops csi2_sd_core_ops = {
 
 static void csi2_irq_en(struct ipu7_isys_csi2 *csi2, bool enable)
 {
-	struct ipu7_device *isp = csi2->isys->adev->isp;
+	struct ipu_device *isp = csi2->isys->adev->isp;
 	unsigned int offset, mask;
 
 	if (!enable) {

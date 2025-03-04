@@ -54,7 +54,7 @@ static struct ipu7_cpd_metadata *ipu7_cpd_get_metadata(const void *cpd, int idx)
 	return (struct ipu7_cpd_metadata *)((u8 *)cpd + cpd_ent->offset);
 }
 
-static int ipu7_cpd_validate_cpd(struct ipu7_device *isp,
+static int ipu7_cpd_validate_cpd(struct ipu_device *isp,
 				 const void *cpd, unsigned long data_size)
 {
 	const struct ipu7_cpd_hdr *cpd_hdr = cpd;
@@ -101,7 +101,7 @@ static int ipu7_cpd_validate_cpd(struct ipu7_device *isp,
 	return 0;
 }
 
-static int ipu7_cpd_validate_metadata(struct ipu7_device *isp,
+static int ipu7_cpd_validate_metadata(struct ipu_device *isp,
 				      const void *cpd, int idx)
 {
 	const struct ipu7_cpd_ent *cpd_ent =
@@ -141,7 +141,7 @@ static int ipu7_cpd_validate_metadata(struct ipu7_device *isp,
 	return 0;
 }
 
-int ipu7_cpd_validate_cpd_file(struct ipu7_device *isp, const void *cpd_file,
+int ipu7_cpd_validate_cpd_file(struct ipu_device *isp, const void *cpd_file,
 			       unsigned long cpd_file_size)
 {
 	struct device *dev = &isp->pdev->dev;

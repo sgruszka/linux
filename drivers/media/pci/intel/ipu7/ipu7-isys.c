@@ -184,7 +184,7 @@ static int isys_notifier_init(struct ipu7_isys *isys)
 {
 	const struct ipu7_isys_internal_csi2_pdata *csi2 =
 		&isys->pdata->ipdata->csi2;
-	struct ipu7_device *isp = isys->adev->isp;
+	struct ipu_device *isp = isys->adev->isp;
 	struct device *dev = &isp->pdev->dev;
 	unsigned int i;
 	int ret;
@@ -501,7 +501,7 @@ static int isys_runtime_pm_resume(struct device *dev)
 {
 	struct ipu_bus_device *adev = to_ipu_bus_device(dev);
 	struct ipu7_isys *isys = ipu7_bus_get_drvdata(adev);
-	struct ipu7_device *isp = adev->isp;
+	struct ipu_device *isp = adev->isp;
 	unsigned long flags;
 	int ret;
 
@@ -703,7 +703,7 @@ static int isys_probe(struct auxiliary_device *auxdev,
 {
 	const struct ipu7_isys_internal_csi2_pdata *csi2_pdata;
 	struct ipu_bus_device *adev = auxdev_to_adev(auxdev);
-	struct ipu7_device *isp = adev->isp;
+	struct ipu_device *isp = adev->isp;
 	struct ipu7_isys *isys;
 	int ret = 0;
 
@@ -1032,7 +1032,7 @@ leave:
 static void ipu7_isys_csi2_isr(struct ipu7_isys_csi2 *csi2)
 {
 	struct device *dev = &csi2->isys->adev->auxdev.dev;
-	struct ipu7_device *isp = csi2->isys->adev->isp;
+	struct ipu_device *isp = csi2->isys->adev->isp;
 	struct ipu7_isys_stream *s;
 	u32 sync, offset;
 	u32 fe = 0;

@@ -2270,7 +2270,7 @@ static int ipu7_map_fw_code_region(struct ipu_bus_device *sys,
 	struct device *dev = &sys->auxdev.dev;
 	struct ipu_bus_device *adev = to_ipu_bus_device(dev);
 	struct sg_table *sgt = &sys->fw_sgt;
-	struct ipu7_device *isp = adev->isp;
+	struct ipu_device *isp = adev->isp;
 	struct pci_dev *pdev = isp->pdev;
 	unsigned long n_pages, i;
 	unsigned long attr = 0;
@@ -2346,7 +2346,7 @@ static int ipu7_init_fw_code_region_by_sys(struct ipu_bus_device *sys,
 					   char *sys_name)
 {
 	struct device *dev = &sys->auxdev.dev;
-	struct ipu7_device *isp = sys->isp;
+	struct ipu_device *isp = sys->isp;
 	int ret;
 
 	/* Copy FW binaries to specific location. */
@@ -2383,7 +2383,7 @@ static int ipu7_init_fw_code_region_by_sys(struct ipu_bus_device *sys,
 	return ret;
 }
 
-static int ipu7_init_fw_code_region(struct ipu7_device *isp)
+static int ipu7_init_fw_code_region(struct ipu_device *isp)
 {
 	int ret;
 
@@ -2425,7 +2425,7 @@ static int ipu7_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	void __iomem *psys_base = NULL;
 	void __iomem *const *iomap;
 	phys_addr_t phys, pb_phys;
-	struct ipu7_device *isp;
+	struct ipu_device *isp;
 	u32 is_es;
 	int ret;
 
@@ -2640,7 +2640,7 @@ buttress_exit:
 
 static void ipu7_pci_remove(struct pci_dev *pdev)
 {
-	struct ipu7_device *isp = pci_get_drvdata(pdev);
+	struct ipu_device *isp = pci_get_drvdata(pdev);
 
 	if (!IS_ERR_OR_NULL(isp->isys) && isp->isys->fw_sgt.nents)
 		ipu7_unmap_fw_code_region(isp->isys);
@@ -2668,7 +2668,7 @@ static void ipu7_pci_remove(struct pci_dev *pdev)
 
 static void ipu7_pci_reset_prepare(struct pci_dev *pdev)
 {
-	struct ipu7_device *isp = pci_get_drvdata(pdev);
+	struct ipu_device *isp = pci_get_drvdata(pdev);
 
 	dev_warn(&pdev->dev, "FLR prepare\n");
 	pm_runtime_forbid(&isp->pdev->dev);
@@ -2676,7 +2676,7 @@ static void ipu7_pci_reset_prepare(struct pci_dev *pdev)
 
 static void ipu7_pci_reset_done(struct pci_dev *pdev)
 {
-	struct ipu7_device *isp = pci_get_drvdata(pdev);
+	struct ipu_device *isp = pci_get_drvdata(pdev);
 
 	ipu_buttress_restore(isp);
 	if (isp->secure_mode)
@@ -2700,7 +2700,7 @@ static int ipu7_suspend(struct device *dev)
 static int ipu7_resume(struct device *dev)
 {
 	struct pci_dev *pdev = to_pci_dev(dev);
-	struct ipu7_device *isp = pci_get_drvdata(pdev);
+	struct ipu_device *isp = pci_get_drvdata(pdev);
 	struct ipu_buttress *b = &isp->buttress;
 	int ret;
 
@@ -2732,7 +2732,7 @@ static int ipu7_resume(struct device *dev)
 static int ipu7_runtime_resume(struct device *dev)
 {
 	struct pci_dev *pdev = to_pci_dev(dev);
-	struct ipu7_device *isp = pci_get_drvdata(pdev);
+	struct ipu_device *isp = pci_get_drvdata(pdev);
 	int ret;
 
 	ipu_buttress_restore(isp);

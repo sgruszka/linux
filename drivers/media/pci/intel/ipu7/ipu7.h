@@ -67,7 +67,7 @@ static inline bool is_ipu8(u8 hw_ver)
 #define IPU_FW_CODE_REGION_END		(IPU_FW_CODE_REGION_START +	\
 					 IPU_FW_CODE_REGION_SIZE) /* 80MB */
 
-struct ipu7_device {
+struct ipu_device {
 	struct pci_dev *pdev;
 	struct list_head devices;
 	struct ipu_bus_device *isys;

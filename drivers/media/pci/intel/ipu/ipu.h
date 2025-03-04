@@ -19,9 +19,19 @@ struct ipu_buttress_ctrl;
 
 struct ipu_buttress_ctrl {
 	u32 freq_ctl, pwr_sts_shift, pwr_sts_mask, pwr_sts_on, pwr_sts_off;
-	unsigned int ratio;
+	u32 ratio;
+
+	/* IPU6 */
 	unsigned int qos_floor;
 	bool started;
+
+	/* IPU7 */
+	u32 subsys_id;
+	u32 ratio_shift;
+	u32 cdyn;
+	u32 cdyn_shift;
+	u32 ovrd_clk;
+	u32 own_clk_ack;
 };
 
 struct ipu_buttress_ipc {
@@ -54,6 +64,12 @@ struct ipu_ipc_buttress_bulk_msg {
 	u8 cmd_size;
 };
 
+enum ipu7_subsys {
+	IPU_IS = 0,
+	IPU_PS = 1,
+	IPU_SUBSYS_NUM = 2,
+};
+
 struct ipu_bus_device {
 	struct auxiliary_device auxdev;
 	const struct auxiliary_driver *auxdrv;
@@ -64,11 +80,21 @@ struct ipu_bus_device {
 	struct ipu_device *isp;
 	struct ipu_buttress_ctrl *ctrl;
 	u64 dma_mask;
-	const struct firmware *fw;
 	struct sg_table fw_sgt;
+
+	/* IPU6 */
+	const struct firmware *fw;
 	u64 *pkg_dir;
 	dma_addr_t pkg_dir_dma_addr;
 	unsigned int pkg_dir_size;
+
+	/* IPU7 */
+	u32 fw_entry;
+	struct ipu7_syscom_context *syscom;
+	struct ia_gofo_boot_config *boot_config;
+	dma_addr_t boot_config_dma_addr;
+	u32 boot_config_size;
+	enum ipu7_subsys subsys;
 };
 
 struct ipu_auxdrv_data {

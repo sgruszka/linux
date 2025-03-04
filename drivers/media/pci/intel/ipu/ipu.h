@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /* Copyright (C) 2013 - 2024 Intel Corporation */
 
-#ifndef IPU6_BUS_H
-#define IPU6_BUS_H
+#ifndef INTEL_IPU_H
+#define INTEL_IPU_H
 
 #include <linux/auxiliary_bus.h>
 #include <linux/container_of.h>

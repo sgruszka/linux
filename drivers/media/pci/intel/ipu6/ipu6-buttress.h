@@ -29,7 +29,7 @@ struct ipu_buttress_ctrl {
 	bool started;
 };
 
-struct ipu6_buttress_ipc {
+struct ipu_buttress_ipc {
 	struct completion send_complete;
 	struct completion recv_complete;
 	u32 nack;
@@ -43,16 +43,16 @@ struct ipu6_buttress_ipc {
 	u32 data0_in;
 };
 
-struct ipu6_buttress {
+struct ipu_buttress {
 	struct mutex power_mutex, auth_mutex, cons_mutex, ipc_mutex;
-	struct ipu6_buttress_ipc cse;
+	struct ipu_buttress_ipc cse;
 	struct list_head constraints;
 	u32 wdt_cached_value;
 	bool force_suspend;
 	u32 ref_clk;
 };
 
-struct ipu6_ipc_buttress_bulk_msg {
+struct ipu_ipc_buttress_bulk_msg {
 	u32 cmd;
 	u32 expected_resp;
 	bool require_resp;
@@ -60,7 +60,7 @@ struct ipu6_ipc_buttress_bulk_msg {
 };
 
 int ipu6_buttress_ipc_reset(struct ipu_device *isp,
-			    struct ipu6_buttress_ipc *ipc);
+			    struct ipu_buttress_ipc *ipc);
 int ipu6_buttress_map_fw_image(struct ipu_bus_device *sys,
 			       const struct firmware *fw,
 			       struct sg_table *sgt);

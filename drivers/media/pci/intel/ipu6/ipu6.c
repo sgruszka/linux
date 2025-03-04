@@ -762,7 +762,7 @@ static int ipu6_resume(struct device *dev)
 {
 	struct pci_dev *pdev = to_pci_dev(dev);
 	struct ipu_device *isp = pci_get_drvdata(pdev);
-	struct ipu6_buttress *b = &isp->buttress;
+	struct ipu_buttress *b = &isp->buttress;
 	int ret;
 
 	/* Configure the arbitration mechanisms for VC requests */
@@ -803,7 +803,7 @@ static int ipu6_runtime_resume(struct device *dev)
 	ipu6_buttress_restore(isp);
 
 	if (isp->need_ipc_reset) {
-		struct ipu6_buttress *b = &isp->buttress;
+		struct ipu_buttress *b = &isp->buttress;
 
 		isp->need_ipc_reset = false;
 		ret = ipu6_buttress_ipc_reset(isp, &b->cse);

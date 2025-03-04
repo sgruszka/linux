@@ -75,7 +75,7 @@ struct ipu_device {
 	struct list_head devices;
 	struct ipu_bus_device *isys;
 	struct ipu_bus_device *psys;
-	struct ipu6_buttress buttress;
+	struct ipu_buttress buttress;
 
 	const struct firmware *cpd_fw;
 	const char *cpd_fw_name;

@@ -679,7 +679,7 @@ get_sof_sequence_by_timestamp(struct ipu7_isys_stream *stream,
 static u64 get_sof_ns_delta(struct ipu7_isys_video *av,
 			    struct ipu7_insys_resp *info)
 {
-	struct ipu7_bus_device *adev = av->isys->adev;
+	struct ipu_bus_device *adev = av->isys->adev;
 	struct ipu7_device *isp = adev->isp;
 	u64 delta, tsc_now;
 
@@ -808,7 +808,7 @@ int ipu7_isys_queue_init(struct ipu7_isys_queue *aq)
 {
 	struct ipu7_isys *isys = ipu7_isys_queue_to_video(aq)->isys;
 	struct ipu7_isys_video *av = ipu7_isys_queue_to_video(aq);
-	struct ipu7_bus_device *adev = isys->adev;
+	struct ipu_bus_device *adev = isys->adev;
 	int ret;
 
 	if (!aq->vbq.io_modes)

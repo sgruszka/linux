@@ -53,7 +53,7 @@ static const struct ipu7_boot_context contexts[IPU_SUBSYS_NUM] = {
 	}
 };
 
-static u32 get_fw_boot_reg_addr(const struct ipu7_bus_device *adev,
+static u32 get_fw_boot_reg_addr(const struct ipu_bus_device *adev,
 				enum ia_gofo_buttress_reg_id reg)
 {
 	u32 base = (adev->subsys == IPU_IS) ? 0 : IA_GOFO_FW_BOOT_ID_MAX;
@@ -61,7 +61,7 @@ static u32 get_fw_boot_reg_addr(const struct ipu7_bus_device *adev,
 	return BUTTRESS_FW_BOOT_PARAMS_ENTRY(base + reg);
 }
 
-static void write_fw_boot_param(const struct ipu7_bus_device *adev,
+static void write_fw_boot_param(const struct ipu_bus_device *adev,
 				enum ia_gofo_buttress_reg_id reg,
 				u32 val)
 {
@@ -73,7 +73,7 @@ static void write_fw_boot_param(const struct ipu7_bus_device *adev,
 	writel(val, base + get_fw_boot_reg_addr(adev, reg));
 }
 
-static u32 read_fw_boot_param(const struct ipu7_bus_device *adev,
+static u32 read_fw_boot_param(const struct ipu_bus_device *adev,
 			      enum ia_gofo_buttress_reg_id reg)
 {
 	void __iomem *base = adev->isp->base;
@@ -81,7 +81,7 @@ static u32 read_fw_boot_param(const struct ipu7_bus_device *adev,
 	return readl(base + get_fw_boot_reg_addr(adev, reg));
 }
 
-static int ipu7_boot_cell_reset(const struct ipu7_bus_device *adev)
+static int ipu7_boot_cell_reset(const struct ipu_bus_device *adev)
 {
 	const struct ipu7_boot_context *ctx = &contexts[adev->subsys];
 	const struct device *dev = &adev->auxdev.dev;
@@ -131,7 +131,7 @@ static int ipu7_boot_cell_reset(const struct ipu7_bus_device *adev)
 	return 0;
 }
 
-static void ipu7_boot_cell_start(const struct ipu7_bus_device *adev)
+static void ipu7_boot_cell_start(const struct ipu_bus_device *adev)
 {
 	const struct ipu7_boot_context *ctx = &contexts[adev->subsys];
 	void __iomem *base = adev->isp->base;
@@ -149,7 +149,7 @@ static void ipu7_boot_cell_start(const struct ipu7_bus_device *adev)
 	writel(val, base + ctx->status_ctrl_reg);
 }
 
-static void ipu7_boot_cell_stop(const struct ipu7_bus_device *adev)
+static void ipu7_boot_cell_stop(const struct ipu_bus_device *adev)
 {
 	const struct ipu7_boot_context *ctx = &contexts[adev->subsys];
 	void __iomem *base = adev->isp->base;
@@ -174,7 +174,7 @@ static void ipu7_boot_cell_stop(const struct ipu7_bus_device *adev)
 	writel(val, base + ctx->status_ctrl_reg);
 }
 
-static int ipu7_boot_cell_init(const struct ipu7_bus_device *adev)
+static int ipu7_boot_cell_init(const struct ipu_bus_device *adev)
 {
 	const struct ipu7_boot_context *ctx = &contexts[adev->subsys];
 	void __iomem *base = adev->isp->base;
@@ -204,7 +204,7 @@ static void init_boot_config(struct ia_gofo_boot_config *boot_config,
 	boot_config->client_version_support.versions[0].patch = 0U;
 }
 
-int ipu7_boot_init_boot_config(struct ipu7_bus_device *adev,
+int ipu7_boot_init_boot_config(struct ipu_bus_device *adev,
 			       struct syscom_queue_config *qconfigs,
 			       int num_queues, u32 uc_freq,
 			       dma_addr_t subsys_config, u8 major)
@@ -288,7 +288,7 @@ int ipu7_boot_init_boot_config(struct ipu7_bus_device *adev,
 }
 EXPORT_SYMBOL_NS_GPL(ipu7_boot_init_boot_config, "INTEL_IPU7");
 
-void ipu7_boot_release_boot_config(struct ipu7_bus_device *adev)
+void ipu7_boot_release_boot_config(struct ipu_bus_device *adev)
 {
 	struct ipu7_syscom_context *syscom = adev->syscom;
 
@@ -310,7 +310,7 @@ void ipu7_boot_release_boot_config(struct ipu7_bus_device *adev)
 }
 EXPORT_SYMBOL_NS_GPL(ipu7_boot_release_boot_config, "INTEL_IPU7");
 
-int ipu7_boot_start_fw(const struct ipu7_bus_device *adev)
+int ipu7_boot_start_fw(const struct ipu_bus_device *adev)
 {
 	const struct device *dev = &adev->auxdev.dev;
 	u32 timeout = IPU_FW_START_STOP_TIMEOUT;
@@ -384,7 +384,7 @@ int ipu7_boot_start_fw(const struct ipu7_bus_device *adev)
 }
 EXPORT_SYMBOL_NS_GPL(ipu7_boot_start_fw, "INTEL_IPU7");
 
-int ipu7_boot_stop_fw(const struct ipu7_bus_device *adev)
+int ipu7_boot_stop_fw(const struct ipu_bus_device *adev)
 {
 	const struct device *dev = &adev->auxdev.dev;
 	u32 timeout = IPU_FW_START_STOP_TIMEOUT;
@@ -427,7 +427,7 @@ int ipu7_boot_stop_fw(const struct ipu7_bus_device *adev)
 }
 EXPORT_SYMBOL_NS_GPL(ipu7_boot_stop_fw, "INTEL_IPU7");
 
-u32 ipu7_boot_get_boot_state(const struct ipu7_bus_device *adev)
+u32 ipu7_boot_get_boot_state(const struct ipu_bus_device *adev)
 {
 	return read_fw_boot_param(adev, IA_GOFO_FW_BOOT_STATE_ID);
 }

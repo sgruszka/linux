@@ -21,7 +21,7 @@
 
 static int bus_pm_runtime_suspend(struct device *dev)
 {
-	struct ipu7_bus_device *adev = to_ipu7_bus_device(dev);
+	struct ipu_bus_device *adev = to_ipu_bus_device(dev);
 	int ret;
 
 	ret = pm_generic_runtime_suspend(dev);
@@ -44,7 +44,7 @@ static int bus_pm_runtime_suspend(struct device *dev)
 
 static int bus_pm_runtime_resume(struct device *dev)
 {
-	struct ipu7_bus_device *adev = to_ipu7_bus_device(dev);
+	struct ipu_bus_device *adev = to_ipu_bus_device(dev);
 	int ret;
 
 	ret = ipu_buttress_powerup(dev, adev->ctrl);
@@ -73,19 +73,19 @@ static struct dev_pm_domain ipu7_bus_pm_domain = {
 static DEFINE_MUTEX(ipu7_bus_mutex);
 static void ipu7_bus_release(struct device *dev)
 {
-	struct ipu7_bus_device *adev = to_ipu7_bus_device(dev);
+	struct ipu_bus_device *adev = to_ipu_bus_device(dev);
 
 	kfree(adev->pdata);
 	kfree(adev);
 }
 
-struct ipu7_bus_device *
+struct ipu_bus_device *
 ipu7_bus_initialize_device(struct pci_dev *pdev, struct device *parent,
 			   void *pdata, const struct ipu_buttress_ctrl *ctrl,
 			   char *name)
 {
 	struct auxiliary_device *auxdev;
-	struct ipu7_bus_device *adev;
+	struct ipu_bus_device *adev;
 	struct ipu7_device *isp = pci_get_drvdata(pdev);
 	int ret;
 
@@ -120,7 +120,7 @@ ipu7_bus_initialize_device(struct pci_dev *pdev, struct device *parent,
 	return adev;
 }
 
-int ipu7_bus_add_device(struct ipu7_bus_device *adev)
+int ipu7_bus_add_device(struct ipu_bus_device *adev)
 {
 	struct auxiliary_device *auxdev = &adev->auxdev;
 	int ret;
@@ -143,7 +143,7 @@ int ipu7_bus_add_device(struct ipu7_bus_device *adev)
 void ipu7_bus_del_devices(struct pci_dev *pdev)
 {
 	struct ipu7_device *isp = pci_get_drvdata(pdev);
-	struct ipu7_bus_device *adev, *save;
+	struct ipu_bus_device *adev, *save;
 
 	mutex_lock(&ipu7_bus_mutex);
 

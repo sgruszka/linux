@@ -12,7 +12,7 @@
 
 #include "ipu7-buttress.h"
 
-struct ipu7_bus_device;
+struct ipu_bus_device;
 struct pci_dev;
 struct firmware;
 
@@ -70,8 +70,8 @@ static inline bool is_ipu8(u8 hw_ver)
 struct ipu7_device {
 	struct pci_dev *pdev;
 	struct list_head devices;
-	struct ipu7_bus_device *isys;
-	struct ipu7_bus_device *psys;
+	struct ipu_bus_device *isys;
+	struct ipu_bus_device *psys;
 	struct ipu_buttress buttress;
 
 	const struct firmware *cpd_fw;
@@ -240,5 +240,5 @@ int request_cpd_fw(const struct firmware **firmware_p, const char *name,
 		   struct device *device);
 void ipu_internal_pdata_init(struct ipu_isys_internal_pdata *isys_ipdata,
 			     struct ipu_psys_internal_pdata *psys_ipdata);
-void ipu7_dump_fw_error_log(const struct ipu7_bus_device *adev);
+void ipu7_dump_fw_error_log(const struct ipu_bus_device *adev);
 #endif /* IPU7_H */

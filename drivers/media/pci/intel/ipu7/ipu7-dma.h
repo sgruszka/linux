@@ -21,30 +21,30 @@ struct ipu7_dma_mapping {
 	struct iova_domain iovad;
 };
 
-void ipu7_dma_sync_single(struct ipu7_bus_device *sys, dma_addr_t dma_handle,
+void ipu7_dma_sync_single(struct ipu_bus_device *sys, dma_addr_t dma_handle,
 			  size_t size);
-void ipu7_dma_sync_sg(struct ipu7_bus_device *sys, struct scatterlist *sglist,
+void ipu7_dma_sync_sg(struct ipu_bus_device *sys, struct scatterlist *sglist,
 		      unsigned int nents);
-void ipu7_dma_sync_sgtable(struct ipu7_bus_device *sys, struct sg_table *sgt);
-void *ipu7_dma_alloc(struct ipu7_bus_device *sys, size_t size,
+void ipu7_dma_sync_sgtable(struct ipu_bus_device *sys, struct sg_table *sgt);
+void *ipu7_dma_alloc(struct ipu_bus_device *sys, size_t size,
 		     dma_addr_t *dma_handle, gfp_t gfp,
 		     unsigned long attrs);
-void ipu7_dma_free(struct ipu7_bus_device *sys, size_t size, void *vaddr,
+void ipu7_dma_free(struct ipu_bus_device *sys, size_t size, void *vaddr,
 		   dma_addr_t dma_handle, unsigned long attrs);
-int ipu7_dma_mmap(struct ipu7_bus_device *sys, struct vm_area_struct *vma,
+int ipu7_dma_mmap(struct ipu_bus_device *sys, struct vm_area_struct *vma,
 		  void *addr, dma_addr_t iova, size_t size,
 		  unsigned long attrs);
-int ipu7_dma_map_sg(struct ipu7_bus_device *sys, struct scatterlist *sglist,
+int ipu7_dma_map_sg(struct ipu_bus_device *sys, struct scatterlist *sglist,
 		    int nents, enum dma_data_direction dir,
 		    unsigned long attrs);
-void ipu7_dma_unmap_sg(struct ipu7_bus_device *sys, struct scatterlist *sglist,
+void ipu7_dma_unmap_sg(struct ipu_bus_device *sys, struct scatterlist *sglist,
 		       int nents, enum dma_data_direction dir,
 		       unsigned long attrs);
-int ipu7_dma_map_sgtable(struct ipu7_bus_device *sys, struct sg_table *sgt,
+int ipu7_dma_map_sgtable(struct ipu_bus_device *sys, struct sg_table *sgt,
 			 enum dma_data_direction dir, unsigned long attrs);
-void ipu7_dma_unmap_sgtable(struct ipu7_bus_device *sys, struct sg_table *sgt,
+void ipu7_dma_unmap_sgtable(struct ipu_bus_device *sys, struct sg_table *sgt,
 			    enum dma_data_direction dir, unsigned long attrs);
-int ipu7_dma_get_sgtable(struct ipu7_bus_device *sys, struct sg_table *sgt,
+int ipu7_dma_get_sgtable(struct ipu_bus_device *sys, struct sg_table *sgt,
 			 void *cpu_addr, dma_addr_t handle, size_t size,
 			 unsigned long attrs);
 #endif /* IPU7_DMA_H */

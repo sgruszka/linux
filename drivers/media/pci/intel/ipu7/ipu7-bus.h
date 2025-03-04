@@ -29,7 +29,7 @@ enum ipu7_subsys {
 	IPU_SUBSYS_NUM = 2,
 };
 
-struct ipu7_bus_device {
+struct ipu_bus_device {
 	struct auxiliary_device auxdev;
 	const struct auxiliary_driver *auxdrv;
 	const struct ipu7_auxdrv_data *auxdrv_data;
@@ -49,21 +49,21 @@ struct ipu7_bus_device {
 };
 
 struct ipu7_auxdrv_data {
-	irqreturn_t (*isr)(struct ipu7_bus_device *adev);
-	irqreturn_t (*isr_threaded)(struct ipu7_bus_device *adev);
+	irqreturn_t (*isr)(struct ipu_bus_device *adev);
+	irqreturn_t (*isr_threaded)(struct ipu_bus_device *adev);
 	bool wake_isr_thread;
 };
 
-#define to_ipu7_bus_device(_dev)					\
-	container_of(to_auxiliary_dev(_dev), struct ipu7_bus_device, auxdev)
+#define to_ipu_bus_device(_dev)					\
+	container_of(to_auxiliary_dev(_dev), struct ipu_bus_device, auxdev)
 #define auxdev_to_adev(_auxdev)					\
-	container_of(_auxdev, struct ipu7_bus_device, auxdev)
+	container_of(_auxdev, struct ipu_bus_device, auxdev)
 #define ipu7_bus_get_drvdata(adev) dev_get_drvdata(&(adev)->auxdev.dev)
 
-struct ipu7_bus_device *
+struct ipu_bus_device *
 ipu7_bus_initialize_device(struct pci_dev *pdev, struct device *parent,
 			   void *pdata, const struct ipu_buttress_ctrl *ctrl,
 			   char *name);
-int ipu7_bus_add_device(struct ipu7_bus_device *adev);
+int ipu7_bus_add_device(struct ipu_bus_device *adev);
 void ipu7_bus_del_devices(struct pci_dev *pdev);
 #endif

@@ -92,7 +92,7 @@ static int video_open(struct file *file)
 {
 	struct ipu7_isys_video *av = video_drvdata(file);
 	struct ipu7_isys *isys = av->isys;
-	struct ipu7_bus_device *adev = isys->adev;
+	struct ipu_bus_device *adev = isys->adev;
 
 	mutex_lock(&isys->mutex);
 	if (isys->need_reset) {
@@ -917,7 +917,7 @@ static const struct v4l2_file_operations isys_fops = {
 
 int ipu7_isys_fw_open(struct ipu7_isys *isys)
 {
-	struct ipu7_bus_device *adev = isys->adev;
+	struct ipu_bus_device *adev = isys->adev;
 	int ret;
 
 	ret = pm_runtime_resume_and_get(&adev->auxdev.dev);

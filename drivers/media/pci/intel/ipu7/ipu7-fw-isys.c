@@ -81,7 +81,7 @@ int ipu7_fw_isys_simple_cmd(struct ipu7_isys *isys,
 int ipu7_fw_isys_init(struct ipu7_isys *isys)
 {
 	struct syscom_queue_config *queue_configs;
-	struct ipu7_bus_device *adev = isys->adev;
+	struct ipu_bus_device *adev = isys->adev;
 	struct device *dev = &adev->auxdev.dev;
 	struct ipu7_insys_config *isys_config;
 	struct ipu7_syscom_context *syscom;
@@ -170,7 +170,7 @@ int ipu7_fw_isys_init(struct ipu7_isys *isys)
 
 void ipu7_fw_isys_release(struct ipu7_isys *isys)
 {
-	struct ipu7_bus_device *adev = isys->adev;
+	struct ipu_bus_device *adev = isys->adev;
 
 	ipu7_boot_release_boot_config(adev);
 	if (isys->subsys_config) {

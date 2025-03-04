@@ -111,7 +111,7 @@ static void __free_buffer(struct page **pages, size_t size, unsigned long attrs)
 	kvfree(pages);
 }
 
-void ipu7_dma_sync_single(struct ipu7_bus_device *sys, dma_addr_t dma_handle,
+void ipu7_dma_sync_single(struct ipu_bus_device *sys, dma_addr_t dma_handle,
 			  size_t size)
 {
 	void *vaddr;
@@ -132,7 +132,7 @@ void ipu7_dma_sync_single(struct ipu7_bus_device *sys, dma_addr_t dma_handle,
 }
 EXPORT_SYMBOL_NS_GPL(ipu7_dma_sync_single, "INTEL_IPU7");
 
-void ipu7_dma_sync_sg(struct ipu7_bus_device *sys, struct scatterlist *sglist,
+void ipu7_dma_sync_sg(struct ipu_bus_device *sys, struct scatterlist *sglist,
 		      unsigned int nents)
 {
 	struct scatterlist *sg;
@@ -143,13 +143,13 @@ void ipu7_dma_sync_sg(struct ipu7_bus_device *sys, struct scatterlist *sglist,
 }
 EXPORT_SYMBOL_NS_GPL(ipu7_dma_sync_sg, "INTEL_IPU7");
 
-void ipu7_dma_sync_sgtable(struct ipu7_bus_device *sys, struct sg_table *sgt)
+void ipu7_dma_sync_sgtable(struct ipu_bus_device *sys, struct sg_table *sgt)
 {
 	ipu7_dma_sync_sg(sys, sgt->sgl, sgt->orig_nents);
 }
 EXPORT_SYMBOL_NS_GPL(ipu7_dma_sync_sgtable, "INTEL_IPU7");
 
-void *ipu7_dma_alloc(struct ipu7_bus_device *sys, size_t size,
+void *ipu7_dma_alloc(struct ipu_bus_device *sys, size_t size,
 		     dma_addr_t *dma_handle, gfp_t gfp,
 		     unsigned long attrs)
 {
@@ -241,7 +241,7 @@ out_kfree:
 }
 EXPORT_SYMBOL_NS_GPL(ipu7_dma_alloc, "INTEL_IPU7");
 
-void ipu7_dma_free(struct ipu7_bus_device *sys, size_t size, void *vaddr,
+void ipu7_dma_free(struct ipu_bus_device *sys, size_t size, void *vaddr,
 		   dma_addr_t dma_handle, unsigned long attrs)
 {
 	struct ipu7_mmu *mmu = sys->mmu;
@@ -294,7 +294,7 @@ void ipu7_dma_free(struct ipu7_bus_device *sys, size_t size, void *vaddr,
 }
 EXPORT_SYMBOL_NS_GPL(ipu7_dma_free, "INTEL_IPU7");
 
-int ipu7_dma_mmap(struct ipu7_bus_device *sys, struct vm_area_struct *vma,
+int ipu7_dma_mmap(struct ipu_bus_device *sys, struct vm_area_struct *vma,
 		  void *addr, dma_addr_t iova, size_t size,
 		  unsigned long attrs)
 {
@@ -327,7 +327,7 @@ int ipu7_dma_mmap(struct ipu7_bus_device *sys, struct vm_area_struct *vma,
 	return 0;
 }
 
-void ipu7_dma_unmap_sg(struct ipu7_bus_device *sys, struct scatterlist *sglist,
+void ipu7_dma_unmap_sg(struct ipu_bus_device *sys, struct scatterlist *sglist,
 		       int nents, enum dma_data_direction dir,
 		       unsigned long attrs)
 {
@@ -371,7 +371,7 @@ void ipu7_dma_unmap_sg(struct ipu7_bus_device *sys, struct scatterlist *sglist,
 }
 EXPORT_SYMBOL_NS_GPL(ipu7_dma_unmap_sg, "INTEL_IPU7");
 
-int ipu7_dma_map_sg(struct ipu7_bus_device *sys, struct scatterlist *sglist,
+int ipu7_dma_map_sg(struct ipu_bus_device *sys, struct scatterlist *sglist,
 		    int nents, enum dma_data_direction dir,
 		    unsigned long attrs)
 {
@@ -453,7 +453,7 @@ out_fail:
 }
 EXPORT_SYMBOL_NS_GPL(ipu7_dma_map_sg, "INTEL_IPU7");
 
-int ipu7_dma_map_sgtable(struct ipu7_bus_device *sys, struct sg_table *sgt,
+int ipu7_dma_map_sgtable(struct ipu_bus_device *sys, struct sg_table *sgt,
 			 enum dma_data_direction dir, unsigned long attrs)
 {
 	int nents;
@@ -468,7 +468,7 @@ int ipu7_dma_map_sgtable(struct ipu7_bus_device *sys, struct sg_table *sgt,
 }
 EXPORT_SYMBOL_NS_GPL(ipu7_dma_map_sgtable, "INTEL_IPU7");
 
-void ipu7_dma_unmap_sgtable(struct ipu7_bus_device *sys, struct sg_table *sgt,
+void ipu7_dma_unmap_sgtable(struct ipu_bus_device *sys, struct sg_table *sgt,
 			    enum dma_data_direction dir, unsigned long attrs)
 {
 	ipu7_dma_unmap_sg(sys, sgt->sgl, sgt->nents, dir, attrs);
@@ -478,7 +478,7 @@ EXPORT_SYMBOL_NS_GPL(ipu7_dma_unmap_sgtable, "INTEL_IPU7");
 /*
  * Create scatter-list for the already allocated DMA buffer
  */
-int ipu7_dma_get_sgtable(struct ipu7_bus_device *sys, struct sg_table *sgt,
+int ipu7_dma_get_sgtable(struct ipu_bus_device *sys, struct sg_table *sgt,
 			 void *cpu_addr, dma_addr_t handle, size_t size,
 			 unsigned long attrs)
 {

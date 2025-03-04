@@ -499,7 +499,7 @@ static void isys_cleanup_hw(struct ipu7_isys *isys)
 
 static int isys_runtime_pm_resume(struct device *dev)
 {
-	struct ipu7_bus_device *adev = to_ipu7_bus_device(dev);
+	struct ipu_bus_device *adev = to_ipu_bus_device(dev);
 	struct ipu7_isys *isys = ipu7_bus_get_drvdata(adev);
 	struct ipu7_device *isp = adev->isp;
 	unsigned long flags;
@@ -529,7 +529,7 @@ static int isys_runtime_pm_resume(struct device *dev)
 
 static int isys_runtime_pm_suspend(struct device *dev)
 {
-	struct ipu7_bus_device *adev = to_ipu7_bus_device(dev);
+	struct ipu_bus_device *adev = to_ipu_bus_device(dev);
 	struct ipu7_isys *isys = ipu7_bus_get_drvdata(adev);
 	unsigned long flags;
 
@@ -580,7 +580,7 @@ static void isys_remove(struct auxiliary_device *auxdev)
 {
 	struct ipu7_isys *isys = dev_get_drvdata(&auxdev->dev);
 	struct isys_fw_msgs *fwmsg, *safe;
-	struct ipu7_bus_device *adev = auxdev_to_adev(auxdev);
+	struct ipu_bus_device *adev = auxdev_to_adev(auxdev);
 
 	for (int i = 0; i < IPU_ISYS_MAX_STREAMS; i++)
 		mutex_destroy(&isys->streams[i].mutex);
@@ -604,7 +604,7 @@ static void isys_remove(struct auxiliary_device *auxdev)
 
 static int alloc_fw_msg_bufs(struct ipu7_isys *isys, int amount)
 {
-	struct ipu7_bus_device *adev = isys->adev;
+	struct ipu_bus_device *adev = isys->adev;
 	struct isys_fw_msgs *addr;
 	dma_addr_t dma_addr;
 	unsigned long flags;
@@ -702,7 +702,7 @@ static int isys_probe(struct auxiliary_device *auxdev,
 		      const struct auxiliary_device_id *auxdev_id)
 {
 	const struct ipu7_isys_internal_csi2_pdata *csi2_pdata;
-	struct ipu7_bus_device *adev = auxdev_to_adev(auxdev);
+	struct ipu_bus_device *adev = auxdev_to_adev(auxdev);
 	struct ipu7_device *isp = adev->isp;
 	struct ipu7_isys *isys;
 	int ret = 0;
@@ -888,7 +888,7 @@ static const struct resp_to_msg is_fw_msg[] = {
 	{N_IPU_INSYS_RESP_TYPE, "N_IPU_INSYS_RESP_TYPE"},
 };
 
-int isys_isr_one(struct ipu7_bus_device *adev)
+int isys_isr_one(struct ipu_bus_device *adev)
 {
 	struct ipu7_isys *isys = ipu7_bus_get_drvdata(adev);
 	struct ipu7_isys_stream *stream = NULL;
@@ -1073,7 +1073,7 @@ static void ipu7_isys_csi2_isr(struct ipu7_isys_csi2 *csi2)
 	}
 }
 
-irqreturn_t isys_isr(struct ipu7_bus_device *adev)
+irqreturn_t isys_isr(struct ipu_bus_device *adev)
 {
 	struct ipu7_isys *isys = ipu7_bus_get_drvdata(adev);
 	u32 status_csi, status_sw, csi_offset, sw_offset;

@@ -311,7 +311,7 @@ static int ipu_buttress_ipc_send(struct ipu7_device *isp,
 	return ipu_buttress_ipc_send_bulk(isp, &msg, 1);
 }
 
-static irqreturn_t ipu_buttress_call_isr(struct ipu7_bus_device *adev)
+static irqreturn_t ipu_buttress_call_isr(struct ipu_bus_device *adev)
 {
 	irqreturn_t ret = IRQ_WAKE_THREAD;
 
@@ -330,7 +330,7 @@ static irqreturn_t ipu_buttress_call_isr(struct ipu7_bus_device *adev)
 irqreturn_t ipu_buttress_isr(int irq, void *isp_ptr)
 {
 	struct ipu7_device *isp = isp_ptr;
-	struct ipu7_bus_device *adev[] = { isp->isys, isp->psys };
+	struct ipu_bus_device *adev[] = { isp->isys, isp->psys };
 	struct ipu_buttress *b = &isp->buttress;
 	struct device *dev = &isp->pdev->dev;
 	irqreturn_t ret = IRQ_NONE;
@@ -423,7 +423,7 @@ irqreturn_t ipu_buttress_isr(int irq, void *isp_ptr)
 irqreturn_t ipu_buttress_isr_threaded(int irq, void *isp_ptr)
 {
 	struct ipu7_device *isp = isp_ptr;
-	struct ipu7_bus_device *adev[] = { isp->isys, isp->psys };
+	struct ipu_bus_device *adev[] = { isp->isys, isp->psys };
 	const struct ipu7_auxdrv_data *drv_data = NULL;
 	irqreturn_t ret = IRQ_NONE;
 	unsigned int i;
@@ -445,7 +445,7 @@ irqreturn_t ipu_buttress_isr_threaded(int irq, void *isp_ptr)
 
 static int isys_d2d_power(struct device *dev, bool on)
 {
-	struct ipu7_device *isp = to_ipu7_bus_device(dev)->isp;
+	struct ipu7_device *isp = to_ipu_bus_device(dev)->isp;
 	int ret = 0;
 	u32 val;
 
@@ -471,7 +471,7 @@ static int isys_d2d_power(struct device *dev, bool on)
 
 static void isys_nde_control(struct device *dev, bool on)
 {
-	struct ipu7_device *isp = to_ipu7_bus_device(dev)->isp;
+	struct ipu7_device *isp = to_ipu_bus_device(dev)->isp;
 	u32 val, value, scale, valid, resvec;
 	u32 nde_reg;
 
@@ -500,7 +500,7 @@ static void isys_nde_control(struct device *dev, bool on)
 static int ipu7_buttress_powerup(struct device *dev,
 				 const struct ipu_buttress_ctrl *ctrl)
 {
-	struct ipu7_device *isp = to_ipu7_bus_device(dev)->isp;
+	struct ipu7_device *isp = to_ipu_bus_device(dev)->isp;
 	u32 val, exp_sts;
 	int ret = 0;
 
@@ -560,7 +560,7 @@ out_power:
 static int ipu7_buttress_powerdown(struct device *dev,
 				   const struct ipu_buttress_ctrl *ctrl)
 {
-	struct ipu7_device *isp = to_ipu7_bus_device(dev)->isp;
+	struct ipu7_device *isp = to_ipu_bus_device(dev)->isp;
 	u32 val, exp_sts;
 	int ret = 0;
 
@@ -600,7 +600,7 @@ out_power:
 static int ipu8_buttress_powerup(struct device *dev,
 				 const struct ipu_buttress_ctrl *ctrl)
 {
-	struct ipu7_device *isp = to_ipu7_bus_device(dev)->isp;
+	struct ipu7_device *isp = to_ipu_bus_device(dev)->isp;
 	u32 sleep_level_reg = BUTTRESS_REG_SLEEP_LEVEL_STS;
 	u32 val, exp_sts;
 	int ret = 0;
@@ -652,7 +652,7 @@ out_power:
 static int ipu8_buttress_powerdown(struct device *dev,
 				   const struct ipu_buttress_ctrl *ctrl)
 {
-	struct ipu7_device *isp = to_ipu7_bus_device(dev)->isp;
+	struct ipu7_device *isp = to_ipu_bus_device(dev)->isp;
 	u32 val, exp_sts;
 	int ret = 0;
 
@@ -700,7 +700,7 @@ out_power:
 int ipu_buttress_powerup(struct device *dev,
 			 const struct ipu_buttress_ctrl *ctrl)
 {
-	struct ipu7_device *isp = to_ipu7_bus_device(dev)->isp;
+	struct ipu7_device *isp = to_ipu_bus_device(dev)->isp;
 
 	if (is_ipu8(isp->hw_ver))
 		return ipu8_buttress_powerup(dev, ctrl);
@@ -711,7 +711,7 @@ int ipu_buttress_powerup(struct device *dev,
 int ipu_buttress_powerdown(struct device *dev,
 			   const struct ipu_buttress_ctrl *ctrl)
 {
-	struct ipu7_device *isp = to_ipu7_bus_device(dev)->isp;
+	struct ipu7_device *isp = to_ipu_bus_device(dev)->isp;
 
 	if (is_ipu8(isp->hw_ver))
 		return ipu8_buttress_powerdown(dev, ctrl);

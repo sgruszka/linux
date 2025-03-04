@@ -81,7 +81,7 @@ struct isys_fw_log {
 struct ipu7_isys {
 	struct media_device media_dev;
 	struct v4l2_device v4l2_dev;
-	struct ipu7_bus_device *adev;
+	struct ipu_bus_device *adev;
 
 	int power;
 	spinlock_t power_lock;	/* Serialise access to power */
@@ -144,7 +144,7 @@ void ipu7_cleanup_fw_msg_bufs(struct ipu7_isys *isys);
 
 extern const struct v4l2_ioctl_ops ipu7_isys_ioctl_ops;
 
-int isys_isr_one(struct ipu7_bus_device *adev);
-irqreturn_t isys_isr(struct ipu7_bus_device *adev);
+int isys_isr_one(struct ipu_bus_device *adev);
+irqreturn_t isys_isr(struct ipu_bus_device *adev);
 
 #endif /* IPU7_ISYS_H */

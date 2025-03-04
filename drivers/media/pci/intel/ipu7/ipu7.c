@@ -2124,14 +2124,14 @@ static int ipu7_isys_check_fwnode_graph(struct fwnode_handle *fwnode)
 	return ipu7_isys_check_fwnode_graph(fwnode->secondary);
 }
 
-static struct ipu7_bus_device *
+static struct ipu_bus_device *
 ipu7_isys_init(struct pci_dev *pdev, struct device *parent,
 	       const struct ipu_buttress_ctrl *ctrl, void __iomem *base,
 	       const struct ipu_isys_internal_pdata *ipdata,
 	       unsigned int nr)
 {
 	struct fwnode_handle *fwnode = dev_fwnode(&pdev->dev);
-	struct ipu7_bus_device *isys_adev;
+	struct ipu_bus_device *isys_adev;
 	struct device *dev = &pdev->dev;
 	struct ipu7_isys_pdata *pdata;
 	int ret;
@@ -2189,12 +2189,12 @@ ipu7_isys_init(struct pci_dev *pdev, struct device *parent,
 	return isys_adev;
 }
 
-static struct ipu7_bus_device *
+static struct ipu_bus_device *
 ipu7_psys_init(struct pci_dev *pdev, struct device *parent,
 	       const struct ipu_buttress_ctrl *ctrl, void __iomem *base,
 	       const struct ipu_psys_internal_pdata *ipdata, unsigned int nr)
 {
-	struct ipu7_bus_device *psys_adev;
+	struct ipu_bus_device *psys_adev;
 	struct ipu7_psys_pdata *pdata;
 	int ret;
 
@@ -2237,7 +2237,7 @@ ipu7_psys_init(struct pci_dev *pdev, struct device *parent,
 }
 
 static struct ia_gofo_msg_log_info_ts fw_error_log[IPU_SUBSYS_NUM];
-void ipu7_dump_fw_error_log(const struct ipu7_bus_device *adev)
+void ipu7_dump_fw_error_log(const struct ipu_bus_device *adev)
 {
 	void __iomem *reg = adev->isp->base + ((adev->subsys == IPU_IS) ?
 					       BUTTRESS_REG_FW_GP24 :
@@ -2264,11 +2264,11 @@ static int ipu7_pci_config_setup(struct pci_dev *dev)
 	return ret;
 }
 
-static int ipu7_map_fw_code_region(struct ipu7_bus_device *sys,
+static int ipu7_map_fw_code_region(struct ipu_bus_device *sys,
 				   void *data, size_t size)
 {
 	struct device *dev = &sys->auxdev.dev;
-	struct ipu7_bus_device *adev = to_ipu7_bus_device(dev);
+	struct ipu_bus_device *adev = to_ipu_bus_device(dev);
 	struct sg_table *sgt = &sys->fw_sgt;
 	struct ipu7_device *isp = adev->isp;
 	struct pci_dev *pdev = isp->pdev;
@@ -2332,7 +2332,7 @@ out:
 	return ret;
 }
 
-static void ipu7_unmap_fw_code_region(struct ipu7_bus_device *sys)
+static void ipu7_unmap_fw_code_region(struct ipu_bus_device *sys)
 {
 	struct pci_dev *pdev = sys->isp->pdev;
 	struct sg_table *sgt = &sys->fw_sgt;
@@ -2342,7 +2342,7 @@ static void ipu7_unmap_fw_code_region(struct ipu7_bus_device *sys)
 	sg_free_table(sgt);
 }
 
-static int ipu7_init_fw_code_region_by_sys(struct ipu7_bus_device *sys,
+static int ipu7_init_fw_code_region_by_sys(struct ipu_bus_device *sys,
 					   char *sys_name)
 {
 	struct device *dev = &sys->auxdev.dev;

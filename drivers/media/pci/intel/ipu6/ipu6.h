@@ -8,11 +8,10 @@
 #include <linux/pci.h>
 #include <linux/types.h>
 
-#include "ipu6-buttress.h"
+#include "../ipu/ipu.h"
 
 struct firmware;
 struct pci_dev;
-struct ipu_bus_device;
 
 #define IPU6_NAME			"intel-ipu6"
 #define IPU6_MEDIA_DEV_MODEL_NAME	"ipu6"

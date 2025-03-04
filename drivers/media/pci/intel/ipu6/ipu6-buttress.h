@@ -11,8 +11,11 @@
 
 struct device;
 struct firmware;
+
 struct ipu_device;
 struct ipu_bus_device;
+struct ipu_buttress_ipc;
+struct ipu_buttress_ctrl;
 
 #define BUTTRESS_PS_FREQ_STEP		25U
 #define BUTTRESS_MIN_FORCE_PS_FREQ	(BUTTRESS_PS_FREQ_STEP * 8)
@@ -21,43 +24,6 @@ struct ipu_bus_device;
 #define BUTTRESS_IS_FREQ_STEP		25U
 #define BUTTRESS_MIN_FORCE_IS_FREQ	(BUTTRESS_IS_FREQ_STEP * 8)
 #define BUTTRESS_MAX_FORCE_IS_FREQ	(BUTTRESS_IS_FREQ_STEP * 22)
-
-struct ipu_buttress_ctrl {
-	u32 freq_ctl, pwr_sts_shift, pwr_sts_mask, pwr_sts_on, pwr_sts_off;
-	unsigned int ratio;
-	unsigned int qos_floor;
-	bool started;
-};
-
-struct ipu_buttress_ipc {
-	struct completion send_complete;
-	struct completion recv_complete;
-	u32 nack;
-	u32 nack_mask;
-	u32 recv_data;
-	u32 csr_out;
-	u32 csr_in;
-	u32 db0_in;
-	u32 db0_out;
-	u32 data0_out;
-	u32 data0_in;
-};
-
-struct ipu_buttress {
-	struct mutex power_mutex, auth_mutex, cons_mutex, ipc_mutex;
-	struct ipu_buttress_ipc cse;
-	struct list_head constraints;
-	u32 wdt_cached_value;
-	bool force_suspend;
-	u32 ref_clk;
-};
-
-struct ipu_ipc_buttress_bulk_msg {
-	u32 cmd;
-	u32 expected_resp;
-	bool require_resp;
-	u8 cmd_size;
-};
 
 int ipu6_buttress_ipc_reset(struct ipu_device *isp,
 			    struct ipu_buttress_ipc *ipc);

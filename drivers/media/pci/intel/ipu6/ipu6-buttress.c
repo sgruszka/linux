@@ -483,6 +483,7 @@ int ipu6_buttress_power(struct device *dev, struct ipu_buttress_ctrl *ctrl,
 
 	return ret;
 }
+EXPORT_SYMBOL_NS_GPL(ipu6_buttress_power, "INTEL_IPU6");
 
 bool ipu6_buttress_get_secure_mode(struct ipu_device *isp)
 {

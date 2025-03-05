@@ -76,6 +76,7 @@ struct ipu_bus_device {
 	const struct ipu_auxdrv_data *auxdrv_data;
 	struct list_head list;
 	void *pdata;
+
 	struct ipu_mmu *mmu;
 	struct ipu_device *isp;
 	struct ipu_buttress_ctrl *ctrl;
@@ -100,6 +101,7 @@ struct ipu_bus_device {
 struct ipu_auxdrv_data {
 	irqreturn_t (*isr)(struct ipu_bus_device *adev);
 	irqreturn_t (*isr_threaded)(struct ipu_bus_device *adev);
+	int (*buttress_power)(struct device *dev, struct ipu_buttress_ctrl *ctrl, bool on);
 	bool wake_isr_thread;
 };
 

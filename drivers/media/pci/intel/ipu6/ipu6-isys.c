@@ -1347,6 +1347,7 @@ leave:
 static const struct ipu_auxdrv_data ipu6_isys_auxdrv_data = {
 	.isr = isys_isr,
 	.isr_threaded = NULL,
+	.buttress_power = ipu6_buttress_power,
 	.wake_isr_thread = false,
 };
 

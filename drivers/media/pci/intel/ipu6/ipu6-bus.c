@@ -15,8 +15,13 @@
 #include <linux/slab.h>
 
 #include "ipu6.h"
-#include "ipu6-buttress.h"
-#include "ipu6-dma.h"
+
+static inline int bus_pm_buttress_power(struct ipu_bus_device *adev, bool on)
+{
+	struct device *dev = &adev->auxdev.dev;
+
+	return adev->auxdrv_data->buttress_power(dev, adev->ctrl, on);
+}
 
 static int bus_pm_runtime_suspend(struct device *dev)
 {
@@ -27,7 +32,7 @@ static int bus_pm_runtime_suspend(struct device *dev)
 	if (ret)
 		return ret;
 
-	ret = ipu6_buttress_power(dev, adev->ctrl, false);
+	ret = bus_pm_buttress_power(adev, false);
 	if (!ret)
 		return 0;
 
@@ -44,9 +49,10 @@ static int bus_pm_runtime_suspend(struct device *dev)
 static int bus_pm_runtime_resume(struct device *dev)
 {
 	struct ipu_bus_device *adev = to_ipu_bus_device(dev);
+
 	int ret;
 
-	ret = ipu6_buttress_power(dev, adev->ctrl, true);
+	ret = bus_pm_buttress_power(adev, true);
 	if (ret)
 		return ret;
 
@@ -57,7 +63,7 @@ static int bus_pm_runtime_resume(struct device *dev)
 	return 0;
 
 out_err:
-	ipu6_buttress_power(dev, adev->ctrl, false);
+	bus_pm_buttress_power(adev, false);
 
 	return -EBUSY;
 }

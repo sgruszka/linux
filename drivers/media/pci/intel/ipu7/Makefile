@@ -2,7 +2,6 @@
 # Copyright (c) 2017 - 2024 Intel Corporation.
 
 intel-ipu7-objs				+= ipu7.o \
-					   ipu7-bus.o \
 					   ipu7-dma.o \
 					   ipu7-mmu.o \
 					   ipu7-buttress.o \

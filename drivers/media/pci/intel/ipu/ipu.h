@@ -71,12 +71,17 @@ struct ipu_device {
 
 	const struct firmware *cpd_fw;
 	const char *cpd_fw_name;
-	u32 cpd_metadata_cmpnt_size;
+
+	u32 cpd_metadata_cmpnt_size; /* IPU6 */
+	void *fw_code_region; /* IPU7*/
 
 	void __iomem *base;
-	bool need_ipc_reset;
-	bool secure_mode;
+	void __iomem *pb_base; /* IPU7 */
+
 	u8 hw_ver;
+	bool need_ipc_reset;
+	bool ipc_reinit; /* IPU7 */
+	bool secure_mode;
 	bool bus_ready_to_probe;
 };
 

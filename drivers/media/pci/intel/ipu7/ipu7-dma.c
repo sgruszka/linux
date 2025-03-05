@@ -14,7 +14,6 @@
 #include <linux/types.h>
 
 #include "ipu7.h"
-#include "ipu7-bus.h"
 #include "ipu7-dma.h"
 #include "ipu7-mmu.h"
 

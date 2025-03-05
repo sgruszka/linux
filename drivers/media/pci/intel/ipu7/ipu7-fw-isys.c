@@ -15,7 +15,7 @@
 
 #include "ipu7.h"
 #include "ipu7-boot.h"
-#include "ipu7-bus.h"
+#include "ipu7-buttress.h"
 #include "ipu7-dma.h"
 #include "ipu7-fw-isys.h"
 #include "ipu7-isys.h"

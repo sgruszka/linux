@@ -34,7 +34,7 @@
 
 #include "abi/ipu7_fw_isys_abi.h"
 
-#include "ipu7-bus.h"
+#include "ipu7-buttress.h"
 #include "ipu7-buttress-regs.h"
 #include "ipu7-cpd.h"
 #include "ipu7-dma.h"
@@ -500,7 +500,7 @@ static void isys_cleanup_hw(struct ipu7_isys *isys)
 static int isys_runtime_pm_resume(struct device *dev)
 {
 	struct ipu_bus_device *adev = to_ipu_bus_device(dev);
-	struct ipu7_isys *isys = ipu7_bus_get_drvdata(adev);
+	struct ipu7_isys *isys = dev_get_drvdata(&adev->auxdev.dev);
 	struct ipu_device *isp = adev->isp;
 	unsigned long flags;
 	int ret;
@@ -530,7 +530,7 @@ static int isys_runtime_pm_resume(struct device *dev)
 static int isys_runtime_pm_suspend(struct device *dev)
 {
 	struct ipu_bus_device *adev = to_ipu_bus_device(dev);
-	struct ipu7_isys *isys = ipu7_bus_get_drvdata(adev);
+	struct ipu7_isys *isys = dev_get_drvdata(&adev->auxdev.dev);
 	unsigned long flags;
 
 	if (!isys)
@@ -890,7 +890,7 @@ static const struct resp_to_msg is_fw_msg[] = {
 
 int isys_isr_one(struct ipu_bus_device *adev)
 {
-	struct ipu7_isys *isys = ipu7_bus_get_drvdata(adev);
+	struct ipu7_isys *isys = dev_get_drvdata(&adev->auxdev.dev);
 	struct ipu7_isys_stream *stream = NULL;
 	struct device *dev = &adev->auxdev.dev;
 	struct ipu7_isys_csi2 *csi2 = NULL;
@@ -977,7 +977,7 @@ int isys_isr_one(struct ipu_bus_device *adev)
 		 * firmware only release the capture msg until software
 		 * get pin_data_ready event
 		 */
-		ipu7_put_fw_msg_buf(ipu7_bus_get_drvdata(adev), resp->buf_id);
+		ipu7_put_fw_msg_buf(dev_get_drvdata(&adev->auxdev.dev), resp->buf_id);
 		if (resp->pin_id < IPU_INSYS_OUTPUT_PINS &&
 		    stream->output_pins[resp->pin_id].pin_ready)
 			stream->output_pins[resp->pin_id].pin_ready(stream,
@@ -1075,7 +1075,7 @@ static void ipu7_isys_csi2_isr(struct ipu7_isys_csi2 *csi2)
 
 irqreturn_t isys_isr(struct ipu_bus_device *adev)
 {
-	struct ipu7_isys *isys = ipu7_bus_get_drvdata(adev);
+	struct ipu7_isys *isys = dev_get_drvdata(&adev->auxdev.dev);
 	u32 status_csi, status_sw, csi_offset, sw_offset;
 	struct device *dev = &isys->adev->auxdev.dev;
 	void __iomem *base = isys->pdata->base;
@@ -1137,6 +1137,7 @@ irqreturn_t isys_isr(struct ipu_bus_device *adev)
 static const struct ipu_auxdrv_data ipu7_isys_auxdrv_data = {
 	.isr = isys_isr,
 	.isr_threaded = NULL,
+	.buttress_power = ipu_buttress_power,
 	.wake_isr_thread = false,
 };
 

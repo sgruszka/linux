@@ -19,7 +19,7 @@
 
 #include "abi/ipu7_fw_isys_abi.h"
 
-#include "ipu7-bus.h"
+#include "ipu7-buttress.h"
 #include "ipu7-dma.h"
 #include "ipu7-fw-isys.h"
 #include "ipu7-isys.h"

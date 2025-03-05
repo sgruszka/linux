@@ -20,7 +20,6 @@
 #include <media/v4l2-subdev.h>
 
 #include "ipu7.h"
-#include "ipu7-bus.h"
 #include "ipu7-isys.h"
 #include "ipu7-isys-csi2.h"
 #include "ipu7-isys-csi2-regs.h"

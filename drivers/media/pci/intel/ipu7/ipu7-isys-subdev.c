@@ -15,7 +15,6 @@
 
 #include <uapi/linux/media-bus-format.h>
 
-#include "ipu7-bus.h"
 #include "ipu7-isys.h"
 #include "ipu7-isys-subdev.h"
 

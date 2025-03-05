@@ -11,53 +11,11 @@
 #include <linux/list.h>
 #include <linux/mutex.h>
 
-struct device;
-struct ipu_device;
-
-struct ipu_buttress_ctrl {
-	u32 subsys_id;
-	u32 freq_ctl, pwr_sts_shift, pwr_sts_mask, pwr_sts_on, pwr_sts_off;
-	u32 ratio;
-	u32 ratio_shift;
-	u32 cdyn;
-	u32 cdyn_shift;
-	u32 ovrd_clk;
-	u32 own_clk_ack;
-};
-
-struct ipu_buttress_ipc {
-	struct completion send_complete;
-	struct completion recv_complete;
-	u32 nack;
-	u32 nack_mask;
-	u32 recv_data;
-	u32 csr_out;
-	u32 csr_in;
-	u32 db0_in;
-	u32 db0_out;
-	u32 data0_out;
-	u32 data0_in;
-};
-
-struct ipu_buttress {
-	struct mutex power_mutex, auth_mutex, cons_mutex, ipc_mutex;
-	struct ipu_buttress_ipc cse;
-	u32 psys_min_freq;
-	u32 wdt_cached_value;
-	u8 psys_force_ratio;
-	bool force_suspend;
-	u32 ref_clk;
-};
-
-struct ipu7_ipc_buttress_bulk_msg {
-	u32 cmd;
-	u32 expected_resp;
-	bool require_resp;
-	u8 cmd_size;
-};
+#include "../ipu/ipu.h"
 
 int ipu_buttress_ipc_reset(struct ipu_device *isp,
 			   struct ipu_buttress_ipc *ipc);
+int ipu_buttress_power(struct device *dev, struct ipu_buttress_ctrl *ctrl, bool on);
 int ipu_buttress_powerup(struct device *dev,
 			 const struct ipu_buttress_ctrl *ctrl);
 int ipu_buttress_powerdown(struct device *dev,

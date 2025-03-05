@@ -22,7 +22,6 @@
 #include <linux/types.h>
 
 #include "ipu7.h"
-#include "ipu7-bus.h"
 #include "ipu7-buttress.h"
 #include "ipu7-buttress-regs.h"
 
@@ -211,7 +210,7 @@ static void ipu_buttress_ipc_recv(struct ipu_device *isp,
 }
 
 static int ipu_buttress_ipc_send_bulk(struct ipu_device *isp,
-				      struct ipu7_ipc_buttress_bulk_msg *msgs,
+				      struct ipu_ipc_buttress_bulk_msg *msgs,
 				      u32 size)
 {
 	unsigned long tx_timeout_jiffies, rx_timeout_jiffies;
@@ -301,7 +300,7 @@ static int ipu_buttress_ipc_send(struct ipu_device *isp,
 				 u32 ipc_msg, u32 size, bool require_resp,
 				 u32 expected_resp)
 {
-	struct ipu7_ipc_buttress_bulk_msg msg = {
+	struct ipu_ipc_buttress_bulk_msg msg = {
 		.cmd = ipc_msg,
 		.cmd_size = size,
 		.require_resp = require_resp,
@@ -718,6 +717,16 @@ int ipu_buttress_powerdown(struct device *dev,
 
 	return ipu7_buttress_powerdown(dev, ctrl);
 }
+
+int ipu_buttress_power(struct device *dev, struct ipu_buttress_ctrl *ctrl, bool on)
+{
+
+	if (on)
+		return ipu_buttress_powerup(dev, ctrl);
+	else
+		return ipu_buttress_powerdown(dev, ctrl);
+}
+EXPORT_SYMBOL_GPL(ipu_buttress_power);
 
 bool ipu_buttress_get_secure_mode(struct ipu_device *isp)
 {

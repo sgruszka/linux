@@ -28,7 +28,6 @@
 #include "abi/ipu7_fw_common_abi.h"
 
 #include "ipu7.h"
-#include "ipu7-bus.h"
 #include "ipu7-buttress.h"
 #include "ipu7-buttress-regs.h"
 #include "ipu7-cpd.h"
@@ -2126,7 +2125,7 @@ static int ipu7_isys_check_fwnode_graph(struct fwnode_handle *fwnode)
 
 static struct ipu_bus_device *
 ipu7_isys_init(struct pci_dev *pdev, struct device *parent,
-	       const struct ipu_buttress_ctrl *ctrl, void __iomem *base,
+	       struct ipu_buttress_ctrl *ctrl, void __iomem *base,
 	       const struct ipu_isys_internal_pdata *ipdata,
 	       unsigned int nr)
 {
@@ -2158,8 +2157,8 @@ ipu7_isys_init(struct pci_dev *pdev, struct device *parent,
 	pdata->base = base;
 	pdata->ipdata = ipdata;
 
-	isys_adev = ipu7_bus_initialize_device(pdev, parent, pdata, ctrl,
-					       IPU_ISYS_NAME);
+	isys_adev = ipu_bus_initialize_device(pdev, parent, pdata, ctrl,
+					      IPU_ISYS_NAME);
 	if (IS_ERR(isys_adev)) {
 		dev_err_probe(dev, PTR_ERR(isys_adev),
 			      "ipu7_bus_initialize_device isys failed\n");
@@ -2180,7 +2179,7 @@ ipu7_isys_init(struct pci_dev *pdev, struct device *parent,
 	isys_adev->mmu->dev = &isys_adev->auxdev.dev;
 	isys_adev->subsys = IPU_IS;
 
-	ret = ipu7_bus_add_device(isys_adev);
+	ret = ipu_bus_add_device(isys_adev);
 	if (ret) {
 		kfree(pdata);
 		return ERR_PTR(ret);
@@ -2191,7 +2190,7 @@ ipu7_isys_init(struct pci_dev *pdev, struct device *parent,
 
 static struct ipu_bus_device *
 ipu7_psys_init(struct pci_dev *pdev, struct device *parent,
-	       const struct ipu_buttress_ctrl *ctrl, void __iomem *base,
+	       struct ipu_buttress_ctrl *ctrl, void __iomem *base,
 	       const struct ipu_psys_internal_pdata *ipdata, unsigned int nr)
 {
 	struct ipu_bus_device *psys_adev;
@@ -2205,7 +2204,7 @@ ipu7_psys_init(struct pci_dev *pdev, struct device *parent,
 	pdata->base = base;
 	pdata->ipdata = ipdata;
 
-	psys_adev = ipu7_bus_initialize_device(pdev, parent, pdata, ctrl,
+	psys_adev = ipu_bus_initialize_device(pdev, parent, pdata, ctrl,
 					       IPU_PSYS_NAME);
 	if (IS_ERR(psys_adev)) {
 		dev_err_probe(&pdev->dev, PTR_ERR(psys_adev),
@@ -2227,7 +2226,7 @@ ipu7_psys_init(struct pci_dev *pdev, struct device *parent,
 	psys_adev->mmu->dev = &psys_adev->auxdev.dev;
 	psys_adev->subsys = IPU_PS;
 
-	ret = ipu7_bus_add_device(psys_adev);
+	ret = ipu_bus_add_device(psys_adev);
 	if (ret) {
 		kfree(pdata);
 		return ERR_PTR(ret);
@@ -2630,7 +2629,7 @@ out_ipu_bus_del_devices:
 		ipu7_mmu_cleanup(isp->isys->mmu);
 	if (!IS_ERR_OR_NULL(isp->psys))
 		pm_runtime_put(&isp->psys->auxdev.dev);
-	ipu7_bus_del_devices(pdev);
+	ipu_bus_del_devices(pdev);
 	release_firmware(isp->cpd_fw);
 buttress_exit:
 	ipu_buttress_exit(isp);
@@ -2650,7 +2649,7 @@ static void ipu7_pci_remove(struct pci_dev *pdev)
 	if (!IS_ERR_OR_NULL(isp->fw_code_region))
 		vfree(isp->fw_code_region);
 
-	ipu7_bus_del_devices(pdev);
+	ipu_bus_del_devices(pdev);
 
 	pm_runtime_forbid(&pdev->dev);
 	pm_runtime_get_noresume(&pdev->dev);

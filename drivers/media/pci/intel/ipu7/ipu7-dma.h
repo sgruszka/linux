@@ -11,7 +11,7 @@
 #include <linux/scatterlist.h>
 #include <linux/types.h>
 
-#include "ipu7-bus.h"
+#include "../ipu/ipu.h"
 
 #define DMA_ATTR_RESERVE_REGION		BIT(31)
 struct ipu7_mmu_info;

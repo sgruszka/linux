@@ -10,7 +10,7 @@
 #include <linux/pci.h>
 #include <linux/types.h>
 
-#include "ipu7-buttress.h"
+#include "../ipu/ipu.h"
 
 struct ipu_bus_device;
 struct pci_dev;
@@ -66,28 +66,6 @@ static inline bool is_ipu8(u8 hw_ver)
 #define IPU_FW_CODE_REGION_START	0x4000000 /* 64MB */
 #define IPU_FW_CODE_REGION_END		(IPU_FW_CODE_REGION_START +	\
 					 IPU_FW_CODE_REGION_SIZE) /* 80MB */
-
-struct ipu_device {
-	struct pci_dev *pdev;
-	struct list_head devices;
-	struct ipu_bus_device *isys;
-	struct ipu_bus_device *psys;
-	struct ipu_buttress buttress;
-
-	const struct firmware *cpd_fw;
-	const char *cpd_fw_name;
-	/* Only for non-secure mode. */
-	void *fw_code_region;
-
-	void __iomem *base;
-	void __iomem *pb_base;
-
-	u8 hw_ver;
-	bool ipc_reinit;
-	bool secure_mode;
-	bool bus_ready_to_probe;
-};
-
 #define IPU_DMA_MASK			39
 #define IPU_LIB_CALL_TIMEOUT_MS		2000
 #define IPU_PSYS_CMD_TIMEOUT_MS		2000

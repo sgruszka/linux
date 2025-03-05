@@ -15,8 +15,6 @@
 struct firmware;
 struct pci_dev;
 
-struct ipu_buttress_ctrl;
-
 struct ipu_buttress_ctrl {
 	u32 freq_ctl, pwr_sts_shift, pwr_sts_mask, pwr_sts_on, pwr_sts_off;
 	u32 ratio;
@@ -62,6 +60,24 @@ struct ipu_ipc_buttress_bulk_msg {
 	u32 expected_resp;
 	bool require_resp;
 	u8 cmd_size;
+};
+
+struct ipu_device {
+	struct pci_dev *pdev;
+	struct list_head devices;
+	struct ipu_bus_device *isys;
+	struct ipu_bus_device *psys;
+	struct ipu_buttress buttress;
+
+	const struct firmware *cpd_fw;
+	const char *cpd_fw_name;
+	u32 cpd_metadata_cmpnt_size;
+
+	void __iomem *base;
+	bool need_ipc_reset;
+	bool secure_mode;
+	u8 hw_ver;
+	bool bus_ready_to_probe;
 };
 
 enum ipu7_subsys {

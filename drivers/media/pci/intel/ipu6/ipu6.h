@@ -69,24 +69,6 @@ static inline bool is_ipu6_tgl(u8 hw_ver)
 /* Virtualization factor to calculate the available virtual pages */
 #define IPU6_DEVICE_GDA_VIRT_FACTOR	32
 
-struct ipu_device {
-	struct pci_dev *pdev;
-	struct list_head devices;
-	struct ipu_bus_device *isys;
-	struct ipu_bus_device *psys;
-	struct ipu_buttress buttress;
-
-	const struct firmware *cpd_fw;
-	const char *cpd_fw_name;
-	u32 cpd_metadata_cmpnt_size;
-
-	void __iomem *base;
-	bool need_ipc_reset;
-	bool secure_mode;
-	u8 hw_ver;
-	bool bus_ready_to_probe;
-};
-
 #define IPU6_ISYS_NAME "isys"
 #define IPU6_PSYS_NAME "psys"
 

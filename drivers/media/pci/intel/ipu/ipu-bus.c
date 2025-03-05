@@ -14,7 +14,7 @@
 #include <linux/pm_runtime.h>
 #include <linux/slab.h>
 
-#include "ipu6.h"
+#include "../ipu/ipu.h"
 
 static inline int bus_pm_buttress_power(struct ipu_bus_device *adev, bool on)
 {

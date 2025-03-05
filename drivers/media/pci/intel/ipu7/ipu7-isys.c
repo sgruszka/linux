@@ -707,7 +707,7 @@ static int isys_probe(struct auxiliary_device *auxdev,
 	struct ipu7_isys *isys;
 	int ret = 0;
 
-	if (!isp->ipu7_bus_ready_to_probe)
+	if (!isp->bus_ready_to_probe)
 		return -EPROBE_DEFER;
 
 	isys = devm_kzalloc(&auxdev->dev, sizeof(*isys), GFP_KERNEL);

@@ -81,10 +81,11 @@ struct ipu_device {
 
 	void __iomem *base;
 	void __iomem *pb_base;
+
 	u8 hw_ver;
 	bool ipc_reinit;
 	bool secure_mode;
-	bool ipu7_bus_ready_to_probe;
+	bool bus_ready_to_probe;
 };
 
 #define IPU_DMA_MASK			39

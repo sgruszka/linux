@@ -2615,7 +2615,7 @@ static int ipu7_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	pm_runtime_put_noidle(dev);
 	pm_runtime_allow(dev);
 
-	isp->ipu7_bus_ready_to_probe = true;
+	isp->bus_ready_to_probe = true;
 
 	return 0;
 

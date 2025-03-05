@@ -5,8 +5,7 @@ intel-ipu6-y			:= ipu6.o \
 				ipu6-mmu.o \
 				ipu6-buttress.o \
 				ipu6-cpd.o \
-				ipu6-fw-com.o \
-				../ipu/ipu-bus.o
+				ipu6-fw-com.o
 
 obj-$(CONFIG_VIDEO_INTEL_IPU6)	+= intel-ipu6.o
 

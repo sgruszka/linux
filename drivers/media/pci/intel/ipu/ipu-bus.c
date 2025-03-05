@@ -14,7 +14,7 @@
 #include <linux/pm_runtime.h>
 #include <linux/slab.h>
 
-#include "../ipu/ipu.h"
+#include "ipu.h"
 
 static inline int bus_pm_buttress_power(struct ipu_bus_device *adev, bool on)
 {
@@ -125,6 +125,7 @@ ipu_bus_initialize_device(struct pci_dev *pdev, struct device *parent,
 
 	return adev;
 }
+EXPORT_SYMBOL_GPL(ipu_bus_initialize_device);
 
 int ipu_bus_add_device(struct ipu_bus_device *adev)
 {
@@ -145,6 +146,7 @@ int ipu_bus_add_device(struct ipu_bus_device *adev)
 
 	return 0;
 }
+EXPORT_SYMBOL_GPL(ipu_bus_add_device);
 
 void ipu_bus_del_devices(struct pci_dev *pdev)
 {
@@ -162,3 +164,6 @@ void ipu_bus_del_devices(struct pci_dev *pdev)
 
 	mutex_unlock(&ipu6_bus_mutex);
 }
+EXPORT_SYMBOL_GPL(ipu_bus_del_devices);
+
+MODULE_LICENSE("GPL");

@@ -442,10 +442,9 @@ irqreturn_t ipu6_buttress_isr_threaded(int irq, void *isp_ptr)
 	return ret;
 }
 
-int ipu6_buttress_power(struct device *dev, struct ipu_buttress_ctrl *ctrl,
-			bool on)
+static int ipu6_buttress_power(struct ipu_device *isp, const struct ipu_buttress_ctrl *ctrl,
+			       bool on)
 {
-	struct ipu_device *isp = to_ipu_bus_device(dev)->isp;
 	u32 pwr_sts, val;
 	int ret;
 
@@ -477,13 +476,20 @@ int ipu6_buttress_power(struct device *dev, struct ipu_buttress_ctrl *ctrl,
 		dev_err(&isp->pdev->dev,
 			"Change power status timeout with 0x%x\n", val);
 
-	ctrl->started = !ret && on;
-
 	mutex_unlock(&isp->buttress.power_mutex);
 
 	return ret;
 }
-EXPORT_SYMBOL_NS_GPL(ipu6_buttress_power, "INTEL_IPU6");
+
+static int ipu6_buttress_powerup(struct ipu_device *isp, const struct ipu_buttress_ctrl *ctrl)
+{
+	return ipu6_buttress_power(isp, ctrl, true);
+}
+
+static int ipu6_buttress_powerdown(struct ipu_device *isp, const struct ipu_buttress_ctrl *ctrl)
+{
+	return ipu6_buttress_power(isp, ctrl, false);
+}
 
 bool ipu6_buttress_get_secure_mode(struct ipu_device *isp)
 {
@@ -843,6 +849,9 @@ int ipu6_buttress_init(struct ipu_device *isp)
 	b->cse.db0_out = BUTTRESS_REG_IU2CSEDB0;
 	b->cse.data0_in = BUTTRESS_REG_CSE2IUDATA0;
 	b->cse.data0_out = BUTTRESS_REG_IU2CSEDATA0;
+
+	isp->hw_ops.buttress_powerup = ipu6_buttress_powerup;
+	isp->hw_ops.buttress_powerdown = ipu6_buttress_powerdown;
 
 	INIT_LIST_HEAD(&b->constraints);
 

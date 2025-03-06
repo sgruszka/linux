@@ -18,9 +18,13 @@
 
 static inline int bus_pm_buttress_power(struct ipu_bus_device *adev, bool on)
 {
-	struct device *dev = &adev->auxdev.dev;
+	struct ipu_device *isp = adev->isp;
+	struct ipu_buttress_ctrl *ctrl = adev->ctrl;
 
-	return adev->auxdrv_data->buttress_power(dev, adev->ctrl, on);
+	if (on)
+		return isp->hw_ops.buttress_powerup(isp, ctrl);
+	else
+		return isp->hw_ops.buttress_powerdown(isp, ctrl);
 }
 
 static int bus_pm_runtime_suspend(struct device *dev)
@@ -132,7 +136,7 @@ int ipu_bus_add_device(struct ipu_bus_device *adev)
 	struct auxiliary_device *auxdev = &adev->auxdev;
 	int ret;
 
-	ret = auxiliary_device_add(auxdev);
+	ret = __auxiliary_device_add(auxdev, "intel_ipu_aux");
 	if (ret) {
 		auxiliary_device_uninit(auxdev);
 		return ret;

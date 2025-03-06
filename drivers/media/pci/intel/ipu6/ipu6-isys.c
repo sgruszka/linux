@@ -1347,13 +1347,12 @@ leave:
 static const struct ipu_auxdrv_data ipu6_isys_auxdrv_data = {
 	.isr = isys_isr,
 	.isr_threaded = NULL,
-	.buttress_power = ipu6_buttress_power,
 	.wake_isr_thread = false,
 };
 
 static const struct auxiliary_device_id ipu6_isys_id_table[] = {
 	{
-		.name = "intel_ipu6.isys",
+		.name = "intel_ipu_aux.isys",
 		.driver_data = (kernel_ulong_t)&ipu6_isys_auxdrv_data,
 	},
 	{ }

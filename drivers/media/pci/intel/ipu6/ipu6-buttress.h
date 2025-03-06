@@ -32,8 +32,6 @@ int ipu6_buttress_map_fw_image(struct ipu_bus_device *sys,
 			       struct sg_table *sgt);
 void ipu6_buttress_unmap_fw_image(struct ipu_bus_device *sys,
 				  struct sg_table *sgt);
-int ipu6_buttress_power(struct device *dev, struct ipu_buttress_ctrl *ctrl,
-			bool on);
 bool ipu6_buttress_get_secure_mode(struct ipu_device *isp);
 int ipu6_buttress_authenticate(struct ipu_device *isp);
 int ipu6_buttress_reset_authentication(struct ipu_device *isp);

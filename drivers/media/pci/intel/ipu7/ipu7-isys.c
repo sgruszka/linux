@@ -1137,13 +1137,12 @@ irqreturn_t isys_isr(struct ipu_bus_device *adev)
 static const struct ipu_auxdrv_data ipu7_isys_auxdrv_data = {
 	.isr = isys_isr,
 	.isr_threaded = NULL,
-	.buttress_power = ipu_buttress_power,
 	.wake_isr_thread = false,
 };
 
 static const struct auxiliary_device_id ipu7_isys_id_table[] = {
 	{
-		.name = "intel_ipu7.isys",
+		.name = "intel_ipu_aux.isys",
 		.driver_data = (kernel_ulong_t)&ipu7_isys_auxdrv_data,
 	},
 	{ }

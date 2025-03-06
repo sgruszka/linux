@@ -15,13 +15,14 @@
 struct firmware;
 struct pci_dev;
 
+struct ipu_device;
+
 struct ipu_buttress_ctrl {
 	u32 freq_ctl, pwr_sts_shift, pwr_sts_mask, pwr_sts_on, pwr_sts_off;
 	u32 ratio;
 
 	/* IPU6 */
 	unsigned int qos_floor;
-	bool started;
 
 	/* IPU7 */
 	u32 subsys_id;
@@ -62,12 +63,18 @@ struct ipu_ipc_buttress_bulk_msg {
 	u8 cmd_size;
 };
 
+struct ipu_hw_ops {
+	int  (*buttress_powerup) (struct ipu_device *isp, const struct ipu_buttress_ctrl *ctrl);
+	int  (*buttress_powerdown) (struct ipu_device *isp, const struct ipu_buttress_ctrl *ctrl);
+};
+
 struct ipu_device {
 	struct pci_dev *pdev;
 	struct list_head devices;
 	struct ipu_bus_device *isys;
 	struct ipu_bus_device *psys;
 	struct ipu_buttress buttress;
+	struct ipu_hw_ops hw_ops;
 
 	const struct firmware *cpd_fw;
 	const char *cpd_fw_name;
@@ -122,7 +129,6 @@ struct ipu_bus_device {
 struct ipu_auxdrv_data {
 	irqreturn_t (*isr)(struct ipu_bus_device *adev);
 	irqreturn_t (*isr_threaded)(struct ipu_bus_device *adev);
-	int (*buttress_power)(struct device *dev, struct ipu_buttress_ctrl *ctrl, bool on);
 	bool wake_isr_thread;
 };
 

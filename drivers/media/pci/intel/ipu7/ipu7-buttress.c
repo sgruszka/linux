@@ -496,10 +496,10 @@ static void isys_nde_control(struct device *dev, bool on)
 	writel(val, isp->base + nde_reg);
 }
 
-static int ipu7_buttress_powerup(struct device *dev,
+static int ipu7_buttress_powerup(struct ipu_device *isp,
 				 const struct ipu_buttress_ctrl *ctrl)
 {
-	struct ipu_device *isp = to_ipu_bus_device(dev)->isp;
+	struct device *dev = &isp->pdev->dev;
 	u32 val, exp_sts;
 	int ret = 0;
 
@@ -556,10 +556,11 @@ out_power:
 	return ret;
 }
 
-static int ipu7_buttress_powerdown(struct device *dev,
+static int ipu7_buttress_powerdown(struct ipu_device *isp,
 				   const struct ipu_buttress_ctrl *ctrl)
 {
-	struct ipu_device *isp = to_ipu_bus_device(dev)->isp;
+	struct device *dev = &isp->pdev->dev;
+
 	u32 val, exp_sts;
 	int ret = 0;
 
@@ -596,10 +597,10 @@ out_power:
 	return ret;
 }
 
-static int ipu8_buttress_powerup(struct device *dev,
+static int ipu8_buttress_powerup(struct ipu_device *isp,
 				 const struct ipu_buttress_ctrl *ctrl)
 {
-	struct ipu_device *isp = to_ipu_bus_device(dev)->isp;
+	struct device *dev = &isp->pdev->dev;
 	u32 sleep_level_reg = BUTTRESS_REG_SLEEP_LEVEL_STS;
 	u32 val, exp_sts;
 	int ret = 0;
@@ -648,10 +649,10 @@ out_power:
 	return ret;
 }
 
-static int ipu8_buttress_powerdown(struct device *dev,
+static int ipu8_buttress_powerdown(struct ipu_device *isp,
 				   const struct ipu_buttress_ctrl *ctrl)
 {
-	struct ipu_device *isp = to_ipu_bus_device(dev)->isp;
+	struct device *dev = &isp->pdev->dev;
 	u32 val, exp_sts;
 	int ret = 0;
 
@@ -695,38 +696,6 @@ out_power:
 
 	return ret;
 }
-
-int ipu_buttress_powerup(struct device *dev,
-			 const struct ipu_buttress_ctrl *ctrl)
-{
-	struct ipu_device *isp = to_ipu_bus_device(dev)->isp;
-
-	if (is_ipu8(isp->hw_ver))
-		return ipu8_buttress_powerup(dev, ctrl);
-
-	return ipu7_buttress_powerup(dev, ctrl);
-}
-
-int ipu_buttress_powerdown(struct device *dev,
-			   const struct ipu_buttress_ctrl *ctrl)
-{
-	struct ipu_device *isp = to_ipu_bus_device(dev)->isp;
-
-	if (is_ipu8(isp->hw_ver))
-		return ipu8_buttress_powerdown(dev, ctrl);
-
-	return ipu7_buttress_powerdown(dev, ctrl);
-}
-
-int ipu_buttress_power(struct device *dev, struct ipu_buttress_ctrl *ctrl, bool on)
-{
-
-	if (on)
-		return ipu_buttress_powerup(dev, ctrl);
-	else
-		return ipu_buttress_powerdown(dev, ctrl);
-}
-EXPORT_SYMBOL_GPL(ipu_buttress_power);
 
 bool ipu_buttress_get_secure_mode(struct ipu_device *isp)
 {
@@ -1152,6 +1121,14 @@ int ipu_buttress_init(struct ipu_device *isp)
 	b->cse.db0_out = BUTTRESS_REG_IU2CSEDB0;
 	b->cse.data0_in = BUTTRESS_REG_CSE2IUDATA0;
 	b->cse.data0_out = BUTTRESS_REG_IU2CSEDATA0;
+
+	if (is_ipu8(isp->hw_ver)) {
+		isp->hw_ops.buttress_powerup = ipu8_buttress_powerup;
+		isp->hw_ops.buttress_powerdown = ipu8_buttress_powerdown;
+	} else {
+		isp->hw_ops.buttress_powerup = ipu7_buttress_powerup;
+		isp->hw_ops.buttress_powerdown = ipu7_buttress_powerdown;
+	}
 
 	isp->secure_mode = ipu_buttress_get_secure_mode(isp);
 	val = readl(isp->base + BUTTRESS_REG_IPU_SKU);

@@ -56,7 +56,7 @@ s64 ipu7_isys_csi2_get_link_freq(struct ipu7_isys_csi2 *csi2)
 	if (!csi2)
 		return -EINVAL;
 
-	dev = &csi2->isys->adev->auxdev.dev;
+	dev = isys_to_dev(csi2->isys);
 	src_pad = media_entity_remote_source_pad_unique(&csi2->asd.sd.entity);
 	if (IS_ERR(src_pad)) {
 		dev_err(dev, "can't get source pad of %s (%ld)\n",
@@ -76,7 +76,7 @@ static int csi2_subscribe_event(struct v4l2_subdev *sd, struct v4l2_fh *fh,
 {
 	struct ipu7_isys_subdev *asd = to_ipu7_isys_subdev(sd);
 	struct ipu7_isys_csi2 *csi2 = to_ipu7_isys_csi2(asd);
-	struct device *dev = &csi2->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(csi2->isys);
 
 	dev_dbg(dev, "csi2 subscribe event(type %u id %u)\n",
 		sub->type, sub->id);
@@ -173,7 +173,7 @@ static void ipu7_isys_csi2_disable_stream(struct ipu7_isys_csi2 *csi2)
 static int ipu7_isys_csi2_enable_stream(struct ipu7_isys_csi2 *csi2)
 {
 	struct ipu7_isys *isys = csi2->isys;
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	void __iomem *isys_base = isys->pdata->base;
 	unsigned int port, nlanes, offset, val;
 	int ret;
@@ -216,7 +216,7 @@ static int ipu7_isys_csi2_set_sel(struct v4l2_subdev *sd,
 				  struct v4l2_subdev_selection *sel)
 {
 	struct ipu7_isys_subdev *asd = to_ipu7_isys_subdev(sd);
-	struct device *dev = &asd->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(asd->isys);
 	struct v4l2_mbus_framefmt *sink_ffmt;
 	struct v4l2_mbus_framefmt *src_ffmt;
 	struct v4l2_rect *crop;
@@ -319,7 +319,7 @@ static int ipu7_isys_csi2_enable_streams(struct v4l2_subdev *sd,
 	int ret, i;
 
 	if (!csi2->stream_count) {
-		dev_dbg(&csi2->isys->adev->auxdev.dev,
+		dev_dbg(isys_to_dev(csi2->isys),
 			"stream on CSI2-%u with %u lanes\n", csi2->port,
 			csi2->nlanes);
 		ret = ipu7_isys_csi2_enable_stream(csi2);
@@ -382,7 +382,7 @@ static int ipu7_isys_csi2_disable_streams(struct v4l2_subdev *sd,
 	if (--csi2->stream_count)
 		return 0;
 
-	dev_dbg(&csi2->isys->adev->auxdev.dev,
+	dev_dbg(isys_to_dev(csi2->isys),
 		"stream off CSI2-%u with %u lanes\n", csi2->port, csi2->nlanes);
 
 	ipu7_isys_csi2_disable_stream(csi2);
@@ -426,7 +426,7 @@ int ipu7_isys_csi2_init(struct ipu7_isys_csi2 *csi2,
 			struct ipu7_isys *isys,
 			void __iomem *base, unsigned int index)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	int ret;
 
 	csi2->isys = isys;
@@ -480,7 +480,7 @@ isys_subdev_cleanup:
 void ipu7_isys_csi2_sof_event_by_stream(struct ipu7_isys_stream *stream)
 {
 	struct ipu7_isys_csi2 *csi2 = ipu7_isys_subdev_to_csi2(stream->asd);
-	struct device *dev = &stream->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(stream->isys);
 	struct video_device *vdev = csi2->asd.sd.devnode;
 	struct v4l2_event ev = {
 		.type = V4L2_EVENT_FRAME_SYNC,
@@ -497,7 +497,7 @@ void ipu7_isys_csi2_sof_event_by_stream(struct ipu7_isys_stream *stream)
 void ipu7_isys_csi2_eof_event_by_stream(struct ipu7_isys_stream *stream)
 {
 	struct ipu7_isys_csi2 *csi2 = ipu7_isys_subdev_to_csi2(stream->asd);
-	struct device *dev = &stream->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(stream->isys);
 	u32 frame_sequence = atomic_read(&stream->sequence);
 
 	dev_dbg(dev, "eof_event::csi2-%i sequence: %i\n",
@@ -511,7 +511,7 @@ int ipu7_isys_csi2_get_remote_desc(u32 source_stream,
 				   int *nr_queues)
 {
 	struct v4l2_mbus_frame_desc_entry *desc_entry = NULL;
-	struct device *dev = &csi2->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(csi2->isys);
 	struct v4l2_mbus_frame_desc desc;
 	struct v4l2_subdev *source;
 	struct media_pad *pad;

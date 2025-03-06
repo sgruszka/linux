@@ -38,7 +38,7 @@ int ipu7_fw_isys_complex_cmd(struct ipu7_isys *isys,
 			     size_t size, u16 send_type)
 {
 	struct ipu7_syscom_context *ctx = isys->adev->syscom;
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	struct ipu7_insys_send_queue_token *token;
 
 	if (send_type >= N_IPU_INSYS_SEND_TYPE)

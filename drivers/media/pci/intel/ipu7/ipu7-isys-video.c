@@ -299,7 +299,7 @@ static int link_validate(struct media_link *link)
 {
 	struct ipu7_isys_video *av =
 		container_of(link->sink, struct ipu7_isys_video, pad);
-	struct device *dev = &av->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(av->isys);
 	struct v4l2_subdev_state *s_state;
 	struct v4l2_mbus_framefmt *s_fmt;
 	struct v4l2_subdev *s_sd;
@@ -380,7 +380,7 @@ static int ipu7_isys_fw_pin_cfg(struct ipu7_isys_video *av,
 	int input_pins = cfg->nof_input_pins++;
 	struct ipu7_isys_queue *aq = &av->aq;
 	struct ipu7_isys *isys = av->isys;
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	struct v4l2_mbus_framefmt fmt;
 	int output_pins;
 	u32 src_stream;
@@ -456,7 +456,7 @@ static int ipu7_isys_fw_pin_cfg(struct ipu7_isys_video *av,
 static int start_stream_firmware(struct ipu7_isys_video *av,
 				 struct ipu7_isys_buffer_list *bl)
 {
-	struct device *dev = &av->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(av->isys);
 	struct ipu7_isys_stream *stream = av->stream;
 	struct ipu7_insys_stream_cfg *stream_cfg;
 	struct ipu7_insys_buffset *buf = NULL;
@@ -589,7 +589,7 @@ out_put_stream_opened:
 
 static void stop_streaming_firmware(struct ipu7_isys_video *av)
 {
-	struct device *dev = &av->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(av->isys);
 	struct ipu7_isys_stream *stream = av->stream;
 	int ret, tout;
 
@@ -614,7 +614,7 @@ static void stop_streaming_firmware(struct ipu7_isys_video *av)
 
 static void close_streaming_firmware(struct ipu7_isys_video *av)
 {
-	struct device *dev = &av->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(av->isys);
 	struct ipu7_isys_stream *stream =  av->stream;
 	int ret, tout;
 
@@ -665,7 +665,7 @@ int ipu7_isys_video_prepare_stream(struct ipu7_isys_video *av,
 	csi2->receiver_errors = 0;
 	stream->source_entity = source_entity;
 
-	dev_dbg(&av->isys->adev->auxdev.dev,
+	dev_dbg(isys_to_dev(av->isys),
 		"prepare stream: external entity %s\n",
 		stream->source_entity->name);
 
@@ -683,7 +683,7 @@ void ipu7_isys_put_stream(struct ipu7_isys_stream *stream)
 		return;
 	}
 
-	dev = &stream->isys->adev->auxdev.dev;
+	dev = isys_to_dev(stream->isys);
 
 	spin_lock_irqsave(&stream->isys->streams_lock, flags);
 	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++) {
@@ -747,7 +747,7 @@ ipu7_isys_query_stream_by_handle(struct ipu7_isys *isys, u8 stream_handle)
 		return NULL;
 
 	if (stream_handle >= IPU_ISYS_MAX_STREAMS) {
-		dev_err(&isys->adev->auxdev.dev,
+		dev_err(isys_to_dev(isys),
 			"stream_handle %d is invalid\n", stream_handle);
 		return NULL;
 	}
@@ -773,7 +773,7 @@ ipu7_isys_query_stream_by_source(struct ipu7_isys *isys, int source, u8 vc)
 		return NULL;
 
 	if (source < 0) {
-		dev_err(&isys->adev->auxdev.dev,
+		dev_err(isys_to_dev(isys),
 			"query stream with invalid port number\n");
 		return NULL;
 	}
@@ -825,7 +825,7 @@ int ipu7_isys_video_set_streaming(struct ipu7_isys_video *av, int state,
 				  struct ipu7_isys_buffer_list *bl)
 {
 	struct ipu7_isys_stream *stream = av->stream;
-	struct device *dev = &av->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(av->isys);
 	struct media_pad *r_pad;
 	struct v4l2_subdev *sd;
 	u32 r_stream;
@@ -962,9 +962,9 @@ void ipu7_isys_fw_close(struct ipu7_isys *isys)
 	mutex_unlock(&isys->mutex);
 
 	if (isys->need_reset)
-		pm_runtime_put_sync(&isys->adev->auxdev.dev);
+		pm_runtime_put_sync(isys_to_dev(isys));
 	else
-		pm_runtime_put(&isys->adev->auxdev.dev);
+		pm_runtime_put(isys_to_dev(isys));
 }
 
 int ipu7_isys_setup_video(struct ipu7_isys_video *av,
@@ -972,7 +972,7 @@ int ipu7_isys_setup_video(struct ipu7_isys_video *av,
 {
 	const struct ipu7_isys_pixelformat *pfmt =
 		ipu7_isys_get_isys_format(av->pix_fmt.pixelformat);
-	struct device *dev = &av->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(av->isys);
 	struct media_pad *source_pad, *remote_pad;
 	struct v4l2_mbus_frame_desc_entry entry;
 	struct v4l2_subdev_route *route = NULL;

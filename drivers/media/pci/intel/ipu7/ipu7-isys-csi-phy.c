@@ -153,7 +153,7 @@ static void dwc_phy_write(struct ipu7_isys *isys, u32 id, u32 addr, u16 data)
 	void __iomem *isys_base = isys->pdata->base;
 	void __iomem *base = isys_base + IS_IO_CDPHY_BASE(id);
 
-	dev_dbg(&isys->adev->auxdev.dev, "phy write: reg 0x%zx = data 0x%04x",
+	dev_dbg(isys_to_dev(isys), "phy write: reg 0x%zx = data 0x%04x",
 		base + addr - isys_base, data);
 	writew(data, base + addr);
 }
@@ -165,7 +165,7 @@ static u16 dwc_phy_read(struct ipu7_isys *isys, u32 id, u32 addr)
 	u16 data;
 
 	data = readw(base + addr);
-	dev_dbg(&isys->adev->auxdev.dev, "phy read: reg 0x%zx = data 0x%04x",
+	dev_dbg(isys_to_dev(isys), "phy read: reg 0x%zx = data 0x%04x",
 		base + addr - isys_base, data);
 
 	return data;
@@ -175,7 +175,7 @@ static void dwc_csi_write(struct ipu7_isys *isys, u32 id, u32 addr, u32 data)
 {
 	void __iomem *isys_base = isys->pdata->base;
 	void __iomem *base = isys_base + IS_IO_CSI2_HOST_BASE(id);
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 
 	dev_dbg(dev, "csi write: reg 0x%zx = data 0x%08x",
 		base + addr - isys_base, data);
@@ -189,7 +189,7 @@ static void gpreg_write(struct ipu7_isys *isys, u32 id, u32 addr, u32 data)
 	void __iomem *isys_base = isys->pdata->base;
 	u32 gpreg = isys->pdata->ipdata->csi2.gpreg;
 	void __iomem *base = isys_base + gpreg + 0x1000 * id;
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 
 	dev_dbg(dev, "gpreg write: reg 0x%zx = data 0x%08x",
 		base + addr - isys_base, data);
@@ -205,7 +205,7 @@ static u32 dwc_csi_read(struct ipu7_isys *isys, u32 id, u32 addr)
 	u32 data;
 
 	data = readl(base + addr);
-	dev_dbg(&isys->adev->auxdev.dev, "csi read: reg 0x%zx = data 0x%x",
+	dev_dbg(isys_to_dev(isys), "csi read: reg 0x%zx = data 0x%x",
 		base + addr - isys_base, data);
 
 	return data;
@@ -243,7 +243,7 @@ static void dwc_csi_write_mask(struct ipu7_isys *isys, u32 id, u32 addr,
 static void ipu7_isys_csi_ctrl_cfg(struct ipu7_isys_csi2 *csi2)
 {
 	struct ipu7_isys *isys = csi2->isys;
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	u32 id, lanes, phy_mode;
 	u32 val;
 
@@ -293,7 +293,7 @@ static int __dids_config(struct ipu7_isys_csi2 *csi2, u32 id, u8 vc, u8 dt)
 	u8 lo, hi;
 	int ret;
 
-	dev_dbg(&isys->adev->auxdev.dev, "config CSI-%u with vc:%u dt:0x%02x\n",
+	dev_dbg(isys_to_dev(isys), "config CSI-%u with vc:%u dt:0x%02x\n",
 		id, vc, dt);
 
 	dwc_csi_write(isys, id, VC_EXTENSION, 0x0);
@@ -321,7 +321,7 @@ static int __dids_config(struct ipu7_isys_csi2 *csi2, u32 id, u8 vc, u8 dt)
 static int ipu7_isys_csi_ctrl_dids_config(struct ipu7_isys_csi2 *csi2, u32 id)
 {
 	struct v4l2_mbus_frame_desc_entry *desc_entry = NULL;
-	struct device *dev = &csi2->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(csi2->isys);
 	struct v4l2_mbus_frame_desc desc;
 	struct v4l2_subdev *ext_sd;
 	struct media_pad *pad;
@@ -368,7 +368,7 @@ static int ipu7_isys_phy_ready(struct ipu7_isys *isys, u32 id)
 	void __iomem *isys_base = isys->pdata->base;
 	u32 gpreg_offset = isys->pdata->ipdata->csi2.gpreg;
 	void __iomem *gpreg = isys_base + gpreg_offset + 0x1000 * id;
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	unsigned int i;
 	u32 phy_ready;
 	u32 reg, rext;
@@ -894,7 +894,7 @@ static void ipu7_isys_cphy_config(struct ipu7_isys *isys, u8 id, u8 lanes,
 static void ipu7_isys_phy_config(struct ipu7_isys *isys, u8 id, u8 lanes,
 				 bool aggregation)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	u32 phy_mode;
 	s64 link_freq;
 	u64 mbps;

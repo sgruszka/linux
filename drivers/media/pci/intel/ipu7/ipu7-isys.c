@@ -54,7 +54,7 @@ isys_complete_ext_device_registration(struct ipu7_isys *isys,
 				      struct v4l2_subdev *sd,
 				      struct ipu7_isys_csi2_config *csi2)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	unsigned int i;
 	int ret;
 
@@ -112,7 +112,7 @@ static void isys_stream_init(struct ipu7_isys *isys)
 
 static int isys_fw_log_init(struct ipu7_isys *isys)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	struct isys_fw_log *fw_log;
 	void *log_buf;
 
@@ -148,7 +148,7 @@ static int isys_notifier_bound(struct v4l2_async_notifier *notifier,
 					      struct ipu7_isys, notifier);
 	struct sensor_async_sd *s_asd =
 		container_of(asc, struct sensor_async_sd, asc);
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	int ret;
 
 	ret = ipu_bridge_instantiate_vcm(sd->dev);
@@ -169,7 +169,7 @@ static int isys_notifier_complete(struct v4l2_async_notifier *notifier)
 	struct ipu7_isys *isys = container_of(notifier,
 					      struct ipu7_isys, notifier);
 
-	dev_info(&isys->adev->auxdev.dev,
+	dev_info(isys_to_dev(isys),
 		 "All sensor registration completed.\n");
 
 	return v4l2_device_register_subdev_nodes(&isys->v4l2_dev);
@@ -346,7 +346,7 @@ static int isys_csi2_create_media_links(struct ipu7_isys *isys)
 {
 	const struct ipu7_isys_internal_csi2_pdata *csi2_pdata =
 		&isys->pdata->ipdata->csi2;
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	struct media_entity *sd;
 	unsigned int i, j;
 	int ret;
@@ -373,7 +373,7 @@ static int isys_csi2_create_media_links(struct ipu7_isys *isys)
 
 static int isys_register_devices(struct ipu7_isys *isys)
 {
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	struct pci_dev *pdev = isys->adev->isp->pdev;
 	int ret;
 
@@ -642,7 +642,7 @@ static int alloc_fw_msg_bufs(struct ipu7_isys *isys, int amount)
 
 struct isys_fw_msgs *ipu7_get_fw_msg_buf(struct ipu7_isys_stream *stream)
 {
-	struct device *dev = &stream->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(stream->isys);
 	struct ipu7_isys *isys = stream->isys;
 	struct isys_fw_msgs *msg;
 	unsigned long flags;
@@ -831,7 +831,7 @@ static void ipu7_isys_register_errors(struct ipu7_isys_csi2 *csi2)
 	if (!status)
 		return;
 
-	dev_dbg(&csi2->isys->adev->auxdev.dev, "csi2-%u error status 0x%08x\n",
+	dev_dbg(isys_to_dev(csi2->isys), "csi2-%u error status 0x%08x\n",
 		csi2->port, status);
 
 	writel(status & mask, csi2->base + offset + IRQ_CTL_CLEAR);
@@ -852,7 +852,7 @@ static void ipu7_isys_csi2_error(struct ipu7_isys_csi2 *csi2)
 
 	for (i = 0; i < CSI_RX_NUM_ERRORS_IN_IRQ; i++) {
 		if (status & BIT(i))
-			dev_err_ratelimited(&csi2->isys->adev->auxdev.dev,
+			dev_err_ratelimited(isys_to_dev(csi2->isys),
 					    "csi2-%i error: %s\n",
 					    csi2->port,
 					    errors[i].error_string);
@@ -1031,7 +1031,7 @@ leave:
 
 static void ipu7_isys_csi2_isr(struct ipu7_isys_csi2 *csi2)
 {
-	struct device *dev = &csi2->isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(csi2->isys);
 	struct ipu_device *isp = csi2->isys->adev->isp;
 	struct ipu7_isys_stream *s;
 	u32 sync, offset;
@@ -1077,7 +1077,7 @@ irqreturn_t isys_isr(struct ipu_bus_device *adev)
 {
 	struct ipu7_isys *isys = dev_get_drvdata(&adev->auxdev.dev);
 	u32 status_csi, status_sw, csi_offset, sw_offset;
-	struct device *dev = &isys->adev->auxdev.dev;
+	struct device *dev = isys_to_dev(isys);
 	void __iomem *base = isys->pdata->base;
 
 	spin_lock(&isys->power_lock);

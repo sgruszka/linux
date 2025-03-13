@@ -63,7 +63,7 @@ static void ipu6_isys_csi2_phy_config_by_port(struct ipu6_isys *isys,
 					      unsigned int nlanes)
 {
 	struct device *dev = isys_to_dev(isys);
-	void __iomem *base = isys->adev->isp->base;
+	void __iomem *base = isys->ipu.adev->isp->base;
 	unsigned int bbnum;
 	u32 val, reg, i;
 
@@ -111,7 +111,7 @@ static void ipu6_isys_csi2_phy_config_by_port(struct ipu6_isys *isys,
 
 static void ipu6_isys_csi2_rx_control(struct ipu6_isys *isys)
 {
-	void __iomem *base = isys->adev->isp->base;
+	void __iomem *base = isys->ipu.adev->isp->base;
 	u32 val, reg;
 
 	reg = CSI2_HUB_GPREG_SIP0_CSI_RX_A_CONTROL;

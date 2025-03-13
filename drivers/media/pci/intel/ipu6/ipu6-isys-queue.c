@@ -31,7 +31,7 @@ static int ipu6_isys_buf_init(struct vb2_buffer *vb)
 		vb2_buffer_to_ipu6_isys_video_buffer(vvb);
 	int ret;
 
-	ret = ipu6_dma_map_sgtable(isys->adev, sg, DMA_TO_DEVICE, 0);
+	ret = ipu6_dma_map_sgtable(isys->ipu.adev, sg, DMA_TO_DEVICE, 0);
 	if (ret)
 		return ret;
 
@@ -49,7 +49,7 @@ static void ipu6_isys_buf_cleanup(struct vb2_buffer *vb)
 		vb2_buffer_to_ipu6_isys_video_buffer(vvb);
 
 	ivb->dma_addr = 0;
-	ipu6_dma_unmap_sgtable(isys->adev, sg, DMA_TO_DEVICE, 0);
+	ipu6_dma_unmap_sgtable(isys->ipu.adev, sg, DMA_TO_DEVICE, 0);
 }
 
 static int ipu6_isys_queue_setup(struct vb2_queue *q, unsigned int *num_buffers,
@@ -684,7 +684,7 @@ get_sof_sequence_by_timestamp(struct ipu6_isys_stream *stream,
 static u64 get_sof_ns_delta(struct ipu6_isys_video *av,
 			    struct ipu6_fw_isys_resp_info_abi *info)
 {
-	struct ipu_bus_device *adev = av->isys->adev;
+	struct ipu_bus_device *adev = av->isys->ipu.adev;
 	struct ipu_device *isp = adev->isp;
 	u64 delta, tsc_now;
 
@@ -818,7 +818,7 @@ int ipu6_isys_queue_init(struct ipu6_isys_queue *aq)
 {
 	struct ipu6_isys *isys = ipu6_isys_queue_to_video(aq)->isys;
 	struct ipu6_isys_video *av = ipu6_isys_queue_to_video(aq);
-	struct ipu_bus_device *adev = isys->adev;
+	struct ipu_bus_device *adev = isys->ipu.adev;
 	int ret;
 
 	/* no support for userptr */

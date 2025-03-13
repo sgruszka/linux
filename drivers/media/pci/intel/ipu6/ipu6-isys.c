@@ -451,7 +451,7 @@ static void set_iwake_ltrdid(struct ipu6_isys *isys, u16 ltr, u16 did,
 	struct device *dev = isys_to_dev(isys);
 	u16 ltr_val, ltr_scale = LTR_SCALE_1024NS;
 	u16 did_val, did_scale = DID_SCALE_1US;
-	struct ipu_device *isp = isys->adev->isp;
+	struct ipu_device *isp = isys->ipu.adev->isp;
 	union fabric_ctrl fc;
 
 	switch (use) {
@@ -637,9 +637,9 @@ void update_watermark_setting(struct ipu6_isys *isys)
 			   iwake_critical_threshold);
 
 	writel(VAL_PKGC_PMON_CFG_RESET,
-	       isys->adev->isp->base + REG_PKGC_PMON_CFG);
+	       isys->ipu.adev->isp->base + REG_PKGC_PMON_CFG);
 	writel(VAL_PKGC_PMON_CFG_START,
-	       isys->adev->isp->base + REG_PKGC_PMON_CFG);
+	       isys->ipu.adev->isp->base + REG_PKGC_PMON_CFG);
 unlock_exit:
 	mutex_unlock(&iwake_watermark->mutex);
 }
@@ -697,7 +697,7 @@ static int isys_notifier_bound(struct v4l2_async_notifier *notifier,
 	if (ret)
 		return ret;
 
-	return v4l2_device_register_subdev_nodes(&isys->v4l2_dev);
+	return v4l2_device_register_subdev_nodes(&isys->ipu.v4l2_dev);
 }
 
 static int isys_notifier_complete(struct v4l2_async_notifier *notifier)
@@ -705,7 +705,7 @@ static int isys_notifier_complete(struct v4l2_async_notifier *notifier)
 	struct ipu6_isys *isys =
 		container_of(notifier, struct ipu6_isys, notifier);
 
-	return v4l2_device_register_subdev_nodes(&isys->v4l2_dev);
+	return v4l2_device_register_subdev_nodes(&isys->ipu.v4l2_dev);
 }
 
 static const struct v4l2_async_notifier_operations isys_async_ops = {
@@ -716,12 +716,12 @@ static const struct v4l2_async_notifier_operations isys_async_ops = {
 #define ISYS_MAX_PORTS 8
 static int isys_notifier_init(struct ipu6_isys *isys)
 {
-	struct ipu_device *isp = isys->adev->isp;
+	struct ipu_device *isp = isys->ipu.adev->isp;
 	struct device *dev = &isp->pdev->dev;
 	unsigned int i;
 	int ret;
 
-	v4l2_async_nf_init(&isys->notifier, &isys->v4l2_dev);
+	v4l2_async_nf_init(&isys->notifier, &isys->ipu.v4l2_dev);
 
 	for (i = 0; i < ISYS_MAX_PORTS; i++) {
 		struct v4l2_fwnode_endpoint vep = {
@@ -783,24 +783,24 @@ static void isys_notifier_cleanup(struct ipu6_isys *isys)
 static int isys_register_devices(struct ipu6_isys *isys)
 {
 	struct device *dev = isys_to_dev(isys);
-	struct pci_dev *pdev = isys->adev->isp->pdev;
+	struct pci_dev *pdev = isys->ipu.adev->isp->pdev;
 	int ret;
 
-	isys->media_dev.dev = dev;
-	media_device_pci_init(&isys->media_dev,
+	isys->ipu.media_dev.dev = dev;
+	media_device_pci_init(&isys->ipu.media_dev,
 			      pdev, IPU6_MEDIA_DEV_MODEL_NAME);
 
-	strscpy(isys->v4l2_dev.name, isys->media_dev.model,
-		sizeof(isys->v4l2_dev.name));
+	strscpy(isys->ipu.v4l2_dev.name, isys->ipu.media_dev.model,
+		sizeof(isys->ipu.v4l2_dev.name));
 
-	ret = media_device_register(&isys->media_dev);
+	ret = media_device_register(&isys->ipu.media_dev);
 	if (ret < 0)
 		goto out_media_device_unregister;
 
-	isys->v4l2_dev.mdev = &isys->media_dev;
-	isys->v4l2_dev.ctrl_handler = NULL;
+	isys->ipu.v4l2_dev.mdev = &isys->ipu.media_dev;
+	isys->ipu.v4l2_dev.ctrl_handler = NULL;
 
-	ret = v4l2_device_register(dev, &isys->v4l2_dev);
+	ret = v4l2_device_register(dev, &isys->ipu.v4l2_dev);
 	if (ret < 0)
 		goto out_media_device_unregister;
 
@@ -829,11 +829,11 @@ out_isys_unregister_video_device:
 	isys_unregister_video_devices(isys);
 
 out_v4l2_device_unregister:
-	v4l2_device_unregister(&isys->v4l2_dev);
+	v4l2_device_unregister(&isys->ipu.v4l2_dev);
 
 out_media_device_unregister:
-	media_device_unregister(&isys->media_dev);
-	media_device_cleanup(&isys->media_dev);
+	media_device_unregister(&isys->ipu.media_dev);
+	media_device_cleanup(&isys->ipu.media_dev);
 
 	dev_err(dev, "failed to register isys devices\n");
 
@@ -844,9 +844,9 @@ static void isys_unregister_devices(struct ipu6_isys *isys)
 {
 	isys_unregister_video_devices(isys);
 	isys_csi2_unregister_subdevices(isys);
-	v4l2_device_unregister(&isys->v4l2_dev);
-	media_device_unregister(&isys->media_dev);
-	media_device_cleanup(&isys->media_dev);
+	v4l2_device_unregister(&isys->ipu.v4l2_dev);
+	media_device_unregister(&isys->ipu.media_dev);
+	media_device_cleanup(&isys->ipu.media_dev);
 }
 
 static int isys_runtime_pm_resume(struct device *dev)
@@ -937,11 +937,13 @@ static void free_fw_msg_bufs(struct ipu6_isys *isys)
 	struct isys_fw_msgs *fwmsg, *safe;
 
 	list_for_each_entry_safe(fwmsg, safe, &isys->framebuflist, head)
-		ipu6_dma_free(isys->adev, sizeof(struct isys_fw_msgs), fwmsg,
+		ipu6_dma_free(isys->ipu.adev, sizeof(struct isys_fw_msgs),
+			      fwmsg,
 			      fwmsg->dma_addr, 0);
 
 	list_for_each_entry_safe(fwmsg, safe, &isys->framebuflist_fw, head)
-		ipu6_dma_free(isys->adev, sizeof(struct isys_fw_msgs), fwmsg,
+		ipu6_dma_free(isys->ipu.adev, sizeof(struct isys_fw_msgs),
+			      fwmsg,
 			      fwmsg->dma_addr, 0);
 }
 
@@ -953,7 +955,7 @@ static int alloc_fw_msg_bufs(struct ipu6_isys *isys, int amount)
 	unsigned int i;
 
 	for (i = 0; i < amount; i++) {
-		addr = ipu6_dma_alloc(isys->adev, sizeof(*addr),
+		addr = ipu6_dma_alloc(isys->ipu.adev, sizeof(*addr),
 				      &dma_addr, GFP_KERNEL, 0);
 		if (!addr)
 			break;
@@ -973,7 +975,8 @@ static int alloc_fw_msg_bufs(struct ipu6_isys *isys, int amount)
 					struct isys_fw_msgs, head);
 		list_del(&addr->head);
 		spin_unlock_irqrestore(&isys->listlock, flags);
-		ipu6_dma_free(isys->adev, sizeof(struct isys_fw_msgs), addr,
+		ipu6_dma_free(isys->ipu.adev, sizeof(struct isys_fw_msgs),
+			      addr,
 			      addr->dma_addr, 0);
 		spin_lock_irqsave(&isys->listlock, flags);
 	}
@@ -1061,7 +1064,7 @@ static int isys_probe(struct auxiliary_device *auxdev,
 	adev->auxdrv_data =
 		(const struct ipu_auxdrv_data *)auxdev_id->driver_data;
 	adev->auxdrv = to_auxiliary_drv(auxdev->dev.driver);
-	isys->adev = adev;
+	isys->ipu.adev = adev;
 	isys->pdata = adev->pdata;
 	csi2_pdata = &isys->pdata->ipdata->csi2;
 

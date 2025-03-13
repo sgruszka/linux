@@ -103,12 +103,24 @@ struct sensor_async_sd {
 	struct v4l2_async_connection asc;
 	struct ipu6_isys_csi2_config csi2;
 };
+/*
+ * struct ipu_isys
+ *
+ * @media_dev: Media device
+ * @v4l2_dev: V4L2 device
+ * @adev: ISYS bus device
+ */
+
+struct ipu_isys {
+	struct media_device media_dev;
+	struct v4l2_device v4l2_dev;
+	struct ipu_bus_device *adev;
+};
 
 /*
  * struct ipu6_isys
  *
- * @media_dev: Media device
- * @v4l2_dev: V4L2 device
+ * @ipu_dev: Common isys device
  * @adev: ISYS bus device
  * @power: Is ISYS powered on or not?
  * @isr_bits: Which bits does the ISR handle?
@@ -128,9 +140,7 @@ struct sensor_async_sd {
  * @csi2: CSI-2 receivers
  */
 struct ipu6_isys {
-	struct media_device media_dev;
-	struct v4l2_device v4l2_dev;
-	struct ipu_bus_device *adev;
+	struct ipu_isys ipu;
 
 	int power;
 	spinlock_t power_lock;
@@ -181,7 +191,7 @@ struct isys_fw_msgs {
 
 static inline struct device *isys_to_dev(struct ipu6_isys *isys)
 {
-	return &isys->adev->auxdev.dev;
+	return &isys->ipu.adev->auxdev.dev;
 }
 
 struct isys_fw_msgs *ipu6_get_fw_msg_buf(struct ipu6_isys_stream *stream);

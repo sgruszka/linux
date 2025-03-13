@@ -554,7 +554,7 @@ int ipu6_isys_csi2_init(struct ipu6_isys_csi2 *csi2,
 		goto fail;
 	}
 
-	ret = v4l2_device_register_subdev(&isys->v4l2_dev, &csi2->asd.sd);
+	ret = v4l2_device_register_subdev(&isys->ipu.v4l2_dev, &csi2->asd.sd);
 	if (ret) {
 		dev_err(dev, "failed to register v4l2 subdev\n");
 		goto fail;

@@ -568,7 +568,7 @@ static int ipu6_isys_mcd_phy_ready(struct ipu6_isys *isys, u8 id)
 
 static void ipu6_isys_mcd_phy_common_init(struct ipu6_isys *isys)
 {
-	struct ipu_bus_device *adev = isys->adev;
+	struct ipu_bus_device *adev = isys->ipu.adev;
 	struct ipu_device *isp = adev->isp;
 	void __iomem *isp_base = isp->base;
 	struct sensor_async_sd *s_asd;
@@ -621,7 +621,7 @@ static int ipu6_isys_driver_port_to_phy_port(struct ipu6_isys_csi2_config *cfg)
 static int ipu6_isys_mcd_phy_config(struct ipu6_isys *isys)
 {
 	struct device *dev = isys_to_dev(isys);
-	struct ipu_bus_device *adev = isys->adev;
+	struct ipu_bus_device *adev = isys->ipu.adev;
 	const struct phy_reg **phy_config_regs;
 	struct ipu_device *isp = adev->isp;
 	void __iomem *isp_base = isp->base;

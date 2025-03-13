@@ -37,7 +37,7 @@ int ipu7_fw_isys_complex_cmd(struct ipu7_isys *isys,
 			     dma_addr_t dma_mapped_buf,
 			     size_t size, u16 send_type)
 {
-	struct ipu7_syscom_context *ctx = isys->adev->syscom;
+	struct ipu7_syscom_context *ctx = isys->ipu.adev->syscom;
 	struct device *dev = isys_to_dev(isys);
 	struct ipu7_insys_send_queue_token *token;
 
@@ -66,7 +66,7 @@ int ipu7_fw_isys_complex_cmd(struct ipu7_isys *isys,
 
 	ipu7_syscom_put_token(ctx, stream_handle + IPU_INSYS_INPUT_MSG_QUEUE);
 	/* now wakeup FW */
-	ipu_buttress_wakeup_is_uc(isys->adev->isp);
+	ipu_buttress_wakeup_is_uc(isys->ipu.adev->isp);
 
 	return 0;
 }
@@ -81,7 +81,7 @@ int ipu7_fw_isys_simple_cmd(struct ipu7_isys *isys,
 int ipu7_fw_isys_init(struct ipu7_isys *isys)
 {
 	struct syscom_queue_config *queue_configs;
-	struct ipu_bus_device *adev = isys->adev;
+	struct ipu_bus_device *adev = isys->ipu.adev;
 	struct device *dev = &adev->auxdev.dev;
 	struct ipu7_insys_config *isys_config;
 	struct ipu7_syscom_context *syscom;
@@ -170,7 +170,7 @@ int ipu7_fw_isys_init(struct ipu7_isys *isys)
 
 void ipu7_fw_isys_release(struct ipu7_isys *isys)
 {
-	struct ipu_bus_device *adev = isys->adev;
+	struct ipu_bus_device *adev = isys->ipu.adev;
 
 	ipu7_boot_release_boot_config(adev);
 	if (isys->subsys_config) {
@@ -185,23 +185,24 @@ void ipu7_fw_isys_release(struct ipu7_isys *isys)
 
 int ipu7_fw_isys_open(struct ipu7_isys *isys)
 {
-	return ipu7_boot_start_fw(isys->adev);
+	return ipu7_boot_start_fw(isys->ipu.adev);
 }
 
 int ipu7_fw_isys_close(struct ipu7_isys *isys)
 {
-	return ipu7_boot_stop_fw(isys->adev);
+	return ipu7_boot_stop_fw(isys->ipu.adev);
 }
 
 struct ipu7_insys_resp *ipu7_fw_isys_get_resp(struct ipu7_isys *isys)
 {
-	return ipu7_syscom_get_token(isys->adev->syscom,
+	return ipu7_syscom_get_token(isys->ipu.adev->syscom,
 				     IPU_INSYS_OUTPUT_MSG_QUEUE);
 }
 
 void ipu7_fw_isys_put_resp(struct ipu7_isys *isys)
 {
-	ipu7_syscom_put_token(isys->adev->syscom, IPU_INSYS_OUTPUT_MSG_QUEUE);
+	ipu7_syscom_put_token(isys->ipu.adev->syscom,
+			      IPU_INSYS_OUTPUT_MSG_QUEUE);
 }
 
 void ipu7_fw_isys_dump_stream_cfg(struct device *dev,

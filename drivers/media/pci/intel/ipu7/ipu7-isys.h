@@ -56,13 +56,23 @@ struct isys_fw_log {
 	u32 count; /* running counter of log */
 	u32 size; /* actual size of log content, in bits */
 };
-
 /*
- * struct ipu7_isys
+ * struct ipu_isys
  *
  * @media_dev: Media device
  * @v4l2_dev: V4L2 device
  * @adev: ISYS bus device
+ */
+struct ipu_isys {
+	struct media_device media_dev;
+	struct v4l2_device v4l2_dev;
+	struct ipu_bus_device *adev;
+};
+
+/*
+ * struct ipu7_isys
+ *
+ * @ipu: Common ipu isys device
  * @power: Is ISYS powered on or not?
  * @isr_bits: Which bits does the ISR handle?
  * @power_lock: Serialise access to power (power state in general)
@@ -79,9 +89,7 @@ struct isys_fw_log {
  * @csi2: CSI-2 receivers
  */
 struct ipu7_isys {
-	struct media_device media_dev;
-	struct v4l2_device v4l2_dev;
-	struct ipu_bus_device *adev;
+	struct ipu_isys ipu;
 
 	int power;
 	spinlock_t power_lock;	/* Serialise access to power */
@@ -140,7 +148,7 @@ struct sensor_async_sd {
 
 static inline struct device *isys_to_dev(struct ipu7_isys *isys)
 {
-	return &isys->adev->auxdev.dev;
+	return &isys->ipu.adev->auxdev.dev;
 }
 
 struct isys_fw_msgs *ipu7_get_fw_msg_buf(struct ipu7_isys_stream *stream);

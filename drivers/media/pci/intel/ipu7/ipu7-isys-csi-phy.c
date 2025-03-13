@@ -527,7 +527,7 @@ static void ipu7_isys_dphy_config(struct ipu7_isys *isys, u8 id, u8 lanes,
 
 	dwc_phy_write_mask(isys, id, CORE_DIG_IOCTRL_RW_AFE_LANE0_CTRL_2_2,
 			   0, 0, 0);
-	if (!is_ipu7(isys->adev->isp->hw_ver) ||
+	if (!is_ipu7(isys->ipu.adev->isp->hw_ver) ||
 	    id == PORT_B || id == PORT_C) {
 		dwc_phy_write_mask(isys, id,
 				   CORE_DIG_IOCTRL_RW_AFE_LANE1_CTRL_2_2,
@@ -544,7 +544,7 @@ static void ipu7_isys_dphy_config(struct ipu7_isys *isys, u8 id, u8 lanes,
 				   1, 0, 0);
 	}
 
-	if (lanes == 4 && is_ipu7(isys->adev->isp->hw_ver)) {
+	if (lanes == 4 && is_ipu7(isys->ipu.adev->isp->hw_ver)) {
 		dwc_phy_write_mask(isys, id,
 				   CORE_DIG_IOCTRL_RW_AFE_LANE3_CTRL_2_2,
 				   0, 0, 0);
@@ -573,7 +573,7 @@ static void ipu7_isys_dphy_config(struct ipu7_isys *isys, u8 id, u8 lanes,
 	index = lookup(table6, mbps);
 	if (index >= 0) {
 		val = table6[index].oa_lane_hsrx_hs_clk_div;
-		if (!is_ipu7(isys->adev->isp->hw_ver) ||
+		if (!is_ipu7(isys->ipu.adev->isp->hw_ver) ||
 		    id == PORT_B || id == PORT_C)
 			reg = CORE_DIG_IOCTRL_RW_AFE_LANE1_CTRL_2_9;
 		else
@@ -695,7 +695,7 @@ static void ipu7_isys_dphy_config(struct ipu7_isys *isys, u8 id, u8 lanes,
 			   hsrxval0, 0, 2);
 	dwc_phy_write_mask(isys, id, CORE_DIG_IOCTRL_RW_AFE_LANE2_CTRL_2_9,
 			   hsrxval0, 0, 2);
-	if (lanes == 4 && is_ipu7(isys->adev->isp->hw_ver)) {
+	if (lanes == 4 && is_ipu7(isys->ipu.adev->isp->hw_ver)) {
 		dwc_phy_write_mask(isys, id,
 				   CORE_DIG_IOCTRL_RW_AFE_LANE3_CTRL_2_9,
 				   hsrxval0, 0, 2);
@@ -710,7 +710,7 @@ static void ipu7_isys_dphy_config(struct ipu7_isys *isys, u8 id, u8 lanes,
 			   hsrxval1, 3, 4);
 	dwc_phy_write_mask(isys, id, CORE_DIG_IOCTRL_RW_AFE_LANE2_CTRL_2_9,
 			   hsrxval1, 3, 4);
-	if (lanes == 4 && is_ipu7(isys->adev->isp->hw_ver)) {
+	if (lanes == 4 && is_ipu7(isys->ipu.adev->isp->hw_ver)) {
 		dwc_phy_write_mask(isys, id,
 				   CORE_DIG_IOCTRL_RW_AFE_LANE3_CTRL_2_9,
 				   hsrxval1, 3, 4);
@@ -725,7 +725,7 @@ static void ipu7_isys_dphy_config(struct ipu7_isys *isys, u8 id, u8 lanes,
 			   hsrxval2, 0, 2);
 	dwc_phy_write_mask(isys, id, CORE_DIG_IOCTRL_RW_AFE_LANE2_CTRL_2_15,
 			   hsrxval2, 0, 2);
-	if (lanes == 4 && is_ipu7(isys->adev->isp->hw_ver)) {
+	if (lanes == 4 && is_ipu7(isys->ipu.adev->isp->hw_ver)) {
 		dwc_phy_write_mask(isys, id,
 				   CORE_DIG_IOCTRL_RW_AFE_LANE3_CTRL_2_15,
 				   hsrxval2, 0, 2);
@@ -759,7 +759,7 @@ static void ipu7_isys_cphy_config(struct ipu7_isys *isys, u8 id, u8 lanes,
 	u32 r;
 	int index;
 
-	if (is_ipu7p5(isys->adev->isp->hw_ver))
+	if (is_ipu7p5(isys->ipu.adev->isp->hw_ver))
 		val = 0x15;
 	else
 		val = 0x155;
@@ -813,7 +813,7 @@ static void ipu7_isys_cphy_config(struct ipu7_isys *isys, u8 id, u8 lanes,
 	dwc_phy_write_mask(isys, id,
 			   CORE_DIG_IOCTRL_RW_AFE_LANE2_CTRL_2_2, 1, 0, 0);
 
-	if (!is_ipu7p5(isys->adev->isp->hw_ver) && lanes == 4) {
+	if (!is_ipu7p5(isys->ipu.adev->isp->hw_ver) && lanes == 4) {
 		dwc_phy_write_mask(isys, id,
 				   CORE_DIG_IOCTRL_RW_AFE_LANE3_CTRL_2_2,
 				   1, 0, 0);
@@ -981,7 +981,7 @@ int ipu7_isys_csi_phy_powerup(struct ipu7_isys_csi2 *csi2)
 	int ret;
 
 	/* lanes remapping for aggregation (port AB) mode */
-	if (!is_ipu7(isys->adev->isp->hw_ver) && lanes > 2 && id == PORT_A) {
+	if (!is_ipu7(isys->ipu.adev->isp->hw_ver) && lanes > 2 && id == PORT_A) {
 		aggregation = true;
 		lanes = 2;
 	}
@@ -1044,7 +1044,7 @@ void ipu7_isys_csi_phy_powerdown(struct ipu7_isys_csi2 *csi2)
 	struct ipu7_isys *isys = csi2->isys;
 
 	ipu7_isys_csi_phy_reset(isys, csi2->port);
-	if (!is_ipu7(isys->adev->isp->hw_ver) &&
+	if (!is_ipu7(isys->ipu.adev->isp->hw_ver) &&
 	    csi2->nlanes > 2 && csi2->port == PORT_A)
 		ipu7_isys_csi_phy_reset(isys, PORT_B);
 }

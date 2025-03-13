@@ -161,7 +161,7 @@ static int isys_notifier_bound(struct v4l2_async_notifier *notifier,
 		 sd->name, s_asd->csi2.nlanes, s_asd->csi2.port);
 	isys_complete_ext_device_registration(isys, sd, &s_asd->csi2);
 
-	return v4l2_device_register_subdev_nodes(&isys->v4l2_dev);
+	return v4l2_device_register_subdev_nodes(&isys->ipu.v4l2_dev);
 }
 
 static int isys_notifier_complete(struct v4l2_async_notifier *notifier)
@@ -172,7 +172,7 @@ static int isys_notifier_complete(struct v4l2_async_notifier *notifier)
 	dev_info(isys_to_dev(isys),
 		 "All sensor registration completed.\n");
 
-	return v4l2_device_register_subdev_nodes(&isys->v4l2_dev);
+	return v4l2_device_register_subdev_nodes(&isys->ipu.v4l2_dev);
 }
 
 static const struct v4l2_async_notifier_operations isys_async_ops = {
@@ -184,12 +184,12 @@ static int isys_notifier_init(struct ipu7_isys *isys)
 {
 	const struct ipu7_isys_internal_csi2_pdata *csi2 =
 		&isys->pdata->ipdata->csi2;
-	struct ipu_device *isp = isys->adev->isp;
+	struct ipu_device *isp = isys->ipu.adev->isp;
 	struct device *dev = &isp->pdev->dev;
 	unsigned int i;
 	int ret;
 
-	v4l2_async_nf_init(&isys->notifier, &isys->v4l2_dev);
+	v4l2_async_nf_init(&isys->notifier, &isys->ipu.v4l2_dev);
 
 	for (i = 0; i < csi2->nports; i++) {
 		struct v4l2_fwnode_endpoint vep = {
@@ -374,23 +374,23 @@ static int isys_csi2_create_media_links(struct ipu7_isys *isys)
 static int isys_register_devices(struct ipu7_isys *isys)
 {
 	struct device *dev = isys_to_dev(isys);
-	struct pci_dev *pdev = isys->adev->isp->pdev;
+	struct pci_dev *pdev = isys->ipu.adev->isp->pdev;
 	int ret;
 
-	media_device_pci_init(&isys->media_dev,
+	media_device_pci_init(&isys->ipu.media_dev,
 			      pdev, IPU_MEDIA_DEV_MODEL_NAME);
 
-	strscpy(isys->v4l2_dev.name, isys->media_dev.model,
-		sizeof(isys->v4l2_dev.name));
+	strscpy(isys->ipu.v4l2_dev.name, isys->ipu.media_dev.model,
+		sizeof(isys->ipu.v4l2_dev.name));
 
-	ret = media_device_register(&isys->media_dev);
+	ret = media_device_register(&isys->ipu.media_dev);
 	if (ret < 0)
 		goto out_media_device_unregister;
 
-	isys->v4l2_dev.mdev = &isys->media_dev;
-	isys->v4l2_dev.ctrl_handler = NULL;
+	isys->ipu.v4l2_dev.mdev = &isys->ipu.media_dev;
+	isys->ipu.v4l2_dev.ctrl_handler = NULL;
 
-	ret = v4l2_device_register(dev, &isys->v4l2_dev);
+	ret = v4l2_device_register(dev, &isys->ipu.v4l2_dev);
 	if (ret < 0)
 		goto out_media_device_unregister;
 
@@ -419,11 +419,11 @@ out_video_unregister_device:
 	isys_unregister_video_devices(isys);
 
 out_v4l2_device_unregister:
-	v4l2_device_unregister(&isys->v4l2_dev);
+	v4l2_device_unregister(&isys->ipu.v4l2_dev);
 
 out_media_device_unregister:
-	media_device_unregister(&isys->media_dev);
-	media_device_cleanup(&isys->media_dev);
+	media_device_unregister(&isys->ipu.media_dev);
+	media_device_cleanup(&isys->ipu.media_dev);
 
 	dev_err(dev, "failed to register isys devices\n");
 
@@ -434,9 +434,9 @@ static void isys_unregister_devices(struct ipu7_isys *isys)
 {
 	isys_unregister_video_devices(isys);
 	isys_csi2_unregister_subdevices(isys);
-	v4l2_device_unregister(&isys->v4l2_dev);
-	media_device_unregister(&isys->media_dev);
-	media_device_cleanup(&isys->media_dev);
+	v4l2_device_unregister(&isys->ipu.v4l2_dev);
+	media_device_unregister(&isys->ipu.media_dev);
+	media_device_cleanup(&isys->ipu.media_dev);
 }
 
 static void enable_csi2_legacy_irq(struct ipu7_isys *isys, bool enable)
@@ -604,7 +604,7 @@ static void isys_remove(struct auxiliary_device *auxdev)
 
 static int alloc_fw_msg_bufs(struct ipu7_isys *isys, int amount)
 {
-	struct ipu_bus_device *adev = isys->adev;
+	struct ipu_bus_device *adev = isys->ipu.adev;
 	struct isys_fw_msgs *addr;
 	dma_addr_t dma_addr;
 	unsigned long flags;
@@ -721,7 +721,7 @@ static int isys_probe(struct auxiliary_device *auxdev,
 	adev->auxdrv_data =
 		(const struct ipu_auxdrv_data *)auxdev_id->driver_data;
 	adev->auxdrv = to_auxiliary_drv(auxdev->dev.driver);
-	isys->adev = adev;
+	isys->ipu.adev = adev;
 	isys->pdata = adev->pdata;
 
 	INIT_LIST_HEAD(&isys->requests);
@@ -898,7 +898,7 @@ int isys_isr_one(struct ipu_bus_device *adev)
 	struct ipu7_insys_resp *resp;
 	u64 ts;
 
-	if (!isys->adev->syscom)
+	if (!isys->ipu.adev->syscom)
 		return 1;
 
 	resp = ipu7_fw_isys_get_resp(isys);
@@ -1032,7 +1032,7 @@ leave:
 static void ipu7_isys_csi2_isr(struct ipu7_isys_csi2 *csi2)
 {
 	struct device *dev = isys_to_dev(csi2->isys);
-	struct ipu_device *isp = csi2->isys->adev->isp;
+	struct ipu_device *isp = csi2->isys->ipu.adev->isp;
 	struct ipu7_isys_stream *s;
 	u32 sync, offset;
 	u32 fe = 0;

@@ -99,7 +99,7 @@ static int video_open(struct file *file)
 {
 	struct ipu7_isys_video *av = video_drvdata(file);
 	struct ipu7_isys *isys = av->isys;
-	struct ipu_bus_device *adev = isys->adev;
+	struct ipu_bus_device *adev = isys->ipu.adev;
 
 	mutex_lock(&isys->mutex);
 	if (isys->need_reset) {
@@ -145,9 +145,9 @@ static int ipu7_isys_vidioc_querycap(struct file *file, void *fh,
 	struct ipu7_isys_video *av = video_drvdata(file);
 
 	strscpy(cap->driver, IPU_ISYS_NAME, sizeof(cap->driver));
-	strscpy(cap->card, av->isys->media_dev.model, sizeof(cap->card));
+	strscpy(cap->card, av->isys->ipu.media_dev.model, sizeof(cap->card));
 	snprintf(cap->bus_info, sizeof(cap->bus_info), "%s",
-		 av->isys->media_dev.bus_info);
+		 av->isys->ipu.media_dev.bus_info);
 
 	return 0;
 }
@@ -985,7 +985,7 @@ static const struct v4l2_file_operations isys_fops = {
 
 int ipu7_isys_fw_open(struct ipu7_isys *isys)
 {
-	struct ipu_bus_device *adev = isys->adev;
+	struct ipu_bus_device *adev = isys->ipu.adev;
 	int ret;
 
 	ret = pm_runtime_resume_and_get(&adev->auxdev.dev);
@@ -1166,8 +1166,8 @@ int ipu7_isys_video_init(struct ipu7_isys_video *av)
 	av->vdev.entity.ops = &entity_ops;
 	av->vdev.release = video_device_release_empty;
 	av->vdev.fops = &isys_fops;
-	av->vdev.v4l2_dev = &av->isys->v4l2_dev;
-	av->vdev.dev_parent = &av->isys->adev->isp->pdev->dev;
+	av->vdev.v4l2_dev = &av->isys->ipu.v4l2_dev;
+	av->vdev.dev_parent = &av->isys->ipu.adev->isp->pdev->dev;
 	av->vdev.ioctl_ops = &ipu7_v4l2_ioctl_ops;
 	av->vdev.queue = &av->aq.vbq;
 	av->vdev.lock = &av->mutex;

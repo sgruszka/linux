@@ -103,7 +103,7 @@ static const struct v4l2_subdev_core_ops csi2_sd_core_ops = {
 
 static void csi2_irq_en(struct ipu7_isys_csi2 *csi2, bool enable)
 {
-	struct ipu_device *isp = csi2->isys->adev->isp;
+	struct ipu_device *isp = csi2->isys->ipu.adev->isp;
 	unsigned int offset, mask;
 
 	if (!enable) {
@@ -166,7 +166,7 @@ static void ipu7_isys_csi2_disable_stream(struct ipu7_isys_csi2 *csi2)
 	offset = IS_IO_GPREGS_BASE;
 	val = readl(isys_base + offset + CSI_PORT_CLK_GATE);
 	val &= ~(1 << port);
-	if (port == 0 && nlanes == 4 && !is_ipu7(isys->adev->isp->hw_ver))
+	if (port == 0 && nlanes == 4 && !is_ipu7(isys->ipu.adev->isp->hw_ver))
 		val &= ~BIT(1);
 	writel(val, isys_base + offset + CSI_PORT_CLK_GATE);
 
@@ -195,7 +195,7 @@ static int ipu7_isys_csi2_enable_stream(struct ipu7_isys_csi2 *csi2)
 	dev_dbg(dev, "port %u CLK_GATE = 0x%04x DIV_FACTOR_APB_CLK=0x%04x\n",
 		port, readl(isys_base + offset + CSI_PORT_CLK_GATE),
 		readl(isys_base + offset + CLK_DIV_FACTOR_APB_CLK));
-	if (port == 0 && nlanes == 4 && !is_ipu7(isys->adev->isp->hw_ver)) {
+	if (port == 0 && nlanes == 4 && !is_ipu7(isys->ipu.adev->isp->hw_ver)) {
 		dev_info(dev, "CSI port %u in aggregation mode\n", port);
 		writel(0x1, isys_base + offset + CSI_PORTAB_AGGREGATION);
 	}
@@ -438,7 +438,7 @@ int ipu7_isys_csi2_init(struct ipu7_isys_csi2 *csi2,
 	csi2->base = base;
 	csi2->port = index;
 
-	if (!is_ipu7(isys->adev->isp->hw_ver))
+	if (!is_ipu7(isys->ipu.adev->isp->hw_ver))
 		csi2->legacy_irq_mask = 0x7 << (index * 3);
 	else
 		csi2->legacy_irq_mask = 0x3 << (index * 2);
@@ -466,7 +466,7 @@ int ipu7_isys_csi2_init(struct ipu7_isys_csi2 *csi2,
 		goto isys_subdev_cleanup;
 	}
 
-	ret = v4l2_device_register_subdev(&isys->v4l2_dev, &csi2->asd.sd);
+	ret = v4l2_device_register_subdev(&isys->ipu.v4l2_dev, &csi2->asd.sd);
 	if (ret) {
 		dev_err(dev, "failed to register v4l2 subdev (%d)\n", ret);
 		goto v4l2_subdev_cleanup;

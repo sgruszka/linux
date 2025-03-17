@@ -932,8 +932,9 @@ ipu6_isys_query_stream_by_handle(struct ipu6_isys *isys, u8 stream_handle)
 }
 
 struct ipu6_isys_stream *
-ipu6_isys_query_stream_by_source(struct ipu6_isys *isys, int source, u8 vc)
+ipu6_isys_query_stream_by_source(struct ipu_isys *_isys, int source, u8 vc)
 {
+	struct ipu6_isys *isys = (struct ipu6_isys *)_isys;
 	struct ipu6_isys_stream *stream = NULL;
 	unsigned long flags;
 	unsigned int i;

@@ -85,6 +85,7 @@ struct ipu7_isys_video {
 	struct video_device vdev;
 	struct v4l2_pix_format pix_fmt;
 	struct v4l2_meta_format meta_fmt;
+
 	struct ipu7_isys *isys;
 	struct ipu7_isys_csi2 *csi2;
 	struct ipu7_isys_stream *stream;

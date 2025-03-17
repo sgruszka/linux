@@ -36,7 +36,7 @@ struct ipu6_isys_stream;
 
 struct ipu6_isys_csi2 {
 	struct ipu6_isys_subdev asd;
-	struct ipu6_isys *isys;
+	struct ipu_isys *isys;
 	struct ipu6_isys_video av[NR_OF_CSI2_SRC_PADS];
 
 	void __iomem *base;
@@ -44,6 +44,11 @@ struct ipu6_isys_csi2 {
 	unsigned int nlanes;
 	unsigned int port;
 };
+
+static inline struct ipu6_isys *to_isys6(struct ipu6_isys_csi2 *csi2)
+{
+	return (struct ipu6_isys *)csi2->isys;
+}
 
 struct ipu6_isys_csi2_timing {
 	u32 ctermen;

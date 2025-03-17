@@ -200,7 +200,7 @@ void ipu6_isys_register_errors(struct ipu6_isys_csi2 *csi2)
 {
 	u32 irq = readl(csi2->base + CSI_PORT_REG_BASE_IRQ_CSI +
 			CSI_PORT_REG_BASE_IRQ_STATUS_OFFSET);
-	struct ipu6_isys *isys = csi2->isys;
+	struct ipu6_isys *isys = to_isys6(csi2);
 	u32 mask;
 
 	mask = isys->pdata->ipdata->csi2.irq_mask;
@@ -235,7 +235,7 @@ static int ipu6_isys_csi2_set_stream(struct v4l2_subdev *sd,
 {
 	struct ipu6_isys_subdev *asd = to_ipu6_isys_subdev(sd);
 	struct ipu6_isys_csi2 *csi2 = to_ipu6_isys_csi2(asd);
-	struct ipu6_isys *isys = csi2->isys;
+	struct ipu6_isys *isys = to_isys6(csi2);
 	struct device *dev = isys_to_dev(isys);
 	struct ipu6_isys_csi2_config cfg;
 	unsigned int nports;
@@ -407,8 +407,6 @@ static int ipu6_isys_csi2_set_sel(struct v4l2_subdev *sd,
 				  struct v4l2_subdev_state *state,
 				  struct v4l2_subdev_selection *sel)
 {
-	struct ipu6_isys_subdev *asd = to_ipu6_isys_subdev(sd);
-	struct device *dev = isys_to_dev(asd->isys);
 	struct v4l2_mbus_framefmt *sink_ffmt;
 	struct v4l2_mbus_framefmt *src_ffmt;
 	struct v4l2_rect *crop;
@@ -447,7 +445,8 @@ static int ipu6_isys_csi2_set_sel(struct v4l2_subdev *sd,
 		src_ffmt->code = ipu6_isys_convert_bayer_order(sink_ffmt->code,
 							       sel->r.left,
 							       sel->r.top);
-	dev_dbg(dev, "set crop for %s sel: %d,%d,%d,%d code: 0x%x\n",
+	dev_dbg(sd->v4l2_dev->dev,
+	       "set crop for %s sel: %d,%d,%d,%d code: 0x%x\n",
 		sd->name, sel->r.left, sel->r.top, sel->r.width, sel->r.height,
 		src_ffmt->code);
 
@@ -532,7 +531,7 @@ int ipu6_isys_csi2_init(struct ipu6_isys_csi2 *csi2,
 	struct device *dev = isys_to_dev(isys);
 	int ret;
 
-	csi2->isys = isys;
+	csi2->isys = (struct ipu_isys *) isys;
 	csi2->base = base;
 	csi2->port = index;
 

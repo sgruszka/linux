@@ -189,10 +189,21 @@ struct isys_fw_msgs {
 	dma_addr_t dma_addr;
 };
 
-static inline struct device *isys_to_dev(struct ipu6_isys *isys)
+static inline struct device *ipu_isys_to_dev(struct ipu_isys *isys)
 {
-	return &isys->ipu.adev->auxdev.dev;
+ 	return &isys->adev->auxdev.dev;
 }
+
+static inline struct device *ipu6_isys_to_dev(struct ipu6_isys *isys)
+{
+ 	return &isys->ipu.adev->auxdev.dev;
+}
+
+#define isys_to_dev(_isys) \
+	_Generic(_isys, \
+		 struct ipu_isys *  : ipu_isys_to_dev,  \
+		 struct ipu6_isys * : ipu6_isys_to_dev  \
+	) (_isys)
 
 struct isys_fw_msgs *ipu6_get_fw_msg_buf(struct ipu6_isys_stream *stream);
 void ipu6_put_fw_msg_buf(struct ipu6_isys *isys, uintptr_t data);

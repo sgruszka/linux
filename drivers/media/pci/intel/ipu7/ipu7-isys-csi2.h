@@ -13,7 +13,6 @@
 #include "ipu7-isys-video.h"
 
 struct ipu7_isys;
-struct ipu7_isys_csi2_pdata;
 struct ipu7_isys_stream;
 
 #define NR_OF_CSI2_VC		16
@@ -41,7 +40,6 @@ struct ipu7_isys_stream;
  */
 struct ipu7_isys_csi2 {
 	struct ipu7_isys_subdev asd;
-	struct ipu7_isys_csi2_pdata *pdata;
 	struct ipu7_isys *isys;
 	struct ipu7_isys_video av[NR_OF_CSI2_SRC_PADS];
 
@@ -50,6 +48,7 @@ struct ipu7_isys_csi2 {
 	u32 legacy_irq_mask;
 	unsigned int nlanes;
 	unsigned int port;
+
 	unsigned int phy_mode;
 	unsigned int stream_count;
 };

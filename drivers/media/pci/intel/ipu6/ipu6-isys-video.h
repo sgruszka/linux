@@ -19,6 +19,7 @@
 #define IPU6_ISYS_MAX_PARALLEL_SOF 2
 
 struct file;
+struct ipu_isys;
 struct ipu6_isys;
 struct ipu6_isys_csi2;
 struct ipu6_isys_subdev;
@@ -41,6 +42,18 @@ struct output_pin_data {
 	void (*pin_ready)(struct ipu6_isys_stream *stream,
 			  struct ipu6_fw_isys_resp_info_abi *info);
 	struct ipu_isys_queue *aq;
+};
+
+struct video_stream_watermark {
+	u32 width;
+	u32 height;
+	u32 hblank;
+	u32 frame_rate;
+	u64 pixel_rate;
+	u64 stream_data_rate;
+	u16 sram_gran_shift;
+	u16 sram_gran_size;
+	struct list_head stream_node;
 };
 
 /*
@@ -71,18 +84,6 @@ struct ipu6_isys_stream {
 	struct output_pin_data output_pins[IPU6_ISYS_OUTPUT_PINS];
 	int error;
 	u8 vc;
-};
-
-struct video_stream_watermark {
-	u32 width;
-	u32 height;
-	u32 hblank;
-	u32 frame_rate;
-	u64 pixel_rate;
-	u64 stream_data_rate;
-	u16 sram_gran_shift;
-	u16 sram_gran_size;
-	struct list_head stream_node;
 };
 
 struct ipu6_isys_video {
@@ -126,7 +127,7 @@ void ipu6_isys_put_stream(struct ipu6_isys_stream *stream);
 struct ipu6_isys_stream *
 ipu6_isys_query_stream_by_handle(struct ipu6_isys *isys, u8 stream_handle);
 struct ipu6_isys_stream *
-ipu6_isys_query_stream_by_source(struct ipu6_isys *isys, int source, u8 vc);
+ipu6_isys_query_stream_by_source(struct ipu_isys *isys, int source, u8 vc);
 
 void ipu6_isys_configure_stream_watermark(struct ipu6_isys_video *av,
 					  bool state);

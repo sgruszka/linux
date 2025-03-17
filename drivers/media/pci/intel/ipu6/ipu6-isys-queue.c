@@ -446,9 +446,9 @@ static int ipu6_isys_link_fmt_validate(struct ipu_isys_queue *aq)
 		return -ENOTCONN;
 
 	sd = media_entity_to_v4l2_subdev(remote_pad->entity);
-	r_stream = ipu6_isys_get_src_stream_by_src_pad(sd, remote_pad->index);
+	r_stream = ipu_isys_get_src_stream_by_src_pad(sd, remote_pad->index);
 
-	ret = ipu6_isys_get_stream_pad_fmt(sd, remote_pad->index, r_stream,
+	ret = ipu_isys_get_stream_pad_fmt(sd, remote_pad->index, r_stream,
 					   &format);
 
 	if (ret) {

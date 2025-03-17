@@ -432,7 +432,7 @@ static int ipu6_isys_csi2_set_sel(struct v4l2_subdev *sd,
 	sel->r.left = 0;
 	sel->r.width = sink_ffmt->width;
 	/* Non-bayer formats can't be single line cropped */
-	if (!ipu6_isys_is_bayer_format(sink_ffmt->code))
+	if (!ipu_isys_is_bayer_format(sink_ffmt->code))
 		sel->r.top &= ~1;
 	sel->r.height = clamp(sel->r.height & ~1, IPU6_ISYS_MIN_HEIGHT,
 			      sink_ffmt->height - sel->r.top);
@@ -441,8 +441,8 @@ static int ipu6_isys_csi2_set_sel(struct v4l2_subdev *sd,
 	/* update source pad format */
 	src_ffmt->width = sel->r.width;
 	src_ffmt->height = sel->r.height;
-	if (ipu6_isys_is_bayer_format(sink_ffmt->code))
-		src_ffmt->code = ipu6_isys_convert_bayer_order(sink_ffmt->code,
+	if (ipu_isys_is_bayer_format(sink_ffmt->code))
+		src_ffmt->code = ipu_isys_convert_bayer_order(sink_ffmt->code,
 							       sel->r.left,
 							       sel->r.top);
 	dev_dbg(sd->v4l2_dev->dev,
@@ -494,11 +494,11 @@ static int ipu6_isys_csi2_get_sel(struct v4l2_subdev *sd,
 
 static const struct v4l2_subdev_pad_ops csi2_sd_pad_ops = {
 	.get_fmt = v4l2_subdev_get_fmt,
-	.set_fmt = ipu6_isys_subdev_set_fmt,
+	.set_fmt = ipu_isys_subdev_set_fmt,
 	.get_selection = ipu6_isys_csi2_get_sel,
 	.set_selection = ipu6_isys_csi2_set_sel,
-	.enum_mbus_code = ipu6_isys_subdev_enum_mbus_code,
-	.set_routing = ipu6_isys_subdev_set_routing,
+	.enum_mbus_code = ipu_isys_subdev_enum_mbus_code,
+	.set_routing = ipu_isys_subdev_set_routing,
 	.enable_streams = ipu6_isys_csi2_enable_streams,
 	.disable_streams = ipu6_isys_csi2_disable_streams,
 };
@@ -520,7 +520,7 @@ void ipu6_isys_csi2_cleanup(struct ipu6_isys_csi2 *csi2)
 
 	v4l2_device_unregister_subdev(&csi2->asd.sd);
 	v4l2_subdev_cleanup(&csi2->asd.sd);
-	ipu6_isys_subdev_cleanup(&csi2->asd);
+	ipu_isys_subdev_cleanup(&csi2->asd);
 	csi2->isys = NULL;
 }
 
@@ -537,7 +537,7 @@ int ipu6_isys_csi2_init(struct ipu6_isys_csi2 *csi2,
 
 	csi2->asd.sd.entity.ops = &csi2_entity_ops;
 	// csi2->asd.isys = isys;
-	ret = ipu6_isys_subdev_init(dev, &csi2->asd, &csi2_sd_ops, 0,
+	ret = ipu_isys_subdev_init(dev, &csi2->asd, &csi2_sd_ops, 0,
 				    NR_OF_CSI2_SINK_PADS, NR_OF_CSI2_SRC_PADS);
 	if (ret)
 		goto fail;

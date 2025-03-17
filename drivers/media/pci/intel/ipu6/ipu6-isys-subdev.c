@@ -15,7 +15,7 @@
 #include "ipu6-isys.h"
 #include "ipu6-isys-subdev.h"
 
-unsigned int ipu6_isys_mbus_code_to_bpp(u32 code)
+unsigned int ipu_isys_mbus_code_to_bpp(u32 code)
 {
 	switch (code) {
 	case MEDIA_BUS_FMT_RGB888_1X24:
@@ -50,7 +50,7 @@ unsigned int ipu6_isys_mbus_code_to_bpp(u32 code)
 	}
 }
 
-unsigned int ipu6_isys_mbus_code_to_mipi(u32 code)
+unsigned int ipu_isys_mbus_code_to_mipi(u32 code)
 {
 	switch (code) {
 	case MEDIA_BUS_FMT_RGB565_1X16:
@@ -87,9 +87,9 @@ unsigned int ipu6_isys_mbus_code_to_mipi(u32 code)
 	}
 }
 
-bool ipu6_isys_is_bayer_format(u32 code)
+bool ipu_isys_is_bayer_format(u32 code)
 {
-	switch (ipu6_isys_mbus_code_to_mipi(code)) {
+	switch (ipu_isys_mbus_code_to_mipi(code)) {
 	case MIPI_CSI2_DT_RAW8:
 	case MIPI_CSI2_DT_RAW10:
 	case MIPI_CSI2_DT_RAW12:
@@ -104,7 +104,7 @@ bool ipu6_isys_is_bayer_format(u32 code)
 	}
 }
 
-u32 ipu6_isys_convert_bayer_order(u32 code, int x, int y)
+u32 ipu_isys_convert_bayer_order(u32 code, int x, int y)
 {
 	static const u32 code_map[] = {
 		MEDIA_BUS_FMT_SRGGB8_1X8,
@@ -136,7 +136,7 @@ u32 ipu6_isys_convert_bayer_order(u32 code, int x, int y)
 	return code_map[i ^ (((y & 1) << 1) | (x & 1))];
 }
 
-int ipu6_isys_subdev_set_fmt(struct v4l2_subdev *sd,
+int ipu_isys_subdev_set_fmt(struct v4l2_subdev *sd,
 			     struct v4l2_subdev_state *state,
 			     struct v4l2_subdev_format *format)
 {
@@ -204,7 +204,7 @@ int ipu6_isys_subdev_set_fmt(struct v4l2_subdev *sd,
 	return 0;
 }
 
-int ipu6_isys_subdev_enum_mbus_code(struct v4l2_subdev *sd,
+int ipu_isys_subdev_enum_mbus_code(struct v4l2_subdev *sd,
 				    struct v4l2_subdev_state *state,
 				    struct v4l2_subdev_mbus_code_enum *code)
 {
@@ -242,7 +242,7 @@ static int subdev_set_routing(struct v4l2_subdev *sd,
 	return v4l2_subdev_set_routing_with_fmt(sd, state, routing, &format);
 }
 
-int ipu6_isys_get_stream_pad_fmt(struct v4l2_subdev *sd, u32 pad, u32 stream,
+int ipu_isys_get_stream_pad_fmt(struct v4l2_subdev *sd, u32 pad, u32 stream,
 				 struct v4l2_mbus_framefmt *format)
 {
 	struct v4l2_mbus_framefmt *fmt;
@@ -260,7 +260,7 @@ int ipu6_isys_get_stream_pad_fmt(struct v4l2_subdev *sd, u32 pad, u32 stream,
 	return fmt ? 0 : -EINVAL;
 }
 
-int ipu6_isys_get_stream_pad_crop(struct v4l2_subdev *sd, u32 pad, u32 stream,
+int ipu_isys_get_stream_pad_crop(struct v4l2_subdev *sd, u32 pad, u32 stream,
 				  struct v4l2_rect *crop)
 {
 	struct v4l2_subdev_state *state;
@@ -278,7 +278,7 @@ int ipu6_isys_get_stream_pad_crop(struct v4l2_subdev *sd, u32 pad, u32 stream,
 	return rect ? 0 : -EINVAL;
 }
 
-u32 ipu6_isys_get_src_stream_by_src_pad(struct v4l2_subdev *sd, u32 pad)
+u32 ipu_isys_get_src_stream_by_src_pad(struct v4l2_subdev *sd, u32 pad)
 {
 	struct v4l2_subdev_state *state;
 	struct v4l2_subdev_route *routes;
@@ -302,7 +302,7 @@ u32 ipu6_isys_get_src_stream_by_src_pad(struct v4l2_subdev *sd, u32 pad)
 	return source_stream;
 }
 
-static int ipu6_isys_subdev_init_state(struct v4l2_subdev *sd,
+static int ipu_isys_subdev_init_state(struct v4l2_subdev *sd,
 				       struct v4l2_subdev_state *state)
 {
 	struct v4l2_subdev_route route = {
@@ -320,7 +320,7 @@ static int ipu6_isys_subdev_init_state(struct v4l2_subdev *sd,
 	return subdev_set_routing(sd, state, &routing);
 }
 
-int ipu6_isys_subdev_set_routing(struct v4l2_subdev *sd,
+int ipu_isys_subdev_set_routing(struct v4l2_subdev *sd,
 				 struct v4l2_subdev_state *state,
 				 enum v4l2_subdev_format_whence which,
 				 struct v4l2_subdev_krouting *routing)
@@ -329,10 +329,10 @@ int ipu6_isys_subdev_set_routing(struct v4l2_subdev *sd,
 }
 
 static const struct v4l2_subdev_internal_ops ipu6_isys_subdev_internal_ops = {
-	.init_state = ipu6_isys_subdev_init_state,
+	.init_state = ipu_isys_subdev_init_state,
 };
 
-int ipu6_isys_subdev_init(struct device *dev,
+int ipu_isys_subdev_init(struct device *dev,
 			  struct ipu_isys_subdev *asd,
 			  const struct v4l2_subdev_ops *ops,
 			  unsigned int nr_ctrls,
@@ -394,7 +394,7 @@ out_media_entity_cleanup:
 	return ret;
 }
 
-void ipu6_isys_subdev_cleanup(struct ipu_isys_subdev *asd)
+void ipu_isys_subdev_cleanup(struct ipu_isys_subdev *asd)
 {
 	media_entity_cleanup(&asd->sd.entity);
 	v4l2_ctrl_handler_free(&asd->ctrl_handler);

@@ -386,7 +386,7 @@ static int link_validate(struct media_link *link)
 		link->sink->entity->name);
 
 	s_pad = media_pad_remote_pad_first(&av->pad);
-	s_stream = ipu6_isys_get_src_stream_by_src_pad(s_sd, s_pad->index);
+	s_stream = ipu_isys_get_src_stream_by_src_pad(s_sd, s_pad->index);
 
 	v4l2_subdev_lock_state(s_state);
 
@@ -455,15 +455,15 @@ static int ipu6_isys_fw_pin_cfg(struct ipu6_isys_video *av,
 	u32 src_stream;
 	int ret;
 
-	src_stream = ipu6_isys_get_src_stream_by_src_pad(sd, src_pad->index);
-	ret = ipu6_isys_get_stream_pad_fmt(sd, src_pad->index, src_stream,
+	src_stream = ipu_isys_get_src_stream_by_src_pad(sd, src_pad->index);
+	ret = ipu_isys_get_stream_pad_fmt(sd, src_pad->index, src_stream,
 					   &fmt);
 	if (ret < 0) {
 		dev_err(dev, "can't get stream format (%d)\n", ret);
 		return ret;
 	}
 
-	ret = ipu6_isys_get_stream_pad_crop(sd, src_pad->index, src_stream,
+	ret = ipu_isys_get_stream_pad_crop(sd, src_pad->index, src_stream,
 					    &v4l2_crop);
 	if (ret < 0) {
 		dev_err(dev, "can't get stream crop (%d)\n", ret);
@@ -775,10 +775,10 @@ void ipu6_isys_configure_stream_watermark(struct ipu6_isys_video *av,
 	link_freq = ipu6_isys_csi2_get_link_freq(csi2);
 	if (link_freq > 0) {
 		lanes = csi2->nlanes;
-		ret = ipu6_isys_get_stream_pad_fmt(&csi2->asd.sd, 0,
+		ret = ipu_isys_get_stream_pad_fmt(&csi2->asd.sd, 0,
 						   av->source_stream, &format);
 		if (!ret) {
-			bpp = ipu6_isys_mbus_code_to_bpp(format.code);
+			bpp = ipu_isys_mbus_code_to_bpp(format.code);
 			pixel_rate = mul_u64_u32_div(link_freq, lanes * 2, bpp);
 		}
 	}
@@ -1003,7 +1003,7 @@ int ipu6_isys_video_set_streaming(struct ipu6_isys_video *av, int state,
 
 	sd = &stream->asd->sd;
 	r_pad = media_pad_remote_pad_first(&av->pad);
-	r_stream = ipu6_isys_get_src_stream_by_src_pad(sd, r_pad->index);
+	r_stream = ipu_isys_get_src_stream_by_src_pad(sd, r_pad->index);
 
 	subdev_state = v4l2_subdev_lock_and_get_active_state(sd);
 	routing = &subdev_state->routing;
@@ -1221,7 +1221,7 @@ int ipu6_isys_setup_video(struct ipu6_isys_video *av,
 					     *source_entity, &entry);
 	if (ret == -ENOIOCTLCMD) {
 		av->vc = 0;
-		av->dt = ipu6_isys_mbus_code_to_mipi(pfmt->code);
+		av->dt = ipu_isys_mbus_code_to_mipi(pfmt->code);
 	} else if (!ret) {
 		dev_dbg(dev, "Framedesc: stream %u, len %u, vc %u, dt %#x\n",
 			entry.stream, entry.length, entry.bus.csi2.vc,

@@ -447,7 +447,7 @@ static int ipu7_isys_fw_pin_cfg(struct ipu7_isys_video *av,
 	struct ipu7_insys_output_pin *output_pin;
 	struct ipu7_insys_input_pin *input_pin;
 	int input_pins = cfg->nof_input_pins++;
-	struct ipu7_isys_queue *aq = &av->aq;
+	struct ipu_isys_queue *aq = &av->aq;
 	struct ipu7_isys *isys = av->isys;
 	struct device *dev = isys_to_dev(isys);
 	struct v4l2_mbus_framefmt fmt;
@@ -521,14 +521,14 @@ static int ipu7_isys_fw_pin_cfg(struct ipu7_isys_video *av,
 
 /* Create stream and start it using the CSS FW ABI. */
 static int start_stream_firmware(struct ipu7_isys_video *av,
-				 struct ipu7_isys_buffer_list *bl)
+				 struct ipu_isys_buffer_list *bl)
 {
 	struct device *dev = isys_to_dev(av->isys);
 	struct ipu7_isys_stream *stream = av->stream;
 	struct ipu7_insys_stream_cfg *stream_cfg;
 	struct ipu7_insys_buffset *buf = NULL;
 	struct isys_fw_msgs *msg = NULL;
-	struct ipu7_isys_queue *aq;
+	struct ipu_isys_queue *aq;
 	int ret, retout, tout;
 	u16 send_type;
 
@@ -889,7 +889,7 @@ static u32 get_remote_pad_stream(struct media_pad *r_pad)
 }
 
 int ipu7_isys_video_set_streaming(struct ipu7_isys_video *av, int state,
-				  struct ipu7_isys_buffer_list *bl)
+				  struct ipu_isys_buffer_list *bl)
 {
 	struct ipu7_isys_stream *stream = av->stream;
 	struct device *dev = isys_to_dev(av->isys);

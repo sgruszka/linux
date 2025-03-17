@@ -285,7 +285,7 @@ static int isys_register_video_devices(struct ipu7_isys *isys)
 				 i * NR_OF_CSI2_SRC_PADS + j);
 			av->isys = isys;
 			av->aq.vbq.buf_struct_size =
-				sizeof(struct ipu7_isys_video_buffer);
+				sizeof(struct ipu_isys_video_buffer);
 
 			ret = ipu7_isys_video_init(av);
 			if (ret)

@@ -140,7 +140,7 @@ int ipu6_isys_subdev_set_fmt(struct v4l2_subdev *sd,
 			     struct v4l2_subdev_state *state,
 			     struct v4l2_subdev_format *format)
 {
-	struct ipu6_isys_subdev *asd = to_ipu6_isys_subdev(sd);
+	struct ipu_isys_subdev *asd = to_ipu6_isys_subdev(sd);
 	struct v4l2_mbus_framefmt *fmt;
 	struct v4l2_rect *crop;
 	u32 code = asd->supported_codes[0];
@@ -208,7 +208,7 @@ int ipu6_isys_subdev_enum_mbus_code(struct v4l2_subdev *sd,
 				    struct v4l2_subdev_state *state,
 				    struct v4l2_subdev_mbus_code_enum *code)
 {
-	struct ipu6_isys_subdev *asd = to_ipu6_isys_subdev(sd);
+	struct ipu_isys_subdev *asd = to_ipu6_isys_subdev(sd);
 	const u32 *supported_codes = asd->supported_codes;
 	u32 index;
 
@@ -333,7 +333,7 @@ static const struct v4l2_subdev_internal_ops ipu6_isys_subdev_internal_ops = {
 };
 
 int ipu6_isys_subdev_init(struct device *dev,
-			  struct ipu6_isys_subdev *asd,
+			  struct ipu_isys_subdev *asd,
 			  const struct v4l2_subdev_ops *ops,
 			  unsigned int nr_ctrls,
 			  unsigned int num_sink_pads,
@@ -394,7 +394,7 @@ out_media_entity_cleanup:
 	return ret;
 }
 
-void ipu6_isys_subdev_cleanup(struct ipu6_isys_subdev *asd)
+void ipu6_isys_subdev_cleanup(struct ipu_isys_subdev *asd)
 {
 	media_entity_cleanup(&asd->sd.entity);
 	v4l2_ctrl_handler_free(&asd->ctrl_handler);

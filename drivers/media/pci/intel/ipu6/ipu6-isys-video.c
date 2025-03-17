@@ -869,7 +869,7 @@ void ipu6_isys_put_stream(struct ipu6_isys_stream *stream)
 }
 
 static struct ipu6_isys_stream *
-ipu6_isys_get_stream(struct ipu6_isys_video *av, struct ipu6_isys_subdev *asd)
+ipu6_isys_get_stream(struct ipu6_isys_video *av, struct ipu_isys_subdev *asd)
 {
 	struct ipu6_isys_stream *stream = NULL;
 	struct ipu6_isys *isys = av->isys;
@@ -1175,7 +1175,7 @@ int ipu6_isys_setup_video(struct ipu6_isys_video *av,
 	struct v4l2_subdev_route *route = NULL;
 	struct v4l2_subdev_route *r;
 	struct v4l2_subdev_state *state;
-	struct ipu6_isys_subdev *asd;
+	struct ipu_isys_subdev *asd;
 	struct v4l2_subdev *remote_sd;
 	struct media_pipeline *pipeline;
 	struct media_pad *source_pad, *remote_pad;

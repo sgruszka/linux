@@ -10,7 +10,7 @@
 #include <media/v4l2-ctrls.h>
 #include <media/v4l2-subdev.h>
 
-struct ipu6_isys_subdev {
+struct ipu_isys_subdev {
 	struct v4l2_subdev sd;
 	u32 const *supported_codes;
 	struct media_pad *pad;
@@ -20,7 +20,7 @@ struct ipu6_isys_subdev {
 };
 
 #define to_ipu6_isys_subdev(__sd) \
-	container_of(__sd, struct ipu6_isys_subdev, sd)
+	container_of(__sd, struct ipu_isys_subdev, sd)
 
 unsigned int ipu6_isys_mbus_code_to_bpp(u32 code);
 unsigned int ipu6_isys_mbus_code_to_mipi(u32 code);
@@ -34,10 +34,6 @@ int ipu6_isys_subdev_enum_mbus_code(struct v4l2_subdev *sd,
 				    struct v4l2_subdev_state *state,
 				    struct v4l2_subdev_mbus_code_enum
 				    *code);
-int ipu6_isys_subdev_link_validate(struct v4l2_subdev *sd,
-				   struct media_link *link,
-				   struct v4l2_subdev_format *source_fmt,
-				   struct v4l2_subdev_format *sink_fmt);
 u32 ipu6_isys_get_src_stream_by_src_pad(struct v4l2_subdev *sd, u32 pad);
 int ipu6_isys_get_stream_pad_fmt(struct v4l2_subdev *sd, u32 pad, u32 stream,
 				 struct v4l2_mbus_framefmt *format);
@@ -48,10 +44,10 @@ int ipu6_isys_subdev_set_routing(struct v4l2_subdev *sd,
 				 enum v4l2_subdev_format_whence which,
 				 struct v4l2_subdev_krouting *routing);
 int ipu6_isys_subdev_init(struct device *dev,
-			  struct ipu6_isys_subdev *asd,
+			  struct ipu_isys_subdev *asd,
 			  const struct v4l2_subdev_ops *ops,
 			  unsigned int nr_ctrls,
 			  unsigned int num_sink_pads,
 			  unsigned int num_source_pads);
-void ipu6_isys_subdev_cleanup(struct ipu6_isys_subdev *asd);
+void ipu6_isys_subdev_cleanup(struct ipu_isys_subdev *asd);
 #endif /* IPU6_ISYS_SUBDEV_H */

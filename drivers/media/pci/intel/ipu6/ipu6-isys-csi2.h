@@ -35,7 +35,7 @@ struct ipu6_isys_stream;
 #define CSI2_CSI_RX_DLY_CNT_SETTLE_DLANE_B		-2
 
 struct ipu6_isys_csi2 {
-	struct ipu6_isys_subdev asd;
+	struct ipu_isys_subdev asd;
 	struct ipu_isys *isys;
 	struct ipu6_isys_video av[NR_OF_CSI2_SRC_PADS];
 

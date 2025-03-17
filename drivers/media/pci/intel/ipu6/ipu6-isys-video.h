@@ -40,7 +40,7 @@ struct sequence_info {
 struct output_pin_data {
 	void (*pin_ready)(struct ipu6_isys_stream *stream,
 			  struct ipu6_fw_isys_resp_info_abi *info);
-	struct ipu6_isys_queue *aq;
+	struct ipu_isys_queue *aq;
 };
 
 /*
@@ -86,7 +86,7 @@ struct video_stream_watermark {
 };
 
 struct ipu6_isys_video {
-	struct ipu6_isys_queue aq;
+	struct ipu_isys_queue aq;
 	/* Serialise access to other fields in the struct. */
 	struct mutex mutex;
 	struct media_pad pad;
@@ -115,7 +115,7 @@ int ipu6_isys_video_prepare_stream(struct ipu6_isys_video *av,
 				   struct media_entity *source_entity,
 				   int nr_queues);
 int ipu6_isys_video_set_streaming(struct ipu6_isys_video *av, int state,
-				  struct ipu6_isys_buffer_list *bl);
+				  struct ipu_isys_buffer_list *bl);
 int ipu6_isys_fw_open(struct ipu6_isys *isys);
 void ipu6_isys_fw_close(struct ipu6_isys *isys);
 int ipu6_isys_setup_video(struct ipu6_isys_video *av,

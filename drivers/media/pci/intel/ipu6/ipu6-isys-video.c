@@ -443,7 +443,7 @@ static int ipu6_isys_fw_pin_cfg(struct ipu6_isys_video *av,
 	struct ipu6_fw_isys_input_pin_info_abi *input_pin;
 	struct ipu6_fw_isys_output_pin_info_abi *output_pin;
 	struct ipu6_isys_stream *stream = av->stream;
-	struct ipu6_isys_queue *aq = &av->aq;
+	struct ipu_isys_queue *aq = &av->aq;
 	struct v4l2_mbus_framefmt fmt;
 	const struct ipu6_isys_pixelformat *pfmt =
 		ipu6_isys_get_isys_format(ipu6_isys_get_format(av), 0);
@@ -516,14 +516,14 @@ static int ipu6_isys_fw_pin_cfg(struct ipu6_isys_video *av,
 }
 
 static int start_stream_firmware(struct ipu6_isys_video *av,
-				 struct ipu6_isys_buffer_list *bl)
+				 struct ipu_isys_buffer_list *bl)
 {
 	struct ipu6_fw_isys_stream_cfg_data_abi *stream_cfg;
 	struct ipu6_fw_isys_frame_buff_set_abi *buf = NULL;
 	struct ipu6_isys_stream *stream = av->stream;
 	struct device *dev = isys_to_dev(av->isys);
 	struct isys_fw_msgs *msg = NULL;
-	struct ipu6_isys_queue *aq;
+	struct ipu_isys_queue *aq;
 	int ret, retout, tout;
 	u16 send_type;
 
@@ -591,7 +591,7 @@ static int start_stream_firmware(struct ipu6_isys_video *av,
 		buf = &msg->fw_msg.frame;
 		ipu6_isys_buf_to_fw_frame_buf(buf, stream, bl);
 		ipu6_isys_buffer_list_queue(bl,
-					    IPU6_ISYS_BUFFER_LIST_FL_ACTIVE, 0);
+					    IPU_ISYS_BUFFER_LIST_FL_ACTIVE, 0);
 	}
 
 	reinit_completion(&stream->stream_start_completion);
@@ -982,7 +982,7 @@ static u64 get_stream_mask_by_pipeline(struct ipu6_isys_video *__av)
 }
 
 int ipu6_isys_video_set_streaming(struct ipu6_isys_video *av, int state,
-				  struct ipu6_isys_buffer_list *bl)
+				  struct ipu_isys_buffer_list *bl)
 {
 	struct v4l2_subdev_krouting *routing;
 	struct ipu6_isys_stream *stream = av->stream;

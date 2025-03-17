@@ -313,7 +313,8 @@ static const struct v4l2_subdev_internal_ops ipu7_isys_subdev_internal_ops = {
 	.init_state = ipu7_isys_subdev_init_state,
 };
 
-int ipu7_isys_subdev_init(struct ipu7_isys_subdev *asd,
+int ipu7_isys_subdev_init(struct device *dev,
+			  struct ipu7_isys_subdev *asd,
 			  const struct v4l2_subdev_ops *ops,
 			  unsigned int nr_ctrls,
 			  unsigned int num_sink_pads,
@@ -329,12 +330,10 @@ int ipu7_isys_subdev_init(struct ipu7_isys_subdev *asd,
 			 V4L2_SUBDEV_FL_HAS_EVENTS |
 			 V4L2_SUBDEV_FL_STREAMS;
 	asd->sd.owner = THIS_MODULE;
-	asd->sd.dev = isys_to_dev(asd->isys);
 	asd->sd.entity.function = MEDIA_ENT_F_VID_IF_BRIDGE;
 	asd->sd.internal_ops = &ipu7_isys_subdev_internal_ops;
 
-	asd->pad = devm_kcalloc(isys_to_dev(asd->isys), num_pads,
-				sizeof(*asd->pad), GFP_KERNEL);
+	asd->pad = devm_kcalloc(dev, num_pads, sizeof(*asd->pad), GFP_KERNEL);
 	if (!asd->pad)
 		return -ENOMEM;
 

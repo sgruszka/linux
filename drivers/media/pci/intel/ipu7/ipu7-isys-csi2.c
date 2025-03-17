@@ -220,8 +220,6 @@ static int ipu7_isys_csi2_set_sel(struct v4l2_subdev *sd,
 				  struct v4l2_subdev_state *state,
 				  struct v4l2_subdev_selection *sel)
 {
-	struct ipu7_isys_subdev *asd = to_ipu7_isys_subdev(sd);
-	struct device *dev = isys_to_dev(asd->isys);
 	struct v4l2_mbus_framefmt *sink_ffmt;
 	struct v4l2_mbus_framefmt *src_ffmt;
 	struct v4l2_rect *crop;
@@ -260,7 +258,8 @@ static int ipu7_isys_csi2_set_sel(struct v4l2_subdev *sd,
 		src_ffmt->code = ipu7_isys_convert_bayer_order(sink_ffmt->code,
 							       sel->r.left,
 							       sel->r.top);
-	dev_dbg(dev, "set crop for %s sel: %d,%d,%d,%d code: 0x%x\n",
+	dev_dbg(sd->v4l2_dev->dev,
+		"set crop for %s sel: %d,%d,%d,%d code: 0x%x\n",
 		sd->name, sel->r.left, sel->r.top, sel->r.width, sel->r.height,
 		src_ffmt->code);
 
@@ -447,9 +446,8 @@ int ipu7_isys_csi2_init(struct ipu7_isys_csi2 *csi2,
 		csi2->legacy_irq_mask);
 
 	csi2->asd.sd.entity.ops = &csi2_entity_ops;
-	csi2->asd.isys = isys;
 
-	ret = ipu7_isys_subdev_init(&csi2->asd, &csi2_sd_ops, 0,
+	ret = ipu7_isys_subdev_init(dev, &csi2->asd, &csi2_sd_ops, 0,
 				    NR_OF_CSI2_SINK_PADS, NR_OF_CSI2_SRC_PADS);
 	if (ret)
 		return ret;

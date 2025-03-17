@@ -536,8 +536,8 @@ int ipu6_isys_csi2_init(struct ipu6_isys_csi2 *csi2,
 	csi2->port = index;
 
 	csi2->asd.sd.entity.ops = &csi2_entity_ops;
-	csi2->asd.isys = isys;
-	ret = ipu6_isys_subdev_init(&csi2->asd, &csi2_sd_ops, 0,
+	// csi2->asd.isys = isys;
+	ret = ipu6_isys_subdev_init(dev, &csi2->asd, &csi2_sd_ops, 0,
 				    NR_OF_CSI2_SINK_PADS, NR_OF_CSI2_SRC_PADS);
 	if (ret)
 		goto fail;

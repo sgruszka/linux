@@ -70,6 +70,60 @@ struct ipu_isys_subdev {
 #define IPU6_ISYS_MAX_WIDTH		4672U
 #define IPU6_ISYS_MAX_HEIGHT		3416U
 
+struct ipu_isys_pixelformat {
+	u32 pixelformat;
+	u32 bpp;
+	u32 bpp_packed;
+	u32 code;
+	u32 css_pixelformat;
+	bool is_meta;
+};
+
+struct ipu_sequence_info {
+	unsigned int sequence;
+	u64 timestamp;
+};
+
+struct ipu_isys_stream;
+
+struct ipu_output_pin_data {
+	void (*pin_ready)(struct ipu_isys_stream *stream, void *info);
+	struct ipu_isys_queue *aq;
+};
+
+#define IPU_ISYS_OUTPUT_PINS 11
+#define IPU_ISYS_MAX_PARALLEL_SOF 2
+
+/*
+ * Align with firmware stream. Each stream represents a CSI virtual channel.
+ * May map to multiple video devices
+ */
+struct ipu_isys_stream {
+	struct mutex mutex;
+	struct media_entity *source_entity;
+	atomic_t sequence;
+	unsigned int seq_index;
+	struct ipu_sequence_info seq[IPU_ISYS_MAX_PARALLEL_SOF];
+	int stream_source;
+	int stream_handle;
+	unsigned int nr_output_pins;
+	struct ipu_isys_subdev *asd;
+
+	int nr_queues;	/* Number of capture queues */
+	int nr_streaming;
+	int streaming;	/* Has streaming been really started? */
+	struct list_head queues;
+	struct completion stream_open_completion;
+	struct completion stream_close_completion;
+	struct completion stream_start_completion;
+	struct completion stream_stop_completion;
+	struct ipu6_isys *isys;
+
+	struct ipu_output_pin_data output_pins[IPU_ISYS_OUTPUT_PINS];
+	int error;
+	u8 vc;
+};
+
 unsigned int ipu_isys_mbus_code_to_bpp(u32 code);
 unsigned int ipu_isys_mbus_code_to_mipi(u32 code);
 bool ipu_isys_is_bayer_format(u32 code);

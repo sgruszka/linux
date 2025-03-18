@@ -1296,7 +1296,7 @@ static int isys_isr_one(struct ipu_bus_device *adev)
 		 * get pin_data_ready event
 		 */
 		ipu6_put_fw_msg_buf(isys, resp->buf_id);
-		if (resp->pin_id < IPU6_ISYS_OUTPUT_PINS &&
+		if (resp->pin_id < IPU_ISYS_OUTPUT_PINS &&
 		    stream->output_pins[resp->pin_id].pin_ready)
 			stream->output_pins[resp->pin_id].pin_ready(stream,
 								    resp);
@@ -1324,7 +1324,7 @@ static int isys_isr_one(struct ipu_bus_device *adev)
 			resp->stream_handle,
 			stream->seq[stream->seq_index].sequence, ts);
 		stream->seq_index = (stream->seq_index + 1)
-			% IPU6_ISYS_MAX_PARALLEL_SOF;
+			% IPU_ISYS_MAX_PARALLEL_SOF;
 		break;
 	case IPU6_FW_ISYS_RESP_TYPE_FRAME_EOF:
 		ipu6_isys_csi2_eof_event_by_stream(stream);

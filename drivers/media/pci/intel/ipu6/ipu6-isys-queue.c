@@ -667,14 +667,14 @@ get_sof_sequence_by_timestamp(struct ipu_isys_stream *stream,
 	if (time == 0)
 		return atomic_read(&stream->sequence) - 1;
 
-	for (i = 0; i < IPU6_ISYS_MAX_PARALLEL_SOF; i++)
+	for (i = 0; i < IPU_ISYS_MAX_PARALLEL_SOF; i++)
 		if (time == stream->seq[i].timestamp) {
 			dev_dbg(dev, "sof: using seq nr %u for ts %llu\n",
 				stream->seq[i].sequence, time);
 			return stream->seq[i].sequence;
 		}
 
-	for (i = 0; i < IPU6_ISYS_MAX_PARALLEL_SOF; i++)
+	for (i = 0; i < IPU_ISYS_MAX_PARALLEL_SOF; i++)
 		dev_dbg(dev, "sof: sequence %u, timestamp value %llu\n",
 			stream->seq[i].sequence, stream->seq[i].timestamp);
 

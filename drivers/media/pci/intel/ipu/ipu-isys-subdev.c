@@ -20,6 +20,9 @@ unsigned int ipu_isys_mbus_code_to_bpp(u32 code)
 	case MEDIA_BUS_FMT_RGB888_1X24:
 	case MEDIA_BUS_FMT_META_24:
 		return 24;
+	case MEDIA_BUS_FMT_YUYV10_1X20:	/* IPU 7*/
+		return 20;
+	case MEDIA_BUS_FMT_Y10_1X10:	/* IPU 7 */
 	case MEDIA_BUS_FMT_RGB565_1X16:
 	case MEDIA_BUS_FMT_UYVY8_1X16:
 	case MEDIA_BUS_FMT_YUYV8_1X16:
@@ -57,19 +60,22 @@ unsigned int ipu_isys_mbus_code_to_mipi(u32 code)
 		return MIPI_CSI2_DT_RGB565;
 	case MEDIA_BUS_FMT_RGB888_1X24:
 		return MIPI_CSI2_DT_RGB888;
+	case MEDIA_BUS_FMT_YUYV10_1X20:	/* IPU 7 */
+		return MIPI_CSI2_DT_YUV422_10B;
 	case MEDIA_BUS_FMT_UYVY8_1X16:
 	case MEDIA_BUS_FMT_YUYV8_1X16:
 		return MIPI_CSI2_DT_YUV422_8B;
-	case MEDIA_BUS_FMT_SBGGR16_1X16:
-	case MEDIA_BUS_FMT_SGBRG16_1X16:
-	case MEDIA_BUS_FMT_SGRBG16_1X16:
-	case MEDIA_BUS_FMT_SRGGB16_1X16:
+	case MEDIA_BUS_FMT_SBGGR16_1X16: /* IPU 6 */
+	case MEDIA_BUS_FMT_SGBRG16_1X16: /* IPU 6 */
+	case MEDIA_BUS_FMT_SGRBG16_1X16: /* IPU 6 */
+	case MEDIA_BUS_FMT_SRGGB16_1X16: /* IPU 6 */
 		return MIPI_CSI2_DT_RAW16;
 	case MEDIA_BUS_FMT_SBGGR12_1X12:
 	case MEDIA_BUS_FMT_SGBRG12_1X12:
 	case MEDIA_BUS_FMT_SGRBG12_1X12:
 	case MEDIA_BUS_FMT_SRGGB12_1X12:
 		return MIPI_CSI2_DT_RAW12;
+	case MEDIA_BUS_FMT_Y10_1X10:	/* IPU 7 */
 	case MEDIA_BUS_FMT_SBGGR10_1X10:
 	case MEDIA_BUS_FMT_SGBRG10_1X10:
 	case MEDIA_BUS_FMT_SGRBG10_1X10:
@@ -121,12 +127,12 @@ u32 ipu_isys_convert_bayer_order(u32 code, int x, int y)
 		MEDIA_BUS_FMT_SGRBG12_1X12,
 		MEDIA_BUS_FMT_SGBRG12_1X12,
 		MEDIA_BUS_FMT_SBGGR12_1X12,
-		MEDIA_BUS_FMT_SRGGB16_1X16,
-		MEDIA_BUS_FMT_SGRBG16_1X16,
-		MEDIA_BUS_FMT_SGBRG16_1X16,
-		MEDIA_BUS_FMT_SBGGR16_1X16,
+		MEDIA_BUS_FMT_SRGGB16_1X16, /* IPU6 */
+		MEDIA_BUS_FMT_SGRBG16_1X16, /* IPU6 */
+		MEDIA_BUS_FMT_SGBRG16_1X16, /* IPU6 */
+		MEDIA_BUS_FMT_SBGGR16_1X16, /* IPU6 */
 	};
-	u32 i;
+	unsigned int i;
 
 	for (i = 0; i < ARRAY_SIZE(code_map); i++)
 		if (code_map[i] == code)
@@ -373,8 +379,10 @@ int ipu_isys_subdev_init(struct device *dev,
 		asd->pad[i].flags = MEDIA_PAD_FL_SOURCE;
 
 	ret = media_entity_pads_init(&asd->sd.entity, num_pads, asd->pad);
-	if (ret)
+	if (ret) {
+		dev_err(dev, "pads init failed with error %d\n", ret);
 		return ret;
+	}
 
 	if (asd->ctrl_init) {
 		ret = v4l2_ctrl_handler_init(&asd->ctrl_handler, nr_ctrls);

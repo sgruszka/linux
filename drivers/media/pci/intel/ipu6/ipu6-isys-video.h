@@ -24,7 +24,7 @@ struct ipu6_isys;
 struct ipu6_isys_csi2;
 struct ipu_isys_subdev;
 
-struct ipu6_isys_pixelformat {
+struct ipu_isys_pixelformat {
 	u32 pixelformat;
 	u32 bpp;
 	u32 bpp_packed;
@@ -33,12 +33,12 @@ struct ipu6_isys_pixelformat {
 	bool is_meta;
 };
 
-struct sequence_info {
+struct ipu_sequence_info {
 	unsigned int sequence;
 	u64 timestamp;
 };
 
-struct output_pin_data {
+struct ipu_output_pin_data {
 	void (*pin_ready)(struct ipu6_isys_stream *stream,
 			  struct ipu6_fw_isys_resp_info_abi *info);
 	struct ipu_isys_queue *aq;
@@ -65,7 +65,7 @@ struct ipu6_isys_stream {
 	struct media_entity *source_entity;
 	atomic_t sequence;
 	unsigned int seq_index;
-	struct sequence_info seq[IPU6_ISYS_MAX_PARALLEL_SOF];
+	struct ipu_sequence_info seq[IPU6_ISYS_MAX_PARALLEL_SOF];
 	int stream_source;
 	int stream_handle;
 	unsigned int nr_output_pins;
@@ -81,7 +81,7 @@ struct ipu6_isys_stream {
 	struct completion stream_stop_completion;
 	struct ipu6_isys *isys;
 
-	struct output_pin_data output_pins[IPU6_ISYS_OUTPUT_PINS];
+	struct ipu_output_pin_data output_pins[IPU6_ISYS_OUTPUT_PINS];
 	int error;
 	u8 vc;
 };
@@ -108,10 +108,10 @@ struct ipu6_isys_video {
 #define ipu6_isys_queue_to_video(__aq) \
 	container_of(__aq, struct ipu6_isys_video, aq)
 
-extern const struct ipu6_isys_pixelformat ipu6_isys_pfmts[];
-extern const struct ipu6_isys_pixelformat ipu6_isys_pfmts_packed[];
+extern const struct ipu_isys_pixelformat ipu6_isys_pfmts[];
+extern const struct ipu_isys_pixelformat ipu6_isys_pfmts_packed[];
 
-const struct ipu6_isys_pixelformat *
+const struct ipu_isys_pixelformat *
 ipu6_isys_get_isys_format(u32 pixelformat, u32 code);
 int ipu6_isys_video_prepare_stream(struct ipu6_isys_video *av,
 				   struct media_entity *source_entity,

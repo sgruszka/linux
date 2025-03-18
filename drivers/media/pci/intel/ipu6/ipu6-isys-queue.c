@@ -541,7 +541,7 @@ static int start_streaming(struct vb2_queue *q, unsigned int count)
 	struct ipu_isys_queue *aq = vb2_queue_to_isys_queue(q);
 	struct ipu6_isys_video *av = ipu6_isys_queue_to_video(aq);
 	struct device *dev = isys_to_dev(av->isys);
-	const struct ipu6_isys_pixelformat *pfmt =
+	const struct ipu_isys_pixelformat *pfmt =
 		ipu6_isys_get_isys_format(ipu6_isys_get_format(av), 0);
 	struct ipu_isys_buffer_list __bl, *bl = NULL;
 	struct ipu6_isys_stream *stream;

@@ -35,7 +35,7 @@
 #include "ipu6-isys-video.h"
 #include "ipu6-platform-regs.h"
 
-const struct ipu6_isys_pixelformat ipu6_isys_pfmts[] = {
+const struct ipu_isys_pixelformat ipu6_isys_pfmts[] = {
 	{ V4L2_PIX_FMT_SBGGR12, 16, 12, MEDIA_BUS_FMT_SBGGR12_1X12,
 	  IPU6_FW_ISYS_FRAME_FORMAT_RAW16 },
 	{ V4L2_PIX_FMT_SGBRG12, 16, 12, MEDIA_BUS_FMT_SGBRG12_1X12,
@@ -111,14 +111,14 @@ static int video_open(struct file *file)
 	return v4l2_fh_open(file);
 }
 
-const struct ipu6_isys_pixelformat *
+const struct ipu_isys_pixelformat *
 ipu6_isys_get_isys_format(u32 pixelformat, u32 type)
 {
-	const struct ipu6_isys_pixelformat *default_pfmt = NULL;
+	const struct ipu_isys_pixelformat *default_pfmt = NULL;
 	unsigned int i;
 
 	for (i = 0; i < ARRAY_SIZE(ipu6_isys_pfmts); i++) {
-		const struct ipu6_isys_pixelformat *pfmt = &ipu6_isys_pfmts[i];
+		const struct ipu_isys_pixelformat *pfmt = &ipu6_isys_pfmts[i];
 
 		if (type && ((!pfmt->is_meta &&
 			      type != V4L2_BUF_TYPE_VIDEO_CAPTURE) ||
@@ -228,7 +228,7 @@ static void ipu6_isys_try_fmt_cap(struct ipu6_isys_video *av, u32 type,
 				  u32 *format, u32 *width, u32 *height,
 				  u32 *bytesperline, u32 *sizeimage)
 {
-	const struct ipu6_isys_pixelformat *pfmt =
+	const struct ipu_isys_pixelformat *pfmt =
 		ipu6_isys_get_isys_format(*format, type);
 
 	*format = pfmt->pixelformat;
@@ -445,7 +445,7 @@ static int ipu6_isys_fw_pin_cfg(struct ipu6_isys_video *av,
 	struct ipu6_isys_stream *stream = av->stream;
 	struct ipu_isys_queue *aq = &av->aq;
 	struct v4l2_mbus_framefmt fmt;
-	const struct ipu6_isys_pixelformat *pfmt =
+	const struct ipu_isys_pixelformat *pfmt =
 		ipu6_isys_get_isys_format(ipu6_isys_get_format(av), 0);
 	struct v4l2_rect v4l2_crop;
 	struct ipu6_isys *isys = av->isys;
@@ -797,7 +797,7 @@ void ipu6_isys_configure_stream_watermark(struct ipu6_isys_video *av,
 static void calculate_stream_datarate(struct ipu6_isys_video *av)
 {
 	struct video_stream_watermark *watermark = &av->watermark;
-	const struct ipu6_isys_pixelformat *pfmt =
+	const struct ipu_isys_pixelformat *pfmt =
 		ipu6_isys_get_isys_format(ipu6_isys_get_format(av), 0);
 	u32 pages_per_line, pb_bytes_per_line, pixels_per_line, bytes_per_line;
 	u64 line_time_ns, stream_data_rate;
@@ -1168,7 +1168,7 @@ void ipu6_isys_fw_close(struct ipu6_isys *isys)
 int ipu6_isys_setup_video(struct ipu6_isys_video *av,
 			  struct media_entity **source_entity, int *nr_queues)
 {
-	const struct ipu6_isys_pixelformat *pfmt =
+	const struct ipu_isys_pixelformat *pfmt =
 		ipu6_isys_get_isys_format(ipu6_isys_get_format(av), 0);
 	struct device *dev = isys_to_dev(av->isys);
 	struct v4l2_mbus_frame_desc_entry entry;

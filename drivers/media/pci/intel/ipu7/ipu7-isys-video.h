@@ -24,7 +24,7 @@ struct file;
 struct ipu7_isys;
 struct ipu7_isys_csi2;
 struct ipu7_insys_stream_cfg;
-struct ipu7_isys_subdev;
+struct ipu_isys_subdev;
 
 struct ipu7_isys_pixelformat {
 	u32 pixelformat;
@@ -60,7 +60,7 @@ struct ipu7_isys_stream {
 	int stream_source;
 	int stream_handle;
 	unsigned int nr_output_pins;
-	struct ipu7_isys_subdev *asd;
+	struct ipu_isys_subdev *asd;
 
 	int nr_queues;  /* Number of capture queues */
 	int nr_streaming;

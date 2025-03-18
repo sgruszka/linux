@@ -79,7 +79,7 @@ s64 ipu7_isys_csi2_get_link_freq(struct ipu7_isys_csi2 *csi2)
 static int csi2_subscribe_event(struct v4l2_subdev *sd, struct v4l2_fh *fh,
 				struct v4l2_event_subscription *sub)
 {
-	struct ipu7_isys_subdev *asd = to_ipu7_isys_subdev(sd);
+	struct ipu_isys_subdev *asd = to_ipu7_isys_subdev(sd);
 	struct ipu7_isys_csi2 *csi2 = to_ipu7_isys_csi2(asd);
 	struct device *dev = isys_to_dev(csi2->isys);
 
@@ -245,7 +245,7 @@ static int ipu7_isys_csi2_set_sel(struct v4l2_subdev *sd,
 	sel->r.left = 0;
 	sel->r.width = sink_ffmt->width;
 	/* Non-bayer formats can't be single line cropped */
-	if (!ipu7_isys_is_bayer_format(sink_ffmt->code))
+	if (!ipu_isys_is_bayer_format(sink_ffmt->code))
 		sel->r.top &= ~1;
 	sel->r.height = clamp(sel->r.height & ~1, IPU_ISYS_MIN_HEIGHT,
 			      sink_ffmt->height - sel->r.top);
@@ -254,8 +254,8 @@ static int ipu7_isys_csi2_set_sel(struct v4l2_subdev *sd,
 	/* update source pad format */
 	src_ffmt->width = sel->r.width;
 	src_ffmt->height = sel->r.height;
-	if (ipu7_isys_is_bayer_format(sink_ffmt->code))
-		src_ffmt->code = ipu7_isys_convert_bayer_order(sink_ffmt->code,
+	if (ipu_isys_is_bayer_format(sink_ffmt->code))
+		src_ffmt->code = ipu_isys_convert_bayer_order(sink_ffmt->code,
 							       sel->r.left,
 							       sel->r.top);
 	dev_dbg(sd->v4l2_dev->dev,
@@ -315,7 +315,7 @@ static int ipu7_isys_csi2_enable_streams(struct v4l2_subdev *sd,
 					 struct v4l2_subdev_state *state,
 					 u32 pad, u64 streams_mask)
 {
-	struct ipu7_isys_subdev *asd = to_ipu7_isys_subdev(sd);
+	struct ipu_isys_subdev *asd = to_ipu7_isys_subdev(sd);
 	struct ipu7_isys_csi2 *csi2 = to_ipu7_isys_csi2(asd);
 	struct v4l2_subdev *r_sd;
 	struct media_pad *r_pad;
@@ -361,7 +361,7 @@ static int ipu7_isys_csi2_disable_streams(struct v4l2_subdev *sd,
 					  struct v4l2_subdev_state *state,
 					  u32 pad, u64 streams_mask)
 {
-	struct ipu7_isys_subdev *asd = to_ipu7_isys_subdev(sd);
+	struct ipu_isys_subdev *asd = to_ipu7_isys_subdev(sd);
 	struct ipu7_isys_csi2 *csi2 = to_ipu7_isys_csi2(asd);
 	struct v4l2_subdev *r_sd;
 	struct media_pad *r_pad;
@@ -396,13 +396,13 @@ static int ipu7_isys_csi2_disable_streams(struct v4l2_subdev *sd,
 
 static const struct v4l2_subdev_pad_ops csi2_sd_pad_ops = {
 	.get_fmt = v4l2_subdev_get_fmt,
-	.set_fmt = ipu7_isys_subdev_set_fmt,
+	.set_fmt = ipu_isys_subdev_set_fmt,
 	.get_selection = ipu7_isys_csi2_get_sel,
 	.set_selection = ipu7_isys_csi2_set_sel,
-	.enum_mbus_code = ipu7_isys_subdev_enum_mbus_code,
+	.enum_mbus_code = ipu_isys_subdev_enum_mbus_code,
 	.enable_streams = ipu7_isys_csi2_enable_streams,
 	.disable_streams = ipu7_isys_csi2_disable_streams,
-	.set_routing = ipu7_isys_subdev_set_routing,
+	.set_routing = ipu_isys_subdev_set_routing,
 };
 
 static const struct v4l2_subdev_ops csi2_sd_ops = {
@@ -422,7 +422,7 @@ void ipu7_isys_csi2_cleanup(struct ipu7_isys_csi2 *csi2)
 
 	v4l2_device_unregister_subdev(&csi2->asd.sd);
 	v4l2_subdev_cleanup(&csi2->asd.sd);
-	ipu7_isys_subdev_cleanup(&csi2->asd);
+	ipu_isys_subdev_cleanup(&csi2->asd);
 	csi2->isys = NULL;
 }
 
@@ -447,7 +447,7 @@ int ipu7_isys_csi2_init(struct ipu7_isys_csi2 *csi2,
 
 	csi2->asd.sd.entity.ops = &csi2_entity_ops;
 
-	ret = ipu7_isys_subdev_init(dev, &csi2->asd, &csi2_sd_ops, 0,
+	ret = ipu_isys_subdev_init(dev, &csi2->asd, &csi2_sd_ops, 0,
 				    NR_OF_CSI2_SINK_PADS, NR_OF_CSI2_SRC_PADS);
 	if (ret)
 		return ret;
@@ -475,7 +475,7 @@ int ipu7_isys_csi2_init(struct ipu7_isys_csi2 *csi2,
 v4l2_subdev_cleanup:
 	v4l2_subdev_cleanup(&csi2->asd.sd);
 isys_subdev_cleanup:
-	ipu7_isys_subdev_cleanup(&csi2->asd);
+	ipu_isys_subdev_cleanup(&csi2->asd);
 
 	return ret;
 }

@@ -39,7 +39,7 @@ struct ipu7_isys_stream;
  * @nlanes: number of lanes in the receiver
  */
 struct ipu7_isys_csi2 {
-	struct ipu7_isys_subdev asd;
+	struct ipu_isys_subdev asd;
 	struct ipu7_isys *isys;
 	struct ipu7_isys_video av[NR_OF_CSI2_SRC_PADS];
 

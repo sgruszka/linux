@@ -379,7 +379,7 @@ static int link_validate(struct media_link *link)
 		link->sink->entity->name);
 
 	s_pad = media_pad_remote_pad_first(&av->pad);
-	s_stream = ipu7_isys_get_src_stream_by_src_pad(s_sd, s_pad->index);
+	s_stream = ipu_isys_get_src_stream_by_src_pad(s_sd, s_pad->index);
 
 	v4l2_subdev_lock_state(s_state);
 
@@ -455,8 +455,8 @@ static int ipu7_isys_fw_pin_cfg(struct ipu7_isys_video *av,
 	u32 src_stream;
 	int ret;
 
-	src_stream = ipu7_isys_get_src_stream_by_src_pad(sd, src_pad->index);
-	ret = ipu7_isys_get_stream_pad_fmt(sd, src_pad->index, src_stream,
+	src_stream = ipu_isys_get_src_stream_by_src_pad(sd, src_pad->index);
+	ret = ipu_isys_get_stream_pad_fmt(sd, src_pad->index, src_stream,
 					   &fmt);
 	if (ret < 0) {
 		dev_err(dev, "can't get stream format (%d)\n", ret);
@@ -767,7 +767,7 @@ void ipu7_isys_put_stream(struct ipu7_isys_stream *stream)
 }
 
 static struct ipu7_isys_stream *
-ipu7_isys_get_stream(struct ipu7_isys_video *av, struct ipu7_isys_subdev *asd)
+ipu7_isys_get_stream(struct ipu7_isys_video *av, struct ipu_isys_subdev *asd)
 {
 	struct ipu7_isys_stream *stream = NULL;
 	struct ipu7_isys *isys = av->isys;
@@ -1047,7 +1047,7 @@ int ipu7_isys_setup_video(struct ipu7_isys_video *av,
 	struct v4l2_subdev_route *route = NULL;
 	struct v4l2_subdev_route *r;
 	struct v4l2_subdev_state *state;
-	struct ipu7_isys_subdev *asd;
+	struct ipu_isys_subdev *asd;
 	struct v4l2_subdev *remote_sd;
 	struct media_pipeline *pipeline;
 	int ret = -EINVAL;
@@ -1091,7 +1091,7 @@ int ipu7_isys_setup_video(struct ipu7_isys_video *av,
 					     nr_queues);
 	if (ret == -ENOIOCTLCMD) {
 		av->vc = 0;
-		av->dt = ipu7_isys_mbus_code_to_mipi(pfmt->code);
+		av->dt = ipu_isys_mbus_code_to_mipi(pfmt->code);
 		*nr_queues = 1;
 	} else if (*nr_queues && !ret) {
 		dev_dbg(dev, "Framedesc: stream %u, len %u, vc %u, dt %#x\n",

@@ -30,7 +30,6 @@ void
 ipu6_isys_buf_calc_sequence_time(struct ipu_isys_buffer *ib,
 				 struct ipu6_fw_isys_resp_info_abi *info);
 void ipu6_isys_queue_buf_done(struct ipu_isys_buffer *ib);
-void ipu6_isys_queue_buf_ready(struct ipu6_isys_stream *stream,
-			       struct ipu6_fw_isys_resp_info_abi *info);
+void ipu6_isys_queue_buf_ready(struct ipu6_isys_stream *stream, void *info);
 int ipu6_isys_queue_init(struct ipu_isys_queue *aq);
 #endif /* IPU6_ISYS_QUEUE_H */

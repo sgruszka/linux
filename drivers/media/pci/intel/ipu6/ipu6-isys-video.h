@@ -39,8 +39,7 @@ struct ipu_sequence_info {
 };
 
 struct ipu_output_pin_data {
-	void (*pin_ready)(struct ipu6_isys_stream *stream,
-			  struct ipu6_fw_isys_resp_info_abi *info);
+	void (*pin_ready)(struct ipu6_isys_stream *stream, void *info);
 	struct ipu_isys_queue *aq;
 };
 

@@ -737,9 +737,9 @@ void ipu6_isys_queue_buf_done(struct ipu_isys_buffer *ib)
 	}
 }
 
-void ipu6_isys_queue_buf_ready(struct ipu6_isys_stream *stream,
-			       struct ipu6_fw_isys_resp_info_abi *info)
+void ipu6_isys_queue_buf_ready(struct ipu6_isys_stream *stream, void *_info)
 {
+	struct ipu6_fw_isys_resp_info_abi *info = _info;
 	struct ipu_isys_queue *aq = stream->output_pins[info->pin_id].aq;
 	struct ipu6_isys *isys = stream->isys;
 	struct device *dev = isys_to_dev(isys);

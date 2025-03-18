@@ -23,3 +23,6 @@ config IPU_BRIDGE
 
 config VIDEO_INTEL_IPU_COMMON
 	tristate
+
+config VIDEO_INTEL_IPU_ISYS
+	tristate

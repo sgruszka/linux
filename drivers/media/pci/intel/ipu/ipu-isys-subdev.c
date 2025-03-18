@@ -12,8 +12,7 @@
 #include <media/v4l2-ctrls.h>
 #include <media/v4l2-subdev.h>
 
-#include "ipu6-isys.h"
-#include "ipu6-isys-subdev.h"
+#include "ipu-isys.h"
 
 unsigned int ipu_isys_mbus_code_to_bpp(u32 code)
 {
@@ -49,6 +48,7 @@ unsigned int ipu_isys_mbus_code_to_bpp(u32 code)
 		return 8;
 	}
 }
+EXPORT_SYMBOL_GPL(ipu_isys_mbus_code_to_bpp);
 
 unsigned int ipu_isys_mbus_code_to_mipi(u32 code)
 {
@@ -86,6 +86,7 @@ unsigned int ipu_isys_mbus_code_to_mipi(u32 code)
 		return 0x3f;
 	}
 }
+EXPORT_SYMBOL_GPL(ipu_isys_mbus_code_to_mipi);
 
 bool ipu_isys_is_bayer_format(u32 code)
 {
@@ -103,6 +104,7 @@ bool ipu_isys_is_bayer_format(u32 code)
 		return false;
 	}
 }
+EXPORT_SYMBOL_GPL(ipu_isys_is_bayer_format);
 
 u32 ipu_isys_convert_bayer_order(u32 code, int x, int y)
 {
@@ -135,6 +137,7 @@ u32 ipu_isys_convert_bayer_order(u32 code, int x, int y)
 
 	return code_map[i ^ (((y & 1) << 1) | (x & 1))];
 }
+EXPORT_SYMBOL_GPL(ipu_isys_convert_bayer_order);
 
 int ipu_isys_subdev_set_fmt(struct v4l2_subdev *sd,
 			     struct v4l2_subdev_state *state,
@@ -203,6 +206,7 @@ int ipu_isys_subdev_set_fmt(struct v4l2_subdev *sd,
 
 	return 0;
 }
+EXPORT_SYMBOL_GPL(ipu_isys_subdev_set_fmt);
 
 int ipu_isys_subdev_enum_mbus_code(struct v4l2_subdev *sd,
 				    struct v4l2_subdev_state *state,
@@ -221,6 +225,7 @@ int ipu_isys_subdev_enum_mbus_code(struct v4l2_subdev *sd,
 
 	return -EINVAL;
 }
+EXPORT_SYMBOL_GPL(ipu_isys_subdev_enum_mbus_code);
 
 static int subdev_set_routing(struct v4l2_subdev *sd,
 			      struct v4l2_subdev_state *state,
@@ -259,6 +264,7 @@ int ipu_isys_get_stream_pad_fmt(struct v4l2_subdev *sd, u32 pad, u32 stream,
 
 	return fmt ? 0 : -EINVAL;
 }
+EXPORT_SYMBOL_GPL(ipu_isys_get_stream_pad_fmt);
 
 int ipu_isys_get_stream_pad_crop(struct v4l2_subdev *sd, u32 pad, u32 stream,
 				  struct v4l2_rect *crop)
@@ -277,6 +283,7 @@ int ipu_isys_get_stream_pad_crop(struct v4l2_subdev *sd, u32 pad, u32 stream,
 
 	return rect ? 0 : -EINVAL;
 }
+EXPORT_SYMBOL_GPL(ipu_isys_get_stream_pad_crop);
 
 u32 ipu_isys_get_src_stream_by_src_pad(struct v4l2_subdev *sd, u32 pad)
 {
@@ -301,6 +308,7 @@ u32 ipu_isys_get_src_stream_by_src_pad(struct v4l2_subdev *sd, u32 pad)
 
 	return source_stream;
 }
+EXPORT_SYMBOL_GPL(ipu_isys_get_src_stream_by_src_pad);
 
 static int ipu_isys_subdev_init_state(struct v4l2_subdev *sd,
 				       struct v4l2_subdev_state *state)
@@ -327,8 +335,9 @@ int ipu_isys_subdev_set_routing(struct v4l2_subdev *sd,
 {
 	return subdev_set_routing(sd, state, routing);
 }
+EXPORT_SYMBOL_GPL(ipu_isys_subdev_set_routing);
 
-static const struct v4l2_subdev_internal_ops ipu6_isys_subdev_internal_ops = {
+static const struct v4l2_subdev_internal_ops ipu_isys_subdev_internal_ops = {
 	.init_state = ipu_isys_subdev_init_state,
 };
 
@@ -350,7 +359,7 @@ int ipu_isys_subdev_init(struct device *dev,
 			 V4L2_SUBDEV_FL_STREAMS;
 	asd->sd.owner = THIS_MODULE;
 	asd->sd.entity.function = MEDIA_ENT_F_VID_IF_BRIDGE;
-	asd->sd.internal_ops = &ipu6_isys_subdev_internal_ops;
+	asd->sd.internal_ops = &ipu_isys_subdev_internal_ops;
 
 	asd->pad = devm_kcalloc(dev, num_pads, sizeof(*asd->pad), GFP_KERNEL);
 	if (!asd->pad)
@@ -393,9 +402,14 @@ out_media_entity_cleanup:
 
 	return ret;
 }
+EXPORT_SYMBOL_GPL(ipu_isys_subdev_init);
 
 void ipu_isys_subdev_cleanup(struct ipu_isys_subdev *asd)
 {
 	media_entity_cleanup(&asd->sd.entity);
 	v4l2_ctrl_handler_free(&asd->ctrl_handler);
 }
+EXPORT_SYMBOL_GPL(ipu_isys_subdev_cleanup);
+
+
+MODULE_LICENSE("GPL");

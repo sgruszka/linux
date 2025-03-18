@@ -65,6 +65,11 @@ struct ipu_isys_subdev {
 #define to_ipu6_isys_subdev(__sd) \
 	container_of(__sd, struct ipu_isys_subdev, sd)
 
+#define IPU6_ISYS_MIN_WIDTH		2U
+#define IPU6_ISYS_MIN_HEIGHT		2U
+#define IPU6_ISYS_MAX_WIDTH		4672U
+#define IPU6_ISYS_MAX_HEIGHT		3416U
+
 unsigned int ipu_isys_mbus_code_to_bpp(u32 code);
 unsigned int ipu_isys_mbus_code_to_mipi(u32 code);
 bool ipu_isys_is_bayer_format(u32 code);

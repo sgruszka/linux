@@ -6,7 +6,6 @@
 
 #include <linux/container_of.h>
 
-#include "ipu6-isys-subdev.h"
 #include "ipu6-isys-video.h"
 
 struct media_entity;

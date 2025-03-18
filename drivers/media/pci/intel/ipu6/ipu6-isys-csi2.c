@@ -21,7 +21,6 @@
 
 #include "ipu6-isys.h"
 #include "ipu6-isys-csi2.h"
-#include "ipu6-isys-subdev.h"
 #include "ipu6-platform-isys-csi2-reg.h"
 
 static const u32 csi2_supported_codes[] = {

@@ -1061,7 +1061,7 @@ int ipu7_isys_setup_video(struct ipu7_isys_video *av,
 	}
 
 	remote_sd = media_entity_to_v4l2_subdev(remote_pad->entity);
-	asd = to_ipu7_isys_subdev(remote_sd);
+	asd = to_ipu_isys_subdev(remote_sd);
 
 	source_pad = media_pad_remote_pad_first(&remote_pad->entity->pads[0]);
 	if (!source_pad) {

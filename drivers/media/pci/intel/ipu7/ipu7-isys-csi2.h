@@ -9,7 +9,6 @@
 #include <linux/container_of.h>
 #include <linux/types.h>
 
-#include "ipu7-isys-subdev.h"
 #include "ipu7-isys-video.h"
 
 struct ipu7_isys;

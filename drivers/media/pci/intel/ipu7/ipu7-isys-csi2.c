@@ -79,7 +79,7 @@ s64 ipu7_isys_csi2_get_link_freq(struct ipu7_isys_csi2 *csi2)
 static int csi2_subscribe_event(struct v4l2_subdev *sd, struct v4l2_fh *fh,
 				struct v4l2_event_subscription *sub)
 {
-	struct ipu_isys_subdev *asd = to_ipu7_isys_subdev(sd);
+	struct ipu_isys_subdev *asd = to_ipu_isys_subdev(sd);
 	struct ipu7_isys_csi2 *csi2 = to_ipu7_isys_csi2(asd);
 	struct device *dev = isys_to_dev(csi2->isys);
 
@@ -315,7 +315,7 @@ static int ipu7_isys_csi2_enable_streams(struct v4l2_subdev *sd,
 					 struct v4l2_subdev_state *state,
 					 u32 pad, u64 streams_mask)
 {
-	struct ipu_isys_subdev *asd = to_ipu7_isys_subdev(sd);
+	struct ipu_isys_subdev *asd = to_ipu_isys_subdev(sd);
 	struct ipu7_isys_csi2 *csi2 = to_ipu7_isys_csi2(asd);
 	struct v4l2_subdev *r_sd;
 	struct media_pad *r_pad;
@@ -361,7 +361,7 @@ static int ipu7_isys_csi2_disable_streams(struct v4l2_subdev *sd,
 					  struct v4l2_subdev_state *state,
 					  u32 pad, u64 streams_mask)
 {
-	struct ipu_isys_subdev *asd = to_ipu7_isys_subdev(sd);
+	struct ipu_isys_subdev *asd = to_ipu_isys_subdev(sd);
 	struct ipu7_isys_csi2 *csi2 = to_ipu7_isys_csi2(asd);
 	struct v4l2_subdev *r_sd;
 	struct media_pad *r_pad;

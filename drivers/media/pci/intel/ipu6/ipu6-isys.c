@@ -306,7 +306,7 @@ void isys_setup_hw(struct ipu6_isys *isys)
 
 static void ipu6_isys_csi2_isr(struct ipu6_isys_csi2 *csi2)
 {
-	struct ipu6_isys_stream *stream;
+	struct ipu_isys_stream *stream;
 	unsigned int i;
 	u32 status;
 	int source;
@@ -985,7 +985,7 @@ static int alloc_fw_msg_bufs(struct ipu6_isys *isys, int amount)
 	return -ENOMEM;
 }
 
-struct isys_fw_msgs *ipu6_get_fw_msg_buf(struct ipu6_isys_stream *stream)
+struct isys_fw_msgs *ipu6_get_fw_msg_buf(struct ipu_isys_stream *stream)
 {
 	struct ipu6_isys *isys = stream->isys;
 	struct device *dev = isys_to_dev(isys);
@@ -1225,7 +1225,7 @@ static int isys_isr_one(struct ipu_bus_device *adev)
 {
 	struct ipu6_isys *isys = dev_get_drvdata(&adev->auxdev.dev);
 	struct ipu6_fw_isys_resp_info_abi *resp;
-	struct ipu6_isys_stream *stream;
+	struct ipu_isys_stream *stream;
 	struct ipu6_isys_csi2 *csi2 = NULL;
 	u32 index;
 	u64 ts;

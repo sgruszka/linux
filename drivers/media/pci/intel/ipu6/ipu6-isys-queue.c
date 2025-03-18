@@ -152,7 +152,7 @@ void ipu6_isys_buffer_list_queue(struct ipu_isys_buffer_list *bl,
  * have been queued to firmware and the *firmware streamon fails for a
  * reason or another.
  */
-static void flush_firmware_streamon_fail(struct ipu6_isys_stream *stream)
+static void flush_firmware_streamon_fail(struct ipu_isys_stream *stream)
 {
 	struct device *dev = isys_to_dev(stream->isys);
 	struct ipu_isys_queue *aq;
@@ -193,7 +193,7 @@ static void flush_firmware_streamon_fail(struct ipu6_isys_stream *stream)
  * that contains one entry from each video buffer queue. If a buffer can't be
  * obtained from every queue, the buffers are returned back to the queue.
  */
-static int buffer_list_get(struct ipu6_isys_stream *stream,
+static int buffer_list_get(struct ipu_isys_stream *stream,
 			   struct ipu_isys_buffer_list *bl)
 {
 	struct device *dev = isys_to_dev(stream->isys);
@@ -253,7 +253,7 @@ ipu6_isys_buf_to_fw_frame_buf_pin(struct vb2_buffer *vb,
 #define IPU6_ISYS_FRAME_NUM_THRESHOLD  (30)
 void
 ipu6_isys_buf_to_fw_frame_buf(struct ipu6_fw_isys_frame_buff_set_abi *set,
-			      struct ipu6_isys_stream *stream,
+			      struct ipu_isys_stream *stream,
 			      struct ipu_isys_buffer_list *bl)
 {
 	struct ipu_isys_buffer *ib;
@@ -289,7 +289,7 @@ ipu6_isys_buf_to_fw_frame_buf(struct ipu6_fw_isys_frame_buff_set_abi *set,
 static int ipu6_isys_stream_start(struct ipu6_isys_video *av,
 				  struct ipu_isys_buffer_list *bl, bool error)
 {
-	struct ipu6_isys_stream *stream = av->stream;
+	struct ipu_isys_stream *stream = av->stream;
 	struct device *dev = isys_to_dev(stream->isys);
 	struct ipu_isys_buffer_list __bl;
 	int ret;
@@ -356,7 +356,7 @@ static void buf_queue(struct vb2_buffer *vb)
 	struct media_pipeline *media_pipe =
 		media_entity_pipeline(&av->vdev.entity);
 	struct ipu6_fw_isys_frame_buff_set_abi *buf = NULL;
-	struct ipu6_isys_stream *stream = av->stream;
+	struct ipu_isys_stream *stream = av->stream;
 	struct ipu_isys_buffer_list bl;
 	struct isys_fw_msgs *msg;
 	unsigned long flags;
@@ -544,7 +544,7 @@ static int start_streaming(struct vb2_queue *q, unsigned int count)
 	const struct ipu_isys_pixelformat *pfmt =
 		ipu6_isys_get_isys_format(ipu6_isys_get_format(av), 0);
 	struct ipu_isys_buffer_list __bl, *bl = NULL;
-	struct ipu6_isys_stream *stream;
+	struct ipu_isys_stream *stream;
 	struct media_entity *source_entity = NULL;
 	int nr_queues, ret;
 
@@ -628,7 +628,7 @@ static void stop_streaming(struct vb2_queue *q)
 {
 	struct ipu_isys_queue *aq = vb2_queue_to_isys_queue(q);
 	struct ipu6_isys_video *av = ipu6_isys_queue_to_video(aq);
-	struct ipu6_isys_stream *stream = av->stream;
+	struct ipu_isys_stream *stream = av->stream;
 
 	mutex_lock(&stream->mutex);
 
@@ -652,7 +652,7 @@ static void stop_streaming(struct vb2_queue *q)
 }
 
 static unsigned int
-get_sof_sequence_by_timestamp(struct ipu6_isys_stream *stream,
+get_sof_sequence_by_timestamp(struct ipu_isys_stream *stream,
 			      struct ipu6_fw_isys_resp_info_abi *info)
 {
 	u64 time = (u64)info->timestamp[1] << 32 | info->timestamp[0];
@@ -705,7 +705,7 @@ void ipu6_isys_buf_calc_sequence_time(struct ipu_isys_buffer *ib,
 	struct ipu_isys_queue *aq = vb2_queue_to_isys_queue(vb->vb2_queue);
 	struct ipu6_isys_video *av = ipu6_isys_queue_to_video(aq);
 	struct device *dev = isys_to_dev(av->isys);
-	struct ipu6_isys_stream *stream = av->stream;
+	struct ipu_isys_stream *stream = av->stream;
 	u64 ns;
 	u32 sequence;
 
@@ -737,7 +737,7 @@ void ipu6_isys_queue_buf_done(struct ipu_isys_buffer *ib)
 	}
 }
 
-void ipu6_isys_queue_buf_ready(struct ipu6_isys_stream *stream, void *_info)
+void ipu6_isys_queue_buf_ready(struct ipu_isys_stream *stream, void *_info)
 {
 	struct ipu6_fw_isys_resp_info_abi *info = _info;
 	struct ipu_isys_queue *aq = stream->output_pins[info->pin_id].aq;

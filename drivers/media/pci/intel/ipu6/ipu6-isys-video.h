@@ -39,7 +39,7 @@ struct ipu_sequence_info {
 };
 
 struct ipu_output_pin_data {
-	void (*pin_ready)(struct ipu6_isys_stream *stream, void *info);
+	void (*pin_ready)(struct ipu_isys_stream *stream, void *info);
 	struct ipu_isys_queue *aq;
 };
 
@@ -59,7 +59,7 @@ struct video_stream_watermark {
  * Align with firmware stream. Each stream represents a CSI virtual channel.
  * May map to multiple video devices
  */
-struct ipu6_isys_stream {
+struct ipu_isys_stream {
 	struct mutex mutex;
 	struct media_entity *source_entity;
 	atomic_t sequence;
@@ -96,7 +96,7 @@ struct ipu6_isys_video {
 
 	struct ipu6_isys *isys;
 	struct ipu6_isys_csi2 *csi2;
-	struct ipu6_isys_stream *stream;
+	struct ipu_isys_stream *stream;
 	unsigned int streaming;
 	struct video_stream_watermark watermark;
 	u32 source_stream;
@@ -123,10 +123,10 @@ int ipu6_isys_setup_video(struct ipu6_isys_video *av,
 			  struct media_entity **source_entity, int *nr_queues);
 int ipu6_isys_video_init(struct ipu6_isys_video *av);
 void ipu6_isys_video_cleanup(struct ipu6_isys_video *av);
-void ipu6_isys_put_stream(struct ipu6_isys_stream *stream);
-struct ipu6_isys_stream *
+void ipu6_isys_put_stream(struct ipu_isys_stream *stream);
+struct ipu_isys_stream *
 ipu6_isys_query_stream_by_handle(struct ipu6_isys *isys, u8 stream_handle);
-struct ipu6_isys_stream *
+struct ipu_isys_stream *
 ipu6_isys_query_stream_by_source(struct ipu_isys *isys, int source, u8 vc);
 
 void ipu6_isys_configure_stream_watermark(struct ipu6_isys_video *av,

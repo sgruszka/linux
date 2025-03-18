@@ -442,7 +442,7 @@ static int ipu6_isys_fw_pin_cfg(struct ipu6_isys_video *av,
 	struct v4l2_subdev *sd = media_entity_to_v4l2_subdev(src_pad->entity);
 	struct ipu6_fw_isys_input_pin_info_abi *input_pin;
 	struct ipu6_fw_isys_output_pin_info_abi *output_pin;
-	struct ipu6_isys_stream *stream = av->stream;
+	struct ipu_isys_stream *stream = av->stream;
 	struct ipu_isys_queue *aq = &av->aq;
 	struct v4l2_mbus_framefmt fmt;
 	const struct ipu_isys_pixelformat *pfmt =
@@ -520,7 +520,7 @@ static int start_stream_firmware(struct ipu6_isys_video *av,
 {
 	struct ipu6_fw_isys_stream_cfg_data_abi *stream_cfg;
 	struct ipu6_fw_isys_frame_buff_set_abi *buf = NULL;
-	struct ipu6_isys_stream *stream = av->stream;
+	struct ipu_isys_stream *stream = av->stream;
 	struct device *dev = isys_to_dev(av->isys);
 	struct isys_fw_msgs *msg = NULL;
 	struct ipu_isys_queue *aq;
@@ -659,7 +659,7 @@ out_put_stream_opened:
 static void stop_streaming_firmware(struct ipu6_isys_video *av)
 {
 	struct device *dev = isys_to_dev(av->isys);
-	struct ipu6_isys_stream *stream = av->stream;
+	struct ipu_isys_stream *stream = av->stream;
 	int ret, tout;
 
 	reinit_completion(&stream->stream_stop_completion);
@@ -684,7 +684,7 @@ static void stop_streaming_firmware(struct ipu6_isys_video *av)
 
 static void close_streaming_firmware(struct ipu6_isys_video *av)
 {
-	struct ipu6_isys_stream *stream = av->stream;
+	struct ipu_isys_stream *stream = av->stream;
 	struct device *dev = isys_to_dev(av->isys);
 	int ret, tout;
 
@@ -713,7 +713,7 @@ int ipu6_isys_video_prepare_stream(struct ipu6_isys_video *av,
 				   struct media_entity *source_entity,
 				   int nr_queues)
 {
-	struct ipu6_isys_stream *stream = av->stream;
+	struct ipu_isys_stream *stream = av->stream;
 	struct ipu6_isys_csi2 *csi2;
 
 	if (WARN_ON(stream->nr_streaming))
@@ -841,7 +841,7 @@ void ipu6_isys_update_stream_watermark(struct ipu6_isys_video *av, bool state)
 	update_watermark_setting(av->isys);
 }
 
-void ipu6_isys_put_stream(struct ipu6_isys_stream *stream)
+void ipu6_isys_put_stream(struct ipu_isys_stream *stream)
 {
 	struct device *dev;
 	unsigned int i;
@@ -868,10 +868,10 @@ void ipu6_isys_put_stream(struct ipu6_isys_stream *stream)
 	spin_unlock_irqrestore(&stream->isys->streams_lock, flags);
 }
 
-static struct ipu6_isys_stream *
+static struct ipu_isys_stream *
 ipu6_isys_get_stream(struct ipu6_isys_video *av, struct ipu_isys_subdev *asd)
 {
-	struct ipu6_isys_stream *stream = NULL;
+	struct ipu_isys_stream *stream = NULL;
 	struct ipu6_isys *isys = av->isys;
 	unsigned long flags;
 	unsigned int i;
@@ -906,11 +906,11 @@ ipu6_isys_get_stream(struct ipu6_isys_video *av, struct ipu_isys_subdev *asd)
 	return stream;
 }
 
-struct ipu6_isys_stream *
+struct ipu_isys_stream *
 ipu6_isys_query_stream_by_handle(struct ipu6_isys *isys, u8 stream_handle)
 {
 	unsigned long flags;
-	struct ipu6_isys_stream *stream = NULL;
+	struct ipu_isys_stream *stream = NULL;
 
 	if (!isys)
 		return NULL;
@@ -931,11 +931,11 @@ ipu6_isys_query_stream_by_handle(struct ipu6_isys *isys, u8 stream_handle)
 	return stream;
 }
 
-struct ipu6_isys_stream *
+struct ipu_isys_stream *
 ipu6_isys_query_stream_by_source(struct ipu_isys *_isys, int source, u8 vc)
 {
 	struct ipu6_isys *isys = (struct ipu6_isys *)_isys;
-	struct ipu6_isys_stream *stream = NULL;
+	struct ipu_isys_stream *stream = NULL;
 	unsigned long flags;
 	unsigned int i;
 
@@ -986,7 +986,7 @@ int ipu6_isys_video_set_streaming(struct ipu6_isys_video *av, int state,
 				  struct ipu_isys_buffer_list *bl)
 {
 	struct v4l2_subdev_krouting *routing;
-	struct ipu6_isys_stream *stream = av->stream;
+	struct ipu_isys_stream *stream = av->stream;
 	struct v4l2_subdev_state *subdev_state;
 	struct device *dev = isys_to_dev(av->isys);
 	struct v4l2_subdev *sd;

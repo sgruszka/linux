@@ -566,7 +566,7 @@ fail:
 	return ret;
 }
 
-void ipu6_isys_csi2_sof_event_by_stream(struct ipu6_isys_stream *stream)
+void ipu6_isys_csi2_sof_event_by_stream(struct ipu_isys_stream *stream)
 {
 	struct video_device *vdev = stream->asd->sd.devnode;
 	struct device *dev = isys_to_dev(stream->isys);
@@ -582,7 +582,7 @@ void ipu6_isys_csi2_sof_event_by_stream(struct ipu6_isys_stream *stream)
 		csi2->port, ev.u.frame_sync.frame_sequence, stream->vc);
 }
 
-void ipu6_isys_csi2_eof_event_by_stream(struct ipu6_isys_stream *stream)
+void ipu6_isys_csi2_eof_event_by_stream(struct ipu_isys_stream *stream)
 {
 	struct device *dev = isys_to_dev(stream->isys);
 	struct ipu6_isys_csi2 *csi2 = ipu6_isys_subdev_to_csi2(stream->asd);

@@ -143,7 +143,7 @@ struct ipu6_isys {
 	u32 isr_csi2_bits;
 	u32 csi2_rx_ctrl_cached;
 	spinlock_t streams_lock;
-	struct ipu6_isys_stream streams[IPU6_ISYS_MAX_STREAMS];
+	struct ipu_isys_stream streams[IPU6_ISYS_MAX_STREAMS];
 	int streams_ref_count[IPU6_ISYS_MAX_STREAMS];
 	void *fwcom;
 	unsigned int line_align;
@@ -201,7 +201,7 @@ static inline struct device *ipu6_isys_to_dev(struct ipu6_isys *isys)
 		 struct ipu6_isys * : ipu6_isys_to_dev  \
 	) (_isys)
 
-struct isys_fw_msgs *ipu6_get_fw_msg_buf(struct ipu6_isys_stream *stream);
+struct isys_fw_msgs *ipu6_get_fw_msg_buf(struct ipu_isys_stream *stream);
 void ipu6_put_fw_msg_buf(struct ipu6_isys *isys, uintptr_t data);
 void ipu6_cleanup_fw_msg_bufs(struct ipu6_isys *isys);
 

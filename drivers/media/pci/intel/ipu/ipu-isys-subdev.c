@@ -143,7 +143,7 @@ int ipu_isys_subdev_set_fmt(struct v4l2_subdev *sd,
 			     struct v4l2_subdev_state *state,
 			     struct v4l2_subdev_format *format)
 {
-	struct ipu_isys_subdev *asd = to_ipu6_isys_subdev(sd);
+	struct ipu_isys_subdev *asd = to_ipu_isys_subdev(sd);
 	struct v4l2_mbus_framefmt *fmt;
 	struct v4l2_rect *crop;
 	u32 code = asd->supported_codes[0];
@@ -212,7 +212,7 @@ int ipu_isys_subdev_enum_mbus_code(struct v4l2_subdev *sd,
 				    struct v4l2_subdev_state *state,
 				    struct v4l2_subdev_mbus_code_enum *code)
 {
-	struct ipu_isys_subdev *asd = to_ipu6_isys_subdev(sd);
+	struct ipu_isys_subdev *asd = to_ipu_isys_subdev(sd);
 	const u32 *supported_codes = asd->supported_codes;
 	u32 index;
 

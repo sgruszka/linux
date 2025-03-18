@@ -102,7 +102,7 @@ s64 ipu6_isys_csi2_get_link_freq(struct ipu6_isys_csi2 *csi2)
 static int csi2_subscribe_event(struct v4l2_subdev *sd, struct v4l2_fh *fh,
 				struct v4l2_event_subscription *sub)
 {
-	struct ipu_isys_subdev *asd = to_ipu6_isys_subdev(sd);
+	struct ipu_isys_subdev *asd = to_ipu_isys_subdev(sd);
 	struct ipu6_isys_csi2 *csi2 = to_ipu6_isys_csi2(asd);
 	struct device *dev = isys_to_dev(csi2->isys);
 
@@ -232,7 +232,7 @@ static int ipu6_isys_csi2_set_stream(struct v4l2_subdev *sd,
 				     const struct ipu6_isys_csi2_timing *timing,
 				     unsigned int nlanes, int enable)
 {
-	struct ipu_isys_subdev *asd = to_ipu6_isys_subdev(sd);
+	struct ipu_isys_subdev *asd = to_ipu_isys_subdev(sd);
 	struct ipu6_isys_csi2 *csi2 = to_ipu6_isys_csi2(asd);
 	struct ipu6_isys *isys = to_isys6(csi2);
 	struct device *dev = isys_to_dev(isys);
@@ -347,7 +347,7 @@ static int ipu6_isys_csi2_enable_streams(struct v4l2_subdev *sd,
 					 struct v4l2_subdev_state *state,
 					 u32 pad, u64 streams_mask)
 {
-	struct ipu_isys_subdev *asd = to_ipu6_isys_subdev(sd);
+	struct ipu_isys_subdev *asd = to_ipu_isys_subdev(sd);
 	struct ipu6_isys_csi2 *csi2 = to_ipu6_isys_csi2(asd);
 	struct ipu6_isys_csi2_timing timing = { };
 	struct v4l2_subdev *remote_sd;

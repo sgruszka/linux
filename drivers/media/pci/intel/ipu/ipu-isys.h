@@ -62,7 +62,7 @@ struct ipu_isys_subdev {
 	int source;	/* SSI stream source; -1 if unset */
 };
 
-#define to_ipu6_isys_subdev(__sd) \
+#define to_ipu_isys_subdev(__sd) \
 	container_of(__sd, struct ipu_isys_subdev, sd)
 
 #define IPU6_ISYS_MIN_WIDTH		2U

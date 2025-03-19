@@ -87,7 +87,6 @@ struct ipu7_isys_video {
 	struct v4l2_meta_format meta_fmt;
 
 	struct ipu7_isys *isys;
-	struct ipu7_isys_csi2 *csi2;
 	struct ipu7_isys_stream *stream;
 	unsigned int streaming;
 	u8 vc;

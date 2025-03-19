@@ -363,8 +363,6 @@ static int isys_csi2_create_media_links(struct ipu7_isys *isys)
 				dev_err(dev, "CSI2 can't create link\n");
 				return ret;
 			}
-
-			av->csi2 = &isys->csi2[i];
 		}
 	}
 

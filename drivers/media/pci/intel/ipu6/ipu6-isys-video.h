@@ -32,7 +32,7 @@ struct video_stream_watermark {
 	struct list_head stream_node;
 };
 
-struct ipu6_isys_video {
+struct ipu_isys_video {
 	struct ipu_isys_queue aq;
 	/* Serialise access to other fields in the struct. */
 	struct mutex mutex;
@@ -41,17 +41,24 @@ struct ipu6_isys_video {
 	struct v4l2_pix_format pix_fmt;
 	struct v4l2_meta_format meta_fmt;
 
-	struct ipu6_isys *isys;
 	struct ipu_isys_stream *stream;
 	unsigned int streaming;
-	struct video_stream_watermark watermark;
-	u32 source_stream;
 	u8 vc;
 	u8 dt;
+
+	struct ipu_isys *isys;
 };
 
-#define ipu6_isys_queue_to_video(__aq) \
-	container_of(__aq, struct ipu6_isys_video, aq)
+struct ipu6_isys_video  {
+	struct ipu_isys_video ipu;
+
+	struct ipu6_isys *isys;
+	struct video_stream_watermark watermark;
+	u32 source_stream;
+};
+
+#define ipu_isys_queue_to_video(__aq) \
+	container_of(__aq, struct ipu_isys_video, aq)
 
 extern const struct ipu_isys_pixelformat ipu6_isys_pfmts[];
 extern const struct ipu_isys_pixelformat ipu6_isys_pfmts_packed[];
@@ -79,10 +86,10 @@ void ipu6_isys_configure_stream_watermark(struct ipu6_isys_video *av,
 					  bool state);
 void ipu6_isys_update_stream_watermark(struct ipu6_isys_video *av, bool state);
 
-u32 ipu6_isys_get_format(struct ipu6_isys_video *av);
-u32 ipu6_isys_get_data_size(struct ipu6_isys_video *av);
-u32 ipu6_isys_get_bytes_per_line(struct ipu6_isys_video *av);
-u32 ipu6_isys_get_frame_width(struct ipu6_isys_video *av);
-u32 ipu6_isys_get_frame_height(struct ipu6_isys_video *av);
+u32 ipu6_isys_get_format(struct ipu_isys_video *av);
+u32 ipu6_isys_get_data_size(struct ipu_isys_video *av);
+u32 ipu6_isys_get_bytes_per_line(struct ipu_isys_video *av);
+u32 ipu6_isys_get_frame_width(struct ipu_isys_video *av);
+u32 ipu6_isys_get_frame_height(struct ipu_isys_video *av);
 
 #endif /* IPU6_ISYS_VIDEO_H */

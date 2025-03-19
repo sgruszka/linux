@@ -209,7 +209,7 @@ static int isys_csi2_create_media_links(struct ipu6_isys *isys)
 			struct ipu6_isys_video *av = &isys->csi2[i].av[j];
 
 			ret = media_create_pad_link(sd, CSI2_PAD_SRC + j,
-						    &av->vdev.entity, 0, 0);
+						    &av->ipu.vdev.entity, 0, 0);
 			if (ret) {
 				dev_err(dev, "CSI2 can't create link\n");
 				return ret;
@@ -242,11 +242,11 @@ static int isys_register_video_devices(struct ipu6_isys *isys)
 		for (j = 0; j < NR_OF_CSI2_SRC_PADS; j++) {
 			struct ipu6_isys_video *av = &isys->csi2[i].av[j];
 
-			snprintf(av->vdev.name, sizeof(av->vdev.name),
+			snprintf(av->ipu.vdev.name, sizeof(av->ipu.vdev.name),
 				 IPU6_ISYS_ENTITY_PREFIX " ISYS Capture %u",
 				 i * NR_OF_CSI2_SRC_PADS + j);
 			av->isys = isys;
-			av->aq.vbq.buf_struct_size =
+			av->ipu.aq.vbq.buf_struct_size =
 				sizeof(struct ipu_isys_video_buffer);
 
 			ret = ipu6_isys_video_init(av);

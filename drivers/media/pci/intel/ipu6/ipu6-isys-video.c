@@ -965,15 +965,17 @@ ipu6_isys_query_stream_by_source(struct ipu_isys *_isys, int source, u8 vc)
 	return stream;
 }
 
-static u64 get_stream_mask_by_pipeline(struct ipu6_isys_video *__av)
+static u64 get_stream_mask_by_pipeline(struct v4l2_subdev *sd,
+				       struct ipu6_isys_video *__av)
 {
 	struct media_pipeline *pipeline =
 		media_entity_pipeline(&__av->vdev.entity);
+	struct ipu6_isys_csi2 *csi2 = (struct ipu6_isys_csi2 *) sd;
 	unsigned int i;
 	u64 stream_mask = 0;
 
 	for (i = 0; i < NR_OF_CSI2_SRC_PADS; i++) {
-		struct ipu6_isys_video *av = &__av->csi2->av[i];
+		struct ipu6_isys_video *av = &csi2->av[i];
 
 		if (pipeline == media_entity_pipeline(&av->vdev.entity))
 			stream_mask |= BIT_ULL(av->source_stream);
@@ -1014,7 +1016,7 @@ int ipu6_isys_video_set_streaming(struct ipu6_isys_video *av, int state,
 	if (ret)
 		return ret;
 
-	stream_mask = get_stream_mask_by_pipeline(av);
+	stream_mask = get_stream_mask_by_pipeline(sd, av);
 	if (!state) {
 		stop_streaming_firmware(av);
 

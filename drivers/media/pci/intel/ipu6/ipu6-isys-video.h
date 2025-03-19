@@ -17,7 +17,6 @@
 
 struct ipu_isys;
 struct ipu6_isys;
-struct ipu6_isys_csi2;
 struct ipu_isys_subdev;
 struct ipu_isys_stream;
 
@@ -43,7 +42,6 @@ struct ipu6_isys_video {
 	struct v4l2_meta_format meta_fmt;
 
 	struct ipu6_isys *isys;
-	struct ipu6_isys_csi2 *csi2;
 	struct ipu_isys_stream *stream;
 	unsigned int streaming;
 	struct video_stream_watermark watermark;

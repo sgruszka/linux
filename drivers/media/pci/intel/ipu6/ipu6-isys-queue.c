@@ -484,7 +484,6 @@ static void return_buffers(struct ipu_isys_queue *aq,
 			   enum vb2_buffer_state state)
 {
 	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
-	struct ipu6_isys_video *av6 = (struct ipu6_isys_video *) av;
 	struct ipu_isys_buffer *ib;
 	bool need_reset = false;
 	unsigned long flags;
@@ -528,9 +527,9 @@ static void return_buffers(struct ipu_isys_queue *aq,
 	spin_unlock_irqrestore(&aq->lock, flags);
 
 	if (need_reset) {
-		mutex_lock(&av6->isys->mutex);
-		av6->isys->need_reset = true;
-		mutex_unlock(&av6->isys->mutex);
+		mutex_lock(&to_isys6(av)->mutex);
+		to_isys6(av)->need_reset = true;
+		mutex_unlock(&to_isys6(av)->mutex);
 	}
 }
 
@@ -572,14 +571,14 @@ static int start_streaming(struct vb2_queue *q, unsigned int count)
 		goto out_pipeline_stop;
 	}
 
-	ret = ipu6_isys_fw_open(av6->isys);
+	ret = ipu6_isys_fw_open(to_isys6(av));
 	if (ret)
 		goto out_pipeline_stop;
 
 	stream = av->stream;
 	mutex_lock(&stream->mutex);
 	if (!stream->nr_streaming) {
-		ret = ipu6_isys_video_prepare_stream(av6, source_entity,
+		ret = ipu6_isys_video_prepare_stream(av, source_entity,
 						     nr_queues);
 		if (ret)
 			goto out_fw_close;
@@ -619,7 +618,7 @@ out_stream_start:
 
 out_fw_close:
 	mutex_unlock(&stream->mutex);
-	ipu6_isys_fw_close(av6->isys);
+	ipu6_isys_fw_close(to_isys6(av));
 
 out_pipeline_stop:
 	ipu6_isys_stream_cleanup(av6);
@@ -641,10 +640,10 @@ static void stop_streaming(struct vb2_queue *q)
 
 	ipu6_isys_update_stream_watermark(av6, false);
 
-	mutex_lock(&av6->isys->stream_mutex);
+	mutex_lock(&to_isys6(av)->stream_mutex);
 	if (stream->nr_streaming == stream->nr_queues && stream->streaming)
 		ipu6_isys_video_set_streaming(av6, 0, NULL);
-	mutex_unlock(&av6->isys->stream_mutex);
+	mutex_unlock(&to_isys6(av)->stream_mutex);
 
 	stream->nr_streaming--;
 	list_del(&aq->node);
@@ -655,7 +654,7 @@ static void stop_streaming(struct vb2_queue *q)
 
 	return_buffers(aq, VB2_BUF_STATE_ERROR);
 
-	ipu6_isys_fw_close(av6->isys);
+	ipu6_isys_fw_close(to_isys6(av));
 }
 
 static unsigned int
@@ -691,7 +690,7 @@ get_sof_sequence_by_timestamp(struct ipu_isys_stream *stream,
 static u64 get_sof_ns_delta(struct ipu6_isys_video *av,
 			    struct ipu6_fw_isys_resp_info_abi *info)
 {
-	struct ipu_bus_device *adev = av->isys->ipu.adev;
+	struct ipu_bus_device *adev = to_isys6(&av->ipu)->ipu.adev;
 	struct ipu_device *isp = adev->isp;
 	u64 delta, tsc_now;
 
@@ -825,15 +824,14 @@ static const struct vb2_ops ipu6_isys_queue_ops = {
 int ipu6_isys_queue_init(struct ipu_isys_queue *aq)
 {
 	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
-	struct ipu6_isys_video *av6 = (struct ipu6_isys_video *) av;
-	struct ipu_bus_device *adev = av6->isys->ipu.adev;
+	struct ipu_bus_device *adev = to_isys6(av)->ipu.adev;
 	int ret;
 
 	/* no support for userptr */
 	if (!aq->vbq.io_modes)
 		aq->vbq.io_modes = VB2_MMAP | VB2_DMABUF;
 
-	aq->vbq.drv_priv = av6->isys;
+	aq->vbq.drv_priv = to_isys6(av);
 	aq->vbq.ops = &ipu6_isys_queue_ops;
 	aq->vbq.lock = &av->mutex;
 	aq->vbq.mem_ops = &vb2_dma_sg_memops;

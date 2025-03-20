@@ -34,7 +34,6 @@ struct video_stream_watermark {
 struct ipu6_isys_video  {
 	struct ipu_isys_video ipu;
 
-	struct ipu6_isys *isys;
 	struct video_stream_watermark watermark;
 	u32 source_stream;
 };
@@ -47,7 +46,7 @@ extern const struct ipu_isys_pixelformat ipu6_isys_pfmts_packed[];
 
 const struct ipu_isys_pixelformat *
 ipu6_isys_get_isys_format(u32 pixelformat, u32 code);
-int ipu6_isys_video_prepare_stream(struct ipu6_isys_video *av,
+int ipu6_isys_video_prepare_stream(struct ipu_isys_video *av,
 				   struct media_entity *source_entity,
 				   int nr_queues);
 int ipu6_isys_video_set_streaming(struct ipu6_isys_video *av, int state,

@@ -68,10 +68,10 @@ void ipu6_isys_configure_stream_watermark(struct ipu6_isys_video *av,
 					  bool state);
 void ipu6_isys_update_stream_watermark(struct ipu6_isys_video *av, bool state);
 
-u32 ipu6_isys_get_format(struct ipu_isys_video *av);
-u32 ipu6_isys_get_data_size(struct ipu_isys_video *av);
-u32 ipu6_isys_get_bytes_per_line(struct ipu_isys_video *av);
-u32 ipu6_isys_get_frame_width(struct ipu_isys_video *av);
-u32 ipu6_isys_get_frame_height(struct ipu_isys_video *av);
+u32 ipu_isys_get_format(struct ipu_isys_video *av);
+u32 ipu_isys_get_data_size(struct ipu_isys_video *av);
+u32 ipu_isys_get_bytes_per_line(struct ipu_isys_video *av);
+u32 ipu_isys_get_frame_width(struct ipu_isys_video *av);
+u32 ipu_isys_get_frame_height(struct ipu_isys_video *av);
 
 #endif /* IPU6_ISYS_VIDEO_H */

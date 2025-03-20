@@ -61,7 +61,7 @@ static int ipu6_isys_queue_setup(struct vb2_queue *q, unsigned int *num_buffers,
 	struct ipu_isys_queue *aq = vb2_queue_to_isys_queue(q);
 	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
 	struct device *dev = isys_to_dev(av->isys);
-	u32 size = ipu6_isys_get_data_size(av);
+	u32 size = ipu_isys_get_data_size(av);
 
 	/* num_planes == 0: we're being called through VIDIOC_REQBUFS */
 	if (!*num_planes) {
@@ -82,9 +82,9 @@ static int ipu6_isys_buf_prepare(struct vb2_buffer *vb)
 	struct ipu_isys_queue *aq = vb2_queue_to_isys_queue(vb->vb2_queue);
 	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
 	struct device *dev = isys_to_dev(av->isys);
-	u32 bytesperline = ipu6_isys_get_bytes_per_line(av);
-	u32 height = ipu6_isys_get_frame_height(av);
-	u32 size = ipu6_isys_get_data_size(av);
+	u32 bytesperline = ipu_isys_get_bytes_per_line(av);
+	u32 height = ipu_isys_get_frame_height(av);
+	u32 size = ipu_isys_get_data_size(av);
 
 	dev_dbg(dev, "buffer: %s: configured size %u, buffer size %lu\n",
 		av->vdev.name, size, vb2_plane_size(vb, 0));
@@ -461,16 +461,16 @@ static int ipu6_isys_link_fmt_validate(struct ipu_isys_queue *aq)
 		return ret;
 	}
 
-	if (format.width != ipu6_isys_get_frame_width(av) ||
-	    format.height != ipu6_isys_get_frame_height(av)) {
+	if (format.width != ipu_isys_get_frame_width(av) ||
+	    format.height != ipu_isys_get_frame_height(av)) {
 		dev_dbg(dev, "wrong width or height %ux%u (%ux%u expected)\n",
-			ipu6_isys_get_frame_width(av),
-			ipu6_isys_get_frame_height(av), format.width,
+			ipu_isys_get_frame_width(av),
+			ipu_isys_get_frame_height(av), format.width,
 			format.height);
 		return -EINVAL;
 	}
 
-	code = ipu6_isys_get_isys_format(ipu6_isys_get_format(av), 0)->code;
+	code = ipu6_isys_get_isys_format(ipu_isys_get_format(av), 0)->code;
 	if (format.code != code) {
 		dev_dbg(dev, "wrong mbus code 0x%8.8x (0x%8.8x expected)\n",
 			code, format.code);
@@ -548,15 +548,15 @@ static int start_streaming(struct vb2_queue *q, unsigned int count)
 	struct ipu6_isys_video *av6 = (struct ipu6_isys_video *) av;
 	struct device *dev = isys_to_dev(av->isys);
 	const struct ipu_isys_pixelformat *pfmt =
-		ipu6_isys_get_isys_format(ipu6_isys_get_format(av), 0);
+		ipu6_isys_get_isys_format(ipu_isys_get_format(av), 0);
 	struct ipu_isys_buffer_list __bl, *bl = NULL;
 	struct ipu_isys_stream *stream;
 	struct media_entity *source_entity = NULL;
 	int nr_queues, ret;
 
 	dev_dbg(dev, "stream: %s: width %u, height %u, css pixelformat %u\n",
-		av->vdev.name, ipu6_isys_get_frame_width(av),
-		ipu6_isys_get_frame_height(av), pfmt->css_pixelformat);
+		av->vdev.name, ipu_isys_get_frame_width(av),
+		ipu_isys_get_frame_height(av), pfmt->css_pixelformat);
 
 	ret = ipu6_isys_setup_video(av6, &source_entity, &nr_queues);
 	if (ret < 0) {

@@ -397,15 +397,15 @@ static int link_validate(struct media_link *link)
 		goto unlock;
 	}
 
-	code = ipu6_isys_get_isys_format(ipu6_isys_get_format(av), 0)->code;
+	code = ipu6_isys_get_isys_format(ipu_isys_get_format(av), 0)->code;
 
-	if (s_fmt->width != ipu6_isys_get_frame_width(av) ||
-	    s_fmt->height != ipu6_isys_get_frame_height(av) ||
+	if (s_fmt->width != ipu_isys_get_frame_width(av) ||
+	    s_fmt->height != ipu_isys_get_frame_height(av) ||
 	    s_fmt->code != code) {
 		dev_dbg(dev, "format mismatch %dx%d,%x != %dx%d,%x\n",
 			s_fmt->width, s_fmt->height, s_fmt->code,
-			ipu6_isys_get_frame_width(av),
-			ipu6_isys_get_frame_height(av), code);
+			ipu_isys_get_frame_width(av),
+			ipu_isys_get_frame_height(av), code);
 		goto unlock;
 	}
 
@@ -448,7 +448,7 @@ static int ipu6_isys_fw_pin_cfg(struct ipu_isys_video *av,
 	struct ipu_isys_queue *aq = &av->aq;
 	struct v4l2_mbus_framefmt fmt;
 	const struct ipu_isys_pixelformat *pfmt =
-		ipu6_isys_get_isys_format(ipu6_isys_get_format(av), 0);
+		ipu6_isys_get_isys_format(ipu_isys_get_format(av), 0);
 	struct v4l2_rect v4l2_crop;
 
 	struct ipu6_isys *isys = av6->isys;
@@ -493,10 +493,10 @@ static int ipu6_isys_fw_pin_cfg(struct ipu_isys_video *av,
 
 	output_pin = &cfg->output_pins[output_pins];
 	output_pin->input_pin_id = input_pins;
-	output_pin->output_res.width = ipu6_isys_get_frame_width(av);
-	output_pin->output_res.height = ipu6_isys_get_frame_height(av);
+	output_pin->output_res.width = ipu_isys_get_frame_width(av);
+	output_pin->output_res.height = ipu_isys_get_frame_height(av);
 
-	output_pin->stride = ipu6_isys_get_bytes_per_line(av);
+	output_pin->stride = ipu_isys_get_bytes_per_line(av);
 	if (pfmt->bpp != pfmt->bpp_packed)
 		output_pin->pt = IPU6_FW_ISYS_PIN_TYPE_RAW_SOC;
 	else
@@ -766,8 +766,8 @@ void ipu6_isys_configure_stream_watermark(struct ipu6_isys_video *av6,
 
 	esd = media_entity_to_v4l2_subdev(av->stream->source_entity);
 
-	av6->watermark.width = ipu6_isys_get_frame_width(av);
-	av6->watermark.height = ipu6_isys_get_frame_height(av);
+	av6->watermark.width = ipu_isys_get_frame_width(av);
+	av6->watermark.height = ipu_isys_get_frame_height(av);
 	av6->watermark.sram_gran_shift = isys->pdata->ipdata->sram_gran_shift;
 	av6->watermark.sram_gran_size = isys->pdata->ipdata->sram_gran_size;
 
@@ -804,7 +804,7 @@ static void calculate_stream_datarate(struct ipu6_isys_video *av)
 {
 	struct video_stream_watermark *watermark = &av->watermark;
 	const struct ipu_isys_pixelformat *pfmt =
-		ipu6_isys_get_isys_format(ipu6_isys_get_format(&av->ipu), 0);
+		ipu6_isys_get_isys_format(ipu_isys_get_format(&av->ipu), 0);
 	u32 pages_per_line, pb_bytes_per_line, pixels_per_line, bytes_per_line;
 	u64 line_time_ns, stream_data_rate;
 	u16 shift, size;
@@ -1178,7 +1178,7 @@ int ipu6_isys_setup_video(struct ipu6_isys_video *av,
 			  struct media_entity **source_entity, int *nr_queues)
 {
 	const struct ipu_isys_pixelformat *pfmt =
-		ipu6_isys_get_isys_format(ipu6_isys_get_format(&av->ipu), 0);
+		ipu6_isys_get_isys_format(ipu_isys_get_format(&av->ipu), 0);
 	struct device *dev = isys_to_dev(av->isys);
 	struct v4l2_mbus_frame_desc_entry entry;
 	struct v4l2_subdev_route *route = NULL;
@@ -1347,7 +1347,7 @@ void ipu6_isys_video_cleanup(struct ipu6_isys_video *av6)
 	mutex_destroy(&av->mutex);
 }
 
-u32 ipu6_isys_get_format(struct ipu_isys_video *av)
+u32 ipu_isys_get_format(struct ipu_isys_video *av)
 {
 	if (av->aq.vbq.type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
 		return av->pix_fmt.pixelformat;
@@ -1358,7 +1358,7 @@ u32 ipu6_isys_get_format(struct ipu_isys_video *av)
 	return 0;
 }
 
-u32 ipu6_isys_get_data_size(struct ipu_isys_video *av)
+u32 ipu_isys_get_data_size(struct ipu_isys_video *av)
 {
 	if (av->aq.vbq.type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
 		return av->pix_fmt.sizeimage;
@@ -1369,7 +1369,7 @@ u32 ipu6_isys_get_data_size(struct ipu_isys_video *av)
 	return 0;
 }
 
-u32 ipu6_isys_get_bytes_per_line(struct ipu_isys_video *av)
+u32 ipu_isys_get_bytes_per_line(struct ipu_isys_video *av)
 {
 	if (av->aq.vbq.type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
 		return av->pix_fmt.bytesperline;
@@ -1380,7 +1380,7 @@ u32 ipu6_isys_get_bytes_per_line(struct ipu_isys_video *av)
 	return 0;
 }
 
-u32 ipu6_isys_get_frame_width(struct ipu_isys_video *av)
+u32 ipu_isys_get_frame_width(struct ipu_isys_video *av)
 {
 	if (av->aq.vbq.type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
 		return av->pix_fmt.width;
@@ -1391,7 +1391,7 @@ u32 ipu6_isys_get_frame_width(struct ipu_isys_video *av)
 	return 0;
 }
 
-u32 ipu6_isys_get_frame_height(struct ipu_isys_video *av)
+u32 ipu_isys_get_frame_height(struct ipu_isys_video *av)
 {
 	if (av->aq.vbq.type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
 		return av->pix_fmt.height;

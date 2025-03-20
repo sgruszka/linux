@@ -16,11 +16,13 @@
 #include <media/videobuf2-dma-sg.h>
 #include <media/videobuf2-v4l2.h>
 
+
+#include "../ipu/ipu-isys.h"
+
 #include "ipu6-buttress.h"
 #include "ipu6-dma.h"
-#include "ipu6-fw-isys.h"
 #include "ipu6-isys.h"
-#include "ipu6-isys-video.h"
+#include "ipu6-isys-queue.h"
 
 static int ipu6_isys_buf_init(struct vb2_buffer *vb)
 {

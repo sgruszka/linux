@@ -13,9 +13,8 @@
 #include <media/media-entity.h>
 #include <media/v4l2-dev.h>
 
-#include "ipu6-isys-queue.h"
+#include "../ipu/ipu-isys.h"
 
-struct ipu_isys;
 struct ipu6_isys;
 struct ipu_isys_subdev;
 struct ipu_isys_stream;
@@ -30,23 +29,6 @@ struct video_stream_watermark {
 	u16 sram_gran_shift;
 	u16 sram_gran_size;
 	struct list_head stream_node;
-};
-
-struct ipu_isys_video {
-	struct ipu_isys_queue aq;
-	/* Serialise access to other fields in the struct. */
-	struct mutex mutex;
-	struct media_pad pad;
-	struct video_device vdev;
-	struct v4l2_pix_format pix_fmt;
-	struct v4l2_meta_format meta_fmt;
-
-	struct ipu_isys_stream *stream;
-	unsigned int streaming;
-	u8 vc;
-	u8 dt;
-
-	struct ipu_isys *isys;
 };
 
 struct ipu6_isys_video  {

@@ -124,6 +124,23 @@ struct ipu_isys_stream {
 	u8 vc;
 };
 
+struct ipu_isys_video {
+	struct ipu_isys_queue aq;
+	/* Serialise access to other fields in the struct. */
+	struct mutex mutex;
+	struct media_pad pad;
+	struct video_device vdev;
+	struct v4l2_pix_format pix_fmt;
+	struct v4l2_meta_format meta_fmt;
+
+	struct ipu_isys_stream *stream;
+	unsigned int streaming;
+	u8 vc;
+	u8 dt;
+
+	struct ipu_isys *isys;
+};
+
 unsigned int ipu_isys_mbus_code_to_bpp(u32 code);
 unsigned int ipu_isys_mbus_code_to_mipi(u32 code);
 bool ipu_isys_is_bayer_format(u32 code);

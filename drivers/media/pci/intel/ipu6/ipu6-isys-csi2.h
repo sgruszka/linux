@@ -44,7 +44,7 @@ struct ipu6_isys_csi2 {
 	unsigned int port;
 };
 
-static inline struct ipu6_isys *to_isys6(struct ipu6_isys_csi2 *csi2)
+static inline struct ipu6_isys *csi2_to_isys6(struct ipu6_isys_csi2 *csi2)
 {
 	return (struct ipu6_isys *)csi2->isys;
 }

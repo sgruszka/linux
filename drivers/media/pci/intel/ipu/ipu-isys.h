@@ -117,12 +117,13 @@ struct ipu_isys_stream {
 	struct completion stream_close_completion;
 	struct completion stream_start_completion;
 	struct completion stream_stop_completion;
-	struct ipu6_isys *isys;
+	struct ipu_isys *isys;
 
 	struct ipu_output_pin_data output_pins[IPU_ISYS_OUTPUT_PINS];
 	int error;
 	u8 vc;
 };
+
 
 struct ipu_isys_video {
 	struct ipu_isys_queue aq;
@@ -140,6 +141,38 @@ struct ipu_isys_video {
 
 	struct ipu_isys *isys;
 };
+
+static inline struct ipu_isys *ipu_stream_to_isys(struct ipu_isys_stream *stream)
+{
+ 	return stream->isys;
+}
+
+static inline struct ipu_isys *ipu_video_to_isys(struct ipu_isys_video *video)
+{
+ 	return video->isys;
+}
+
+#define to_isys(p) \
+	_Generic(p, \
+		 struct ipu_isys_stream *:  ipu_stream_to_isys,  \
+		 struct ipu_isys_video * :  video_to_isys  \
+	) (_isys)
+
+static inline struct ipu6_isys *ipu_stream_to_isys6(struct ipu_isys_stream *stream)
+{
+ 	return (struct ipu6_isys *) stream->isys;
+}
+
+static inline struct ipu6_isys *ipu_video_to_isys6(struct ipu_isys_video *video)
+{
+ 	return (struct ipu6_isys *) video->isys;
+}
+
+#define to_isys6(p) \
+	_Generic(p, \
+		 struct ipu_isys_stream *:  ipu_stream_to_isys6,  \
+		 struct ipu_isys_video * :  ipu_video_to_isys6  \
+	) (p)
 
 unsigned int ipu_isys_mbus_code_to_bpp(u32 code);
 unsigned int ipu_isys_mbus_code_to_mipi(u32 code);

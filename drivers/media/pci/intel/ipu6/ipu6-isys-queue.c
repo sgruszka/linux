@@ -297,9 +297,9 @@ static int ipu6_isys_stream_start(struct ipu6_isys_video *av6,
 	struct ipu_isys_buffer_list __bl;
 	int ret;
 
-	mutex_lock(&stream->isys->stream_mutex);
+	mutex_lock(&to_isys6(stream)->stream_mutex);
 	ret = ipu6_isys_video_set_streaming(av6, 1, bl);
-	mutex_unlock(&stream->isys->stream_mutex);
+	mutex_unlock(&to_isys6(stream)->stream_mutex);
 	if (ret)
 		goto out_requeue;
 
@@ -326,7 +326,7 @@ static int ipu6_isys_stream_start(struct ipu6_isys_video *av6,
 						 stream->nr_output_pins);
 		ipu6_isys_buffer_list_queue(bl, IPU_ISYS_BUFFER_LIST_FL_ACTIVE,
 					    0);
-		ret = ipu6_fw_isys_complex_cmd(stream->isys,
+		ret = ipu6_fw_isys_complex_cmd(to_isys6(stream),
 					       stream->stream_handle, buf,
 					       msg->dma_addr, sizeof(*buf),
 					       send_type);
@@ -425,7 +425,7 @@ static void buf_queue(struct vb2_buffer *vb)
 	 */
 	ipu6_isys_buffer_list_queue(&bl, IPU_ISYS_BUFFER_LIST_FL_ACTIVE, 0);
 
-	ret = ipu6_fw_isys_complex_cmd(stream->isys, stream->stream_handle,
+	ret = ipu6_fw_isys_complex_cmd(to_isys6(stream), stream->stream_handle,
 				       buf, msg->dma_addr, sizeof(*buf),
 				       IPU6_FW_ISYS_SEND_TYPE_STREAM_CAPTURE);
 	if (ret < 0)
@@ -663,7 +663,7 @@ get_sof_sequence_by_timestamp(struct ipu_isys_stream *stream,
 			      struct ipu6_fw_isys_resp_info_abi *info)
 {
 	u64 time = (u64)info->timestamp[1] << 32 | info->timestamp[0];
-	struct ipu6_isys *isys = stream->isys;
+	struct ipu6_isys *isys = to_isys6(stream);
 	struct device *dev = isys_to_dev(isys);
 	unsigned int i;
 
@@ -749,7 +749,7 @@ void ipu6_isys_queue_buf_ready(struct ipu_isys_stream *stream, void *_info)
 {
 	struct ipu6_fw_isys_resp_info_abi *info = _info;
 	struct ipu_isys_queue *aq = stream->output_pins[info->pin_id].aq;
-	struct ipu6_isys *isys = stream->isys;
+	struct ipu6_isys *isys = to_isys6(stream);
 	struct device *dev = isys_to_dev(isys);
 	struct ipu_isys_buffer *ib;
 	struct vb2_buffer *vb;

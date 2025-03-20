@@ -199,7 +199,7 @@ void ipu6_isys_register_errors(struct ipu6_isys_csi2 *csi2)
 {
 	u32 irq = readl(csi2->base + CSI_PORT_REG_BASE_IRQ_CSI +
 			CSI_PORT_REG_BASE_IRQ_STATUS_OFFSET);
-	struct ipu6_isys *isys = to_isys6(csi2);
+	struct ipu6_isys *isys = csi2_to_isys6(csi2);
 	u32 mask;
 
 	mask = isys->pdata->ipdata->csi2.irq_mask;
@@ -234,7 +234,7 @@ static int ipu6_isys_csi2_set_stream(struct v4l2_subdev *sd,
 {
 	struct ipu_isys_subdev *asd = to_ipu_isys_subdev(sd);
 	struct ipu6_isys_csi2 *csi2 = to_ipu6_isys_csi2(asd);
-	struct ipu6_isys *isys = to_isys6(csi2);
+	struct ipu6_isys *isys = csi2_to_isys6(csi2);
 	struct device *dev = isys_to_dev(isys);
 	struct ipu6_isys_csi2_config cfg;
 	unsigned int nports;

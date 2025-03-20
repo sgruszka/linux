@@ -860,18 +860,18 @@ void ipu6_isys_put_stream(struct ipu_isys_stream *stream)
 
 	dev = isys_to_dev(stream->isys);
 
-	spin_lock_irqsave(&stream->isys->streams_lock, flags);
+	spin_lock_irqsave(&to_isys6(stream)->streams_lock, flags);
 	for (i = 0; i < IPU6_ISYS_MAX_STREAMS; i++) {
-		if (&stream->isys->streams[i] == stream) {
-			if (stream->isys->streams_ref_count[i] > 0)
-				stream->isys->streams_ref_count[i]--;
+		if (&to_isys6(stream)->streams[i] == stream) {
+			if (to_isys6(stream)->streams_ref_count[i] > 0)
+				to_isys6(stream)->streams_ref_count[i]--;
 			else
 				dev_warn(dev, "invalid stream %d\n", i);
 
 			break;
 		}
 	}
-	spin_unlock_irqrestore(&stream->isys->streams_lock, flags);
+	spin_unlock_irqrestore(&to_isys6(stream)->streams_lock, flags);
 }
 
 static struct ipu_isys_stream *

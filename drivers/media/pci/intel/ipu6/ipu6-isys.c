@@ -152,7 +152,7 @@ static void isys_stream_init(struct ipu6_isys *isys)
 		init_completion(&isys->streams[i].stream_start_completion);
 		init_completion(&isys->streams[i].stream_stop_completion);
 		INIT_LIST_HEAD(&isys->streams[i].queues);
-		isys->streams[i].isys = isys;
+		isys->streams[i].isys = (struct ipu_isys *)isys;
 		isys->streams[i].stream_handle = i;
 		isys->streams[i].vc = INVALID_VC_ID;
 	}
@@ -985,7 +985,7 @@ static int alloc_fw_msg_bufs(struct ipu6_isys *isys, int amount)
 
 struct isys_fw_msgs *ipu6_get_fw_msg_buf(struct ipu_isys_stream *stream)
 {
-	struct ipu6_isys *isys = stream->isys;
+	struct ipu6_isys *isys = to_isys6(stream);
 	struct device *dev = isys_to_dev(isys);
 	struct isys_fw_msgs *msg;
 	unsigned long flags;

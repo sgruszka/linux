@@ -59,16 +59,15 @@ struct ipu_isys_subdev {
 	struct media_pad *pad;
 	struct v4l2_ctrl_handler ctrl_handler;
 	void (*ctrl_init)(struct v4l2_subdev *sd);
-	int source;	/* SSI stream source; -1 if unset */
+	int source; /* SSI stream source; -1 if unset */
 };
 
-#define to_ipu_isys_subdev(__sd) \
-	container_of(__sd, struct ipu_isys_subdev, sd)
+#define to_ipu_isys_subdev(__sd) container_of(__sd, struct ipu_isys_subdev, sd)
 
-#define IPU6_ISYS_MIN_WIDTH		2U
-#define IPU6_ISYS_MIN_HEIGHT		2U
-#define IPU6_ISYS_MAX_WIDTH		4672U
-#define IPU6_ISYS_MAX_HEIGHT		3416U
+#define IPU6_ISYS_MIN_WIDTH	2U
+#define IPU6_ISYS_MIN_HEIGHT	2U
+#define IPU6_ISYS_MAX_WIDTH	4672U
+#define IPU6_ISYS_MAX_HEIGHT	3416U
 
 struct ipu_isys_pixelformat {
 	u32 pixelformat;
@@ -109,9 +108,9 @@ struct ipu_isys_stream {
 	unsigned int nr_output_pins;
 	struct ipu_isys_subdev *asd;
 
-	int nr_queues;	/* Number of capture queues */
+	int nr_queues; /* Number of capture queues */
 	int nr_streaming;
-	int streaming;	/* Has streaming been really started? */
+	int streaming; /* Has streaming been really started? */
 	struct list_head queues;
 	struct completion stream_open_completion;
 	struct completion stream_close_completion;
@@ -123,7 +122,6 @@ struct ipu_isys_stream {
 	int error;
 	u8 vc;
 };
-
 
 struct ipu_isys_video {
 	struct ipu_isys_queue aq;
@@ -144,35 +142,33 @@ struct ipu_isys_video {
 
 static inline struct ipu_isys *ipu_stream_to_isys(struct ipu_isys_stream *stream)
 {
- 	return stream->isys;
+	return stream->isys;
 }
 
 static inline struct ipu_isys *ipu_video_to_isys(struct ipu_isys_video *video)
 {
- 	return video->isys;
+	return video->isys;
 }
 
-#define to_isys(p) \
-	_Generic(p, \
-		 struct ipu_isys_stream *:  ipu_stream_to_isys,  \
-		 struct ipu_isys_video * :  video_to_isys  \
-	) (_isys)
+#define to_isys(p)                                            \
+	_Generic(p,                                           \
+		struct ipu_isys_stream *: ipu_stream_to_isys, \
+		struct ipu_isys_video *: video_to_isys)(_isys)
 
-static inline struct ipu6_isys *ipu_stream_to_isys6(struct ipu_isys_stream *stream)
+static inline struct ipu6_isys * ipu_stream_to_isys6(struct ipu_isys_stream *stream)
 {
- 	return (struct ipu6_isys *) stream->isys;
+	return (struct ipu6_isys *)stream->isys;
 }
 
 static inline struct ipu6_isys *ipu_video_to_isys6(struct ipu_isys_video *video)
 {
- 	return (struct ipu6_isys *) video->isys;
+	return (struct ipu6_isys *)video->isys;
 }
 
-#define to_isys6(p) \
-	_Generic(p, \
-		 struct ipu_isys_stream *:  ipu_stream_to_isys6,  \
-		 struct ipu_isys_video * :  ipu_video_to_isys6  \
-	) (p)
+#define to_isys6(p)                                            \
+	_Generic(p,                                            \
+		struct ipu_isys_stream *: ipu_stream_to_isys6, \
+		struct ipu_isys_video *: ipu_video_to_isys6)(p)
 
 unsigned int ipu_isys_mbus_code_to_bpp(u32 code);
 unsigned int ipu_isys_mbus_code_to_mipi(u32 code);
@@ -180,29 +176,25 @@ bool ipu_isys_is_bayer_format(u32 code);
 u32 ipu_isys_convert_bayer_order(u32 code, int x, int y);
 
 int ipu_isys_subdev_set_fmt(struct v4l2_subdev *sd,
-			     struct v4l2_subdev_state *state,
-			     struct v4l2_subdev_format *fmt);
+			    struct v4l2_subdev_state *state,
+			    struct v4l2_subdev_format *fmt);
 int ipu_isys_subdev_enum_mbus_code(struct v4l2_subdev *sd,
-				    struct v4l2_subdev_state *state,
-				    struct v4l2_subdev_mbus_code_enum
-				    *code);
+				   struct v4l2_subdev_state *state,
+				   struct v4l2_subdev_mbus_code_enum *code);
 u32 ipu_isys_get_src_stream_by_src_pad(struct v4l2_subdev *sd, u32 pad);
 int ipu_isys_get_stream_pad_fmt(struct v4l2_subdev *sd, u32 pad, u32 stream,
-				 struct v4l2_mbus_framefmt *format);
+				struct v4l2_mbus_framefmt *format);
 int ipu_isys_get_stream_pad_crop(struct v4l2_subdev *sd, u32 pad, u32 stream,
-				  struct v4l2_rect *crop);
+				 struct v4l2_rect *crop);
 int ipu_isys_subdev_set_routing(struct v4l2_subdev *sd,
-				 struct v4l2_subdev_state *state,
-				 enum v4l2_subdev_format_whence which,
-				 struct v4l2_subdev_krouting *routing);
-int ipu_isys_subdev_init(struct device *dev,
-			  struct ipu_isys_subdev *asd,
-			  const struct v4l2_subdev_ops *ops,
-			  unsigned int nr_ctrls,
-			  unsigned int num_sink_pads,
-			  unsigned int num_source_pads);
+				struct v4l2_subdev_state *state,
+				enum v4l2_subdev_format_whence which,
+				struct v4l2_subdev_krouting *routing);
+int ipu_isys_subdev_init(struct device *dev, struct ipu_isys_subdev *asd,
+			 const struct v4l2_subdev_ops *ops,
+			 unsigned int nr_ctrls, unsigned int num_sink_pads,
+			 unsigned int num_source_pads);
 void ipu_isys_subdev_cleanup(struct ipu_isys_subdev *asd);
-
 
 static inline u32 ipu_isys_get_format(struct ipu_isys_video *av)
 {

@@ -169,4 +169,61 @@ int ipu_isys_subdev_init(struct device *dev,
 			  unsigned int num_sink_pads,
 			  unsigned int num_source_pads);
 void ipu_isys_subdev_cleanup(struct ipu_isys_subdev *asd);
+
+
+static inline u32 ipu_isys_get_format(struct ipu_isys_video *av)
+{
+	if (av->aq.vbq.type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
+		return av->pix_fmt.pixelformat;
+
+	if (av->aq.vbq.type == V4L2_BUF_TYPE_META_CAPTURE)
+		return av->meta_fmt.dataformat;
+
+	return 0;
+}
+
+static inline u32 ipu_isys_get_data_size(struct ipu_isys_video *av)
+{
+	if (av->aq.vbq.type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
+		return av->pix_fmt.sizeimage;
+
+	if (av->aq.vbq.type == V4L2_BUF_TYPE_META_CAPTURE)
+		return av->meta_fmt.buffersize;
+
+	return 0;
+}
+
+static inline u32 ipu_isys_get_bytes_per_line(struct ipu_isys_video *av)
+{
+	if (av->aq.vbq.type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
+		return av->pix_fmt.bytesperline;
+
+	if (av->aq.vbq.type == V4L2_BUF_TYPE_META_CAPTURE)
+		return av->meta_fmt.bytesperline;
+
+	return 0;
+}
+
+static inline u32 ipu_isys_get_frame_width(struct ipu_isys_video *av)
+{
+	if (av->aq.vbq.type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
+		return av->pix_fmt.width;
+
+	if (av->aq.vbq.type == V4L2_BUF_TYPE_META_CAPTURE)
+		return av->meta_fmt.width;
+
+	return 0;
+}
+
+static inline u32 ipu_isys_get_frame_height(struct ipu_isys_video *av)
+{
+	if (av->aq.vbq.type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
+		return av->pix_fmt.height;
+
+	if (av->aq.vbq.type == V4L2_BUF_TYPE_META_CAPTURE)
+		return av->meta_fmt.height;
+
+	return 0;
+}
+
 #endif

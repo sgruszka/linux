@@ -70,7 +70,7 @@ struct ipu6_csi2_error {
 
 #define to_ipu_isys_csi2(__asd) container_of(__asd, struct ipu_isys_csi2, asd)
 
-s64 ipu6_isys_csi2_get_link_freq(struct ipu_isys_csi2 *csi2);
+s64 ipu_isys_csi2_get_link_freq(struct ipu_isys_csi2 *csi2);
 int ipu6_isys_csi2_init(struct ipu_isys_csi2 *csi2, struct ipu6_isys *isys,
 			void __iomem *base, unsigned int index);
 void ipu6_isys_csi2_cleanup(struct ipu_isys_csi2 *csi2);

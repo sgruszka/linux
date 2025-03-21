@@ -75,7 +75,7 @@ static const struct ipu6_csi2_error dphy_rx_errors[] = {
 	{ "HSIDLE detected", false }
 };
 
-s64 ipu6_isys_csi2_get_link_freq(struct ipu_isys_csi2 *csi2)
+s64 ipu_isys_csi2_get_link_freq(struct ipu_isys_csi2 *csi2)
 {
 	struct media_pad *src_pad;
 	struct v4l2_subdev *ext_sd;
@@ -171,7 +171,7 @@ ipu6_isys_csi2_calc_timing(struct ipu_isys_csi2 *csi2,
 	struct device *dev = isys_to_dev(csi2->isys);
 	s64 link_freq;
 
-	link_freq = ipu6_isys_csi2_get_link_freq(csi2);
+	link_freq = ipu_isys_csi2_get_link_freq(csi2);
 	if (link_freq < 0)
 		return link_freq;
 

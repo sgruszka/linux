@@ -470,7 +470,7 @@ int ipu6_isys_dwc_phy_set_power(struct ipu6_isys *isys,
 		return -EINVAL;
 	}
 
-	link_freq = ipu6_isys_csi2_get_link_freq(&isys->csi2[port].csi2);
+	link_freq = ipu_isys_csi2_get_link_freq(&isys->csi2[port].csi2);
 	if (link_freq < 0) {
 		dev_err(dev, "get link freq failed(%lld).\n", link_freq);
 		return link_freq;

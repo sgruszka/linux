@@ -15,10 +15,6 @@
 
 #include "../ipu/ipu-isys.h"
 
-struct ipu6_isys;
-struct ipu_isys_subdev;
-struct ipu_isys_stream;
-
 struct video_stream_watermark {
 	u32 width;
 	u32 height;

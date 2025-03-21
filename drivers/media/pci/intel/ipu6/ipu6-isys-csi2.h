@@ -33,10 +33,9 @@ struct ipu_isys_stream;
 #define CSI2_CSI_RX_DLY_CNT_SETTLE_DLANE_A		85
 #define CSI2_CSI_RX_DLY_CNT_SETTLE_DLANE_B		-2
 
-struct ipu6_isys_csi2 {
+struct ipu_isys_csi2 {
 	struct ipu_isys_subdev asd;
 	struct ipu_isys *isys;
-	struct ipu6_isys_video av[NR_OF_CSI2_SRC_PADS];
 
 	void __iomem *base;
 	u32 receiver_errors;
@@ -44,7 +43,12 @@ struct ipu6_isys_csi2 {
 	unsigned int port;
 };
 
-static inline struct ipu6_isys *csi2_to_isys6(struct ipu6_isys_csi2 *csi2)
+struct ipu6_isys_csi2 {
+	struct ipu_isys_csi2 csi2;
+	struct ipu6_isys_video av[NR_OF_CSI2_SRC_PADS];
+};
+
+static inline struct ipu6_isys *csi2_to_isys6(struct ipu_isys_csi2 *csi2)
 {
 	return (struct ipu6_isys *)csi2->isys;
 }
@@ -61,21 +65,21 @@ struct ipu6_csi2_error {
 	bool is_info_only;
 };
 
-#define ipu6_isys_subdev_to_csi2(__sd) \
-	container_of(__sd, struct ipu6_isys_csi2, asd)
+#define ipu_isys_subdev_to_csi2(__sd) \
+	container_of(__sd, struct ipu_isys_csi2, asd)
 
-#define to_ipu6_isys_csi2(__asd) container_of(__asd, struct ipu6_isys_csi2, asd)
+#define to_ipu_isys_csi2(__asd) container_of(__asd, struct ipu_isys_csi2, asd)
 
-s64 ipu6_isys_csi2_get_link_freq(struct ipu6_isys_csi2 *csi2);
-int ipu6_isys_csi2_init(struct ipu6_isys_csi2 *csi2, struct ipu6_isys *isys,
+s64 ipu6_isys_csi2_get_link_freq(struct ipu_isys_csi2 *csi2);
+int ipu6_isys_csi2_init(struct ipu_isys_csi2 *csi2, struct ipu6_isys *isys,
 			void __iomem *base, unsigned int index);
-void ipu6_isys_csi2_cleanup(struct ipu6_isys_csi2 *csi2);
+void ipu6_isys_csi2_cleanup(struct ipu_isys_csi2 *csi2);
 void ipu6_isys_csi2_sof_event_by_stream(struct ipu_isys_stream *stream);
 void ipu6_isys_csi2_eof_event_by_stream(struct ipu_isys_stream *stream);
-void ipu6_isys_register_errors(struct ipu6_isys_csi2 *csi2);
-void ipu6_isys_csi2_error(struct ipu6_isys_csi2 *csi2);
+void ipu6_isys_register_errors(struct ipu_isys_csi2 *csi2);
+void ipu6_isys_csi2_error(struct ipu_isys_csi2 *csi2);
 int ipu6_isys_csi2_get_remote_desc(u32 source_stream,
-				   struct ipu6_isys_csi2 *csi2,
+				   struct ipu_isys_csi2 *csi2,
 				   struct media_entity *source_entity,
 				   struct v4l2_mbus_frame_desc_entry *entry);
 

@@ -75,7 +75,7 @@ static const struct ipu6_csi2_error dphy_rx_errors[] = {
 	{ "HSIDLE detected", false }
 };
 
-s64 ipu6_isys_csi2_get_link_freq(struct ipu6_isys_csi2 *csi2)
+s64 ipu6_isys_csi2_get_link_freq(struct ipu_isys_csi2 *csi2)
 {
 	struct media_pad *src_pad;
 	struct v4l2_subdev *ext_sd;
@@ -103,7 +103,7 @@ static int csi2_subscribe_event(struct v4l2_subdev *sd, struct v4l2_fh *fh,
 				struct v4l2_event_subscription *sub)
 {
 	struct ipu_isys_subdev *asd = to_ipu_isys_subdev(sd);
-	struct ipu6_isys_csi2 *csi2 = to_ipu6_isys_csi2(asd);
+	struct ipu_isys_csi2 *csi2 = to_ipu_isys_csi2(asd);
 	struct device *dev = isys_to_dev(csi2->isys);
 
 	dev_dbg(dev, "csi2 subscribe event(type %u id %u)\n",
@@ -165,7 +165,7 @@ static u32 calc_timing(s32 a, s32 b, s64 link_freq, s32 accinv)
 }
 
 static int
-ipu6_isys_csi2_calc_timing(struct ipu6_isys_csi2 *csi2,
+ipu6_isys_csi2_calc_timing(struct ipu_isys_csi2 *csi2,
 			   struct ipu6_isys_csi2_timing *timing, s32 accinv)
 {
 	struct device *dev = isys_to_dev(csi2->isys);
@@ -195,7 +195,7 @@ ipu6_isys_csi2_calc_timing(struct ipu6_isys_csi2 *csi2,
 	return 0;
 }
 
-void ipu6_isys_register_errors(struct ipu6_isys_csi2 *csi2)
+void ipu6_isys_register_errors(struct ipu_isys_csi2 *csi2)
 {
 	u32 irq = readl(csi2->base + CSI_PORT_REG_BASE_IRQ_CSI +
 			CSI_PORT_REG_BASE_IRQ_STATUS_OFFSET);
@@ -208,7 +208,7 @@ void ipu6_isys_register_errors(struct ipu6_isys_csi2 *csi2)
 	csi2->receiver_errors |= irq & mask;
 }
 
-void ipu6_isys_csi2_error(struct ipu6_isys_csi2 *csi2)
+void ipu6_isys_csi2_error(struct ipu_isys_csi2 *csi2)
 {
 	struct device *dev = isys_to_dev(csi2->isys);
 	const struct ipu6_csi2_error *errors;
@@ -233,7 +233,7 @@ static int ipu6_isys_csi2_set_stream(struct v4l2_subdev *sd,
 				     unsigned int nlanes, int enable)
 {
 	struct ipu_isys_subdev *asd = to_ipu_isys_subdev(sd);
-	struct ipu6_isys_csi2 *csi2 = to_ipu6_isys_csi2(asd);
+	struct ipu_isys_csi2 *csi2 = to_ipu_isys_csi2(asd);
 	struct ipu6_isys *isys = csi2_to_isys6(csi2);
 	struct device *dev = isys_to_dev(isys);
 	struct ipu6_isys_csi2_config cfg;
@@ -348,7 +348,7 @@ static int ipu6_isys_csi2_enable_streams(struct v4l2_subdev *sd,
 					 u32 pad, u64 streams_mask)
 {
 	struct ipu_isys_subdev *asd = to_ipu_isys_subdev(sd);
-	struct ipu6_isys_csi2 *csi2 = to_ipu6_isys_csi2(asd);
+	struct ipu_isys_csi2 *csi2 = to_ipu_isys_csi2(asd);
 	struct ipu6_isys_csi2_timing timing = { };
 	struct v4l2_subdev *remote_sd;
 	struct media_pad *remote_pad;
@@ -512,7 +512,7 @@ static const struct media_entity_operations csi2_entity_ops = {
 	.has_pad_interdep = v4l2_subdev_has_pad_interdep,
 };
 
-void ipu6_isys_csi2_cleanup(struct ipu6_isys_csi2 *csi2)
+void ipu6_isys_csi2_cleanup(struct ipu_isys_csi2 *csi2)
 {
 	if (!csi2->isys)
 		return;
@@ -523,7 +523,7 @@ void ipu6_isys_csi2_cleanup(struct ipu6_isys_csi2 *csi2)
 	csi2->isys = NULL;
 }
 
-int ipu6_isys_csi2_init(struct ipu6_isys_csi2 *csi2,
+int ipu6_isys_csi2_init(struct ipu_isys_csi2 *csi2,
 			struct ipu6_isys *isys,
 			void __iomem *base, unsigned int index)
 {
@@ -535,7 +535,7 @@ int ipu6_isys_csi2_init(struct ipu6_isys_csi2 *csi2,
 	csi2->port = index;
 
 	csi2->asd.sd.entity.ops = &csi2_entity_ops;
-	// csi2->asd.isys = isys;
+
 	ret = ipu_isys_subdev_init(dev, &csi2->asd, &csi2_sd_ops, 0,
 				    NR_OF_CSI2_SINK_PADS, NR_OF_CSI2_SRC_PADS);
 	if (ret)
@@ -570,7 +570,7 @@ void ipu6_isys_csi2_sof_event_by_stream(struct ipu_isys_stream *stream)
 {
 	struct video_device *vdev = stream->asd->sd.devnode;
 	struct device *dev = isys_to_dev(stream->isys);
-	struct ipu6_isys_csi2 *csi2 = ipu6_isys_subdev_to_csi2(stream->asd);
+	struct ipu_isys_csi2 *csi2 = ipu_isys_subdev_to_csi2(stream->asd);
 	struct v4l2_event ev = {
 		.type = V4L2_EVENT_FRAME_SYNC,
 	};
@@ -585,7 +585,7 @@ void ipu6_isys_csi2_sof_event_by_stream(struct ipu_isys_stream *stream)
 void ipu6_isys_csi2_eof_event_by_stream(struct ipu_isys_stream *stream)
 {
 	struct device *dev = isys_to_dev(stream->isys);
-	struct ipu6_isys_csi2 *csi2 = ipu6_isys_subdev_to_csi2(stream->asd);
+	struct ipu_isys_csi2 *csi2 = ipu_isys_subdev_to_csi2(stream->asd);
 	u32 frame_sequence = atomic_read(&stream->sequence);
 
 	dev_dbg(dev, "eof_event::csi2-%i sequence: %i\n",
@@ -593,7 +593,7 @@ void ipu6_isys_csi2_eof_event_by_stream(struct ipu_isys_stream *stream)
 }
 
 int ipu6_isys_csi2_get_remote_desc(u32 source_stream,
-				   struct ipu6_isys_csi2 *csi2,
+				   struct ipu_isys_csi2 *csi2,
 				   struct media_entity *source_entity,
 				   struct v4l2_mbus_frame_desc_entry *entry)
 {

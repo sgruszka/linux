@@ -105,7 +105,7 @@ static int isys_isr_one(struct ipu_bus_device *adev);
 static int
 isys_complete_ext_device_registration(struct ipu6_isys *isys,
 				      struct v4l2_subdev *sd,
-				      struct ipu6_isys_csi2_config *csi2)
+				      struct ipu6_isys_csi2_config *csi2_conf)
 {
 	struct device *dev = isys_to_dev(isys);
 	unsigned int i;
@@ -123,7 +123,7 @@ isys_complete_ext_device_registration(struct ipu6_isys *isys,
 	}
 
 	ret = media_create_pad_link(&sd->entity, i,
-				    &isys->csi2[csi2->port].asd.sd.entity,
+				    &isys->csi2[csi2_conf->port].csi2.asd.sd.entity,
 				    0, MEDIA_LNK_FL_ENABLED |
 				       MEDIA_LNK_FL_IMMUTABLE);
 	if (ret) {
@@ -131,7 +131,7 @@ isys_complete_ext_device_registration(struct ipu6_isys *isys,
 		goto unregister_subdev;
 	}
 
-	isys->csi2[csi2->port].nlanes = csi2->nlanes;
+	isys->csi2[csi2_conf->port].csi2.nlanes = csi2_conf->nlanes;
 
 	return 0;
 
@@ -165,7 +165,7 @@ static void isys_csi2_unregister_subdevices(struct ipu6_isys *isys)
 	unsigned int i;
 
 	for (i = 0; i < csi2->nports; i++)
-		ipu6_isys_csi2_cleanup(&isys->csi2[i]);
+		ipu6_isys_csi2_cleanup(&isys->csi2[i].csi2);
 }
 
 static int isys_csi2_register_subdevices(struct ipu6_isys *isys)
@@ -176,7 +176,7 @@ static int isys_csi2_register_subdevices(struct ipu6_isys *isys)
 	int ret;
 
 	for (i = 0; i < csi2_pdata->nports; i++) {
-		ret = ipu6_isys_csi2_init(&isys->csi2[i], isys,
+		ret = ipu6_isys_csi2_init(&isys->csi2[i].csi2, isys,
 					  isys->pdata->base +
 					  CSI_REG_PORT_BASE(i), i);
 		if (ret)
@@ -189,7 +189,7 @@ static int isys_csi2_register_subdevices(struct ipu6_isys *isys)
 
 fail:
 	while (i--)
-		ipu6_isys_csi2_cleanup(&isys->csi2[i]);
+		ipu6_isys_csi2_cleanup(&isys->csi2[i].csi2);
 
 	return ret;
 }
@@ -203,7 +203,7 @@ static int isys_csi2_create_media_links(struct ipu6_isys *isys)
 	int ret;
 
 	for (i = 0; i < csi2_pdata->nports; i++) {
-		struct media_entity *sd = &isys->csi2[i].asd.sd.entity;
+		struct media_entity *sd = &isys->csi2[i].csi2.asd.sd.entity;
 
 		for (j = 0; j < NR_OF_CSI2_SRC_PADS; j++) {
 			struct ipu6_isys_video *av = &isys->csi2[i].av[j];
@@ -302,8 +302,9 @@ void isys_setup_hw(struct ipu6_isys *isys)
 		writel(thd[i], base + IPU6_REG_ISYS_CDC_THRESHOLD(i));
 }
 
-static void ipu6_isys_csi2_isr(struct ipu6_isys_csi2 *csi2)
+static void ipu6_isys_csi2_isr(struct ipu6_isys_csi2 *csi2_6)
 {
+	struct ipu_isys_csi2 *csi2 = (struct ipu_isys_csi2 *) csi2_6;
 	struct ipu_isys_stream *stream;
 	unsigned int i;
 	u32 status;
@@ -373,7 +374,7 @@ irqreturn_t isys_isr(struct ipu_bus_device *adev)
 
 			for (i = 0; i < isys->pdata->ipdata->csi2.nports; i++) {
 				/* irq from not enabled port */
-				if (!isys->csi2[i].base)
+				if (!isys->csi2[i].csi2.base)
 					continue;
 				if (status_csi & IPU6_ISYS_UNISPART_IRQ_CSI2(i))
 					ipu6_isys_csi2_isr(&isys->csi2[i]);
@@ -1224,7 +1225,7 @@ static int isys_isr_one(struct ipu_bus_device *adev)
 	struct ipu6_isys *isys = dev_get_drvdata(&adev->auxdev.dev);
 	struct ipu6_fw_isys_resp_info_abi *resp;
 	struct ipu_isys_stream *stream;
-	struct ipu6_isys_csi2 *csi2 = NULL;
+	struct ipu_isys_csi2 *csi2 = NULL;
 	u32 index;
 	u64 ts;
 
@@ -1267,7 +1268,7 @@ static int isys_isr_one(struct ipu_bus_device *adev)
 	}
 	stream->error = resp->error_info.error;
 
-	csi2 = ipu6_isys_subdev_to_csi2(stream->asd);
+	csi2 = ipu_isys_subdev_to_csi2(stream->asd);
 
 	switch (resp->type) {
 	case IPU6_FW_ISYS_RESP_TYPE_STREAM_OPEN_DONE:

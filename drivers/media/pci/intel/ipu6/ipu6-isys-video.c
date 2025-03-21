@@ -718,7 +718,7 @@ int ipu6_isys_video_prepare_stream(struct ipu_isys_video *av,
 				   int nr_queues)
 {
 	struct ipu_isys_stream *stream = av->stream;
-	struct ipu6_isys_csi2 *csi2;
+	struct ipu_isys_csi2 *csi2;
 
 	if (WARN_ON(stream->nr_streaming))
 		return -EINVAL;
@@ -733,7 +733,7 @@ int ipu6_isys_video_prepare_stream(struct ipu_isys_video *av,
 		return -EINVAL;
 
 	stream->stream_source = stream->asd->source;
-	csi2 = ipu6_isys_subdev_to_csi2(stream->asd);
+	csi2 = ipu_isys_subdev_to_csi2(stream->asd);
 	csi2->receiver_errors = 0;
 	stream->source_entity = source_entity;
 
@@ -749,7 +749,7 @@ void ipu6_isys_configure_stream_watermark(struct ipu6_isys_video *av6,
 {
 	struct ipu_isys_video *av = (struct ipu_isys_video *) av6;
 	struct ipu6_isys *isys = to_isys6(av);
-	struct ipu6_isys_csi2 *csi2 = NULL;
+	struct ipu_isys_csi2 *csi2 = NULL;
 	struct isys_iwake_watermark *iwake_watermark = &isys->iwake_watermark;
 	struct device *dev = isys_to_dev(isys);
 	struct v4l2_mbus_framefmt format;
@@ -776,7 +776,7 @@ void ipu6_isys_configure_stream_watermark(struct ipu6_isys_video *av6,
 	else
 		av6->watermark.hblank = 0;
 
-	csi2 = ipu6_isys_subdev_to_csi2(av->stream->asd);
+	csi2 = ipu_isys_subdev_to_csi2(av->stream->asd);
 	link_freq = ipu6_isys_csi2_get_link_freq(csi2);
 	if (link_freq > 0) {
 		lanes = csi2->nlanes;
@@ -1226,7 +1226,7 @@ int ipu6_isys_setup_video(struct ipu6_isys_video *av,
 	v4l2_subdev_unlock_state(state);
 
 	ret = ipu6_isys_csi2_get_remote_desc(av->source_stream,
-					     to_ipu6_isys_csi2(asd),
+					     to_ipu_isys_csi2(asd),
 					     *source_entity, &entry);
 	if (ret == -ENOIOCTLCMD) {
 		av->ipu.vc = 0;

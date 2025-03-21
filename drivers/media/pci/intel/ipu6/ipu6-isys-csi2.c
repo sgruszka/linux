@@ -99,14 +99,10 @@ s64 ipu_isys_csi2_get_link_freq(struct ipu_isys_csi2 *csi2)
 	return v4l2_get_link_freq(ext_sd->ctrl_handler, 0, 0);
 }
 
-static int csi2_subscribe_event(struct v4l2_subdev *sd, struct v4l2_fh *fh,
-				struct v4l2_event_subscription *sub)
+static int ipu_subscribe_event(struct v4l2_subdev *sd, struct v4l2_fh *fh,
+			       struct v4l2_event_subscription *sub)
 {
-	struct ipu_isys_subdev *asd = to_ipu_isys_subdev(sd);
-	struct ipu_isys_csi2 *csi2 = to_ipu_isys_csi2(asd);
-	struct device *dev = isys_to_dev(csi2->isys);
-
-	dev_dbg(dev, "csi2 subscribe event(type %u id %u)\n",
+	dev_dbg(sd->v4l2_dev->dev, "subscribe event(type %u id %u)\n",
 		sub->type, sub->id);
 
 	switch (sub->type) {
@@ -120,7 +116,7 @@ static int csi2_subscribe_event(struct v4l2_subdev *sd, struct v4l2_fh *fh,
 }
 
 static const struct v4l2_subdev_core_ops csi2_sd_core_ops = {
-	.subscribe_event = csi2_subscribe_event,
+	.subscribe_event = ipu_subscribe_event,
 	.unsubscribe_event = v4l2_event_subdev_unsubscribe,
 };
 

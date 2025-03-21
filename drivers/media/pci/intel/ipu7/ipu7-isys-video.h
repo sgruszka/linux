@@ -86,12 +86,17 @@ struct ipu7_isys_video {
 	struct v4l2_pix_format pix_fmt;
 	struct v4l2_meta_format meta_fmt;
 
-	struct ipu7_isys *isys;
+	struct ipu_isys *isys;
 	struct ipu7_isys_stream *stream;
 	unsigned int streaming;
 	u8 vc;
 	u8 dt;
 };
+
+static inline struct ipu7_isys *to_isys7(struct ipu7_isys_video *iv)
+{
+	return (struct ipu7_isys *) iv->isys;
+}
 
 #define ipu7_isys_queue_to_video(__aq)			\
 	container_of(__aq, struct ipu7_isys_video, aq)

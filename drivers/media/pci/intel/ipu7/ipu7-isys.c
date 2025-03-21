@@ -283,7 +283,7 @@ static int isys_register_video_devices(struct ipu7_isys *isys)
 			snprintf(av->vdev.name, sizeof(av->vdev.name),
 				 IPU_ISYS_ENTITY_PREFIX " ISYS Capture %u",
 				 i * NR_OF_CSI2_SRC_PADS + j);
-			av->isys = isys;
+			av->isys = (struct ipu_isys *) isys;
 			av->aq.vbq.buf_struct_size =
 				sizeof(struct ipu_isys_video_buffer);
 

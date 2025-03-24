@@ -480,7 +480,7 @@ isys_subdev_cleanup:
 	return ret;
 }
 
-void ipu7_isys_csi2_sof_event_by_stream(struct ipu7_isys_stream *stream)
+void ipu7_isys_csi2_sof_event_by_stream(struct ipu_isys_stream *stream)
 {
 	struct ipu7_isys_csi2 *csi2 = ipu7_isys_subdev_to_csi2(stream->asd);
 	struct device *dev = isys_to_dev(stream->isys);
@@ -497,7 +497,7 @@ void ipu7_isys_csi2_sof_event_by_stream(struct ipu7_isys_stream *stream)
 		csi2->port, ev.u.frame_sync.frame_sequence, stream->vc);
 }
 
-void ipu7_isys_csi2_eof_event_by_stream(struct ipu7_isys_stream *stream)
+void ipu7_isys_csi2_eof_event_by_stream(struct ipu_isys_stream *stream)
 {
 	struct ipu7_isys_csi2 *csi2 = ipu7_isys_subdev_to_csi2(stream->asd);
 	struct device *dev = isys_to_dev(stream->isys);

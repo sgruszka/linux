@@ -12,7 +12,7 @@
 #include "ipu7-isys-video.h"
 
 struct ipu7_isys;
-struct ipu7_isys_stream;
+struct ipu_isys_stream;
 
 #define NR_OF_CSI2_VC		16
 #define INVALID_VC_ID		-1
@@ -61,8 +61,8 @@ s64 ipu7_isys_csi2_get_link_freq(struct ipu7_isys_csi2 *csi2);
 int ipu7_isys_csi2_init(struct ipu7_isys_csi2 *csi2, struct ipu7_isys *isys,
 			void __iomem *base, unsigned int index);
 void ipu7_isys_csi2_cleanup(struct ipu7_isys_csi2 *csi2);
-void ipu7_isys_csi2_sof_event_by_stream(struct ipu7_isys_stream *stream);
-void ipu7_isys_csi2_eof_event_by_stream(struct ipu7_isys_stream *stream);
+void ipu7_isys_csi2_sof_event_by_stream(struct ipu_isys_stream *stream);
+void ipu7_isys_csi2_eof_event_by_stream(struct ipu_isys_stream *stream);
 int ipu7_isys_csi2_get_remote_desc(u32 source_stream,
 				   struct ipu7_isys_csi2 *csi2,
 				   struct media_entity *source_entity,

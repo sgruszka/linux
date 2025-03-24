@@ -96,7 +96,7 @@ struct ipu7_isys {
 	u32 isr_csi2_mask;
 	u32 csi2_rx_ctrl_cached;
 	spinlock_t streams_lock;
-	struct ipu7_isys_stream streams[IPU_ISYS_MAX_STREAMS];
+	struct ipu_isys_stream streams[IPU_ISYS_MAX_STREAMS];
 	int streams_ref_count[IPU_ISYS_MAX_STREAMS];
 	unsigned int line_align;
 	u32 phy_rext_cal;
@@ -151,7 +151,7 @@ static inline struct device *isys_to_dev(struct ipu7_isys *isys)
 	return &isys->ipu.adev->auxdev.dev;
 }
 
-struct isys_fw_msgs *ipu7_get_fw_msg_buf(struct ipu7_isys_stream *stream);
+struct isys_fw_msgs *ipu7_get_fw_msg_buf(struct ipu_isys_stream *stream);
 void ipu7_put_fw_msg_buf(struct ipu7_isys *isys, uintptr_t data);
 void ipu7_cleanup_fw_msg_bufs(struct ipu7_isys *isys);
 

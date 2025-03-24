@@ -104,7 +104,7 @@ static void isys_stream_init(struct ipu7_isys *isys)
 		init_completion(&isys->streams[i].stream_start_completion);
 		init_completion(&isys->streams[i].stream_stop_completion);
 		INIT_LIST_HEAD(&isys->streams[i].queues);
-		isys->streams[i].isys = isys;
+		isys->streams[i].isys = (struct ipu_isys *) isys;
 		isys->streams[i].stream_handle = i;
 		isys->streams[i].vc = INVALID_VC_ID;
 	}
@@ -638,7 +638,7 @@ static int alloc_fw_msg_bufs(struct ipu7_isys *isys, int amount)
 	return -ENOMEM;
 }
 
-struct isys_fw_msgs *ipu7_get_fw_msg_buf(struct ipu7_isys_stream *stream)
+struct isys_fw_msgs *ipu7_get_fw_msg_buf(struct ipu_isys_stream *stream)
 {
 	struct device *dev = isys_to_dev(stream->isys);
 	struct ipu7_isys *isys = stream->isys;
@@ -889,7 +889,7 @@ static const struct resp_to_msg is_fw_msg[] = {
 int isys_isr_one(struct ipu_bus_device *adev)
 {
 	struct ipu7_isys *isys = dev_get_drvdata(&adev->auxdev.dev);
-	struct ipu7_isys_stream *stream = NULL;
+	struct ipu_isys_stream *stream = NULL;
 	struct device *dev = &adev->auxdev.dev;
 	struct ipu7_isys_csi2 *csi2 = NULL;
 	struct ia_gofo_msg_err err_info;
@@ -976,7 +976,7 @@ int isys_isr_one(struct ipu_bus_device *adev)
 		 * get pin_data_ready event
 		 */
 		ipu7_put_fw_msg_buf(dev_get_drvdata(&adev->auxdev.dev), resp->buf_id);
-		if (resp->pin_id < IPU_INSYS_OUTPUT_PINS &&
+		if (resp->pin_id < IPU_ISYS_OUTPUT_PINS &&
 		    stream->output_pins[resp->pin_id].pin_ready)
 			stream->output_pins[resp->pin_id].pin_ready(stream,
 								    resp);
@@ -1031,7 +1031,7 @@ static void ipu7_isys_csi2_isr(struct ipu7_isys_csi2 *csi2)
 {
 	struct device *dev = isys_to_dev(csi2->isys);
 	struct ipu_device *isp = csi2->isys->ipu.adev->isp;
-	struct ipu7_isys_stream *s;
+	struct ipu_isys_stream *s;
 	u32 sync, offset;
 	u32 fe = 0;
 	u8 vc;

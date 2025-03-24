@@ -36,7 +36,7 @@
 #include "ipu7-isys-video.h"
 #include "ipu7-platform-regs.h"
 
-const struct ipu7_isys_pixelformat ipu7_isys_pfmts[] = {
+const struct ipu_isys_pixelformat ipu7_isys_pfmts[] = {
 	{V4L2_PIX_FMT_SBGGR12, 16, 12, MEDIA_BUS_FMT_SBGGR12_1X12,
 	 IPU_INSYS_FRAME_FORMAT_RAW16},
 	{V4L2_PIX_FMT_SGBRG12, 16, 12, MEDIA_BUS_FMT_SGBRG12_1X12,
@@ -112,14 +112,14 @@ static int video_open(struct file *file)
 	return v4l2_fh_open(file);
 }
 
-const struct ipu7_isys_pixelformat *
+const struct ipu_isys_pixelformat *
 ipu7_isys_get_isys_format(u32 pixelformat, u32 type)
 {
-	const struct ipu7_isys_pixelformat *default_pfmt = NULL;
+	const struct ipu_isys_pixelformat *default_pfmt = NULL;
 	unsigned int i;
 
 	for (i = 0; i < ARRAY_SIZE(ipu7_isys_pfmts); i++) {
-		const struct ipu7_isys_pixelformat *pfmt = &ipu7_isys_pfmts[i];
+		const struct ipu_isys_pixelformat *pfmt = &ipu7_isys_pfmts[i];
 
 		if (type && ((!pfmt->is_meta &&
 			      type != V4L2_BUF_TYPE_VIDEO_CAPTURE) ||
@@ -222,7 +222,7 @@ static void ipu7_isys_try_fmt_cap(struct ipu7_isys_video *av, u32 type,
 				  u32 *format, u32 *width, u32 *height,
 				  u32 *bytesperline, u32 *sizeimage)
 {
-	const struct ipu7_isys_pixelformat *pfmt =
+	const struct ipu_isys_pixelformat *pfmt =
 		ipu7_isys_get_isys_format(*format, type);
 
 	*format = pfmt->pixelformat;
@@ -442,8 +442,8 @@ static int ipu7_isys_fw_pin_cfg(struct ipu7_isys_video *av,
 {
 	struct media_pad *src_pad = media_pad_remote_pad_first(&av->pad);
 	struct v4l2_subdev *sd = media_entity_to_v4l2_subdev(src_pad->entity);
-	struct ipu7_isys_stream *stream = av->stream;
-	const struct ipu7_isys_pixelformat *pfmt =
+	struct ipu_isys_stream *stream = av->stream;
+	const struct ipu_isys_pixelformat *pfmt =
 		ipu7_isys_get_isys_format(ipu7_isys_get_format(av), 0);
 	struct ipu7_insys_output_pin *output_pin;
 	struct ipu7_insys_input_pin *input_pin;
@@ -525,7 +525,7 @@ static int start_stream_firmware(struct ipu7_isys_video *av,
 				 struct ipu_isys_buffer_list *bl)
 {
 	struct device *dev = isys_to_dev(to_isys7(av));
-	struct ipu7_isys_stream *stream = av->stream;
+	struct ipu_isys_stream *stream = av->stream;
 	struct ipu7_insys_stream_cfg *stream_cfg;
 	struct ipu7_insys_buffset *buf = NULL;
 	struct isys_fw_msgs *msg = NULL;
@@ -660,7 +660,7 @@ out_put_stream_opened:
 static void stop_streaming_firmware(struct ipu7_isys_video *av)
 {
 	struct device *dev = isys_to_dev(to_isys7(av));
-	struct ipu7_isys_stream *stream = av->stream;
+	struct ipu_isys_stream *stream = av->stream;
 	int ret, tout;
 
 	reinit_completion(&stream->stream_stop_completion);
@@ -685,7 +685,7 @@ static void stop_streaming_firmware(struct ipu7_isys_video *av)
 static void close_streaming_firmware(struct ipu7_isys_video *av)
 {
 	struct device *dev = isys_to_dev(to_isys7(av));
-	struct ipu7_isys_stream *stream =  av->stream;
+	struct ipu_isys_stream *stream =  av->stream;
 	int ret, tout;
 
 	reinit_completion(&stream->stream_close_completion);
@@ -713,7 +713,7 @@ int ipu7_isys_video_prepare_stream(struct ipu7_isys_video *av,
 				   struct media_entity *source_entity,
 				   int nr_queues)
 {
-	struct ipu7_isys_stream *stream = av->stream;
+	struct ipu_isys_stream *stream = av->stream;
 	struct ipu7_isys_csi2 *csi2;
 
 	if (WARN_ON(stream->nr_streaming))
@@ -742,7 +742,7 @@ int ipu7_isys_video_prepare_stream(struct ipu7_isys_video *av,
 	return 0;
 }
 
-void ipu7_isys_put_stream(struct ipu7_isys_stream *stream)
+void ipu7_isys_put_stream(struct ipu_isys_stream *stream)
 {
 	unsigned long flags;
 	struct device *dev;
@@ -769,10 +769,10 @@ void ipu7_isys_put_stream(struct ipu7_isys_stream *stream)
 	spin_unlock_irqrestore(&stream->isys->streams_lock, flags);
 }
 
-static struct ipu7_isys_stream *
+static struct ipu_isys_stream *
 ipu7_isys_get_stream(struct ipu7_isys_video *av, struct ipu_isys_subdev *asd)
 {
-	struct ipu7_isys_stream *stream = NULL;
+	struct ipu_isys_stream *stream = NULL;
 	struct ipu7_isys *isys = to_isys7(av);
 	unsigned long flags;
 	unsigned int i;
@@ -807,11 +807,11 @@ ipu7_isys_get_stream(struct ipu7_isys_video *av, struct ipu_isys_subdev *asd)
 	return stream;
 }
 
-struct ipu7_isys_stream *
+struct ipu_isys_stream *
 ipu7_isys_query_stream_by_handle(struct ipu7_isys *isys, u8 stream_handle)
 {
 	unsigned long flags;
-	struct ipu7_isys_stream *stream = NULL;
+	struct ipu_isys_stream *stream = NULL;
 
 	if (!isys)
 		return NULL;
@@ -832,10 +832,10 @@ ipu7_isys_query_stream_by_handle(struct ipu7_isys *isys, u8 stream_handle)
 	return stream;
 }
 
-struct ipu7_isys_stream *
+struct ipu_isys_stream *
 ipu7_isys_query_stream_by_source(struct ipu7_isys *isys, int source, u8 vc)
 {
-	struct ipu7_isys_stream *stream = NULL;
+	struct ipu_isys_stream *stream = NULL;
 	unsigned long flags;
 	unsigned int i;
 
@@ -894,7 +894,7 @@ static u32 get_remote_pad_stream(struct media_pad *r_pad)
 int ipu7_isys_video_set_streaming(struct ipu7_isys_video *av, int state,
 				  struct ipu_isys_buffer_list *bl)
 {
-	struct ipu7_isys_stream *stream = av->stream;
+	struct ipu_isys_stream *stream = av->stream;
 	struct device *dev = isys_to_dev(to_isys7(av));
 	struct media_pad *r_pad;
 	struct v4l2_subdev *sd;
@@ -1042,7 +1042,7 @@ void ipu7_isys_fw_close(struct ipu7_isys *isys)
 int ipu7_isys_setup_video(struct ipu7_isys_video *av,
 			  struct media_entity **source_entity, int *nr_queues)
 {
-	const struct ipu7_isys_pixelformat *pfmt =
+	const struct ipu_isys_pixelformat *pfmt =
 		ipu7_isys_get_isys_format(ipu7_isys_get_format(av), 0);
 	struct device *dev = isys_to_dev(to_isys7(av));
 	struct media_pad *source_pad, *remote_pad;

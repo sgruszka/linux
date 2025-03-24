@@ -330,4 +330,5 @@ void ipu_isys_buffer_list_queue(struct ipu_isys_buffer_list *bl,
 void ipu_flush_firmware_streamon_fail(struct ipu_isys_stream *stream);
 int ipu_buffer_list_get(struct ipu_isys_stream *stream,
 			struct ipu_isys_buffer_list *bl);
+int ipu_isys_link_fmt_validate(struct ipu_isys_queue *aq);
 #endif

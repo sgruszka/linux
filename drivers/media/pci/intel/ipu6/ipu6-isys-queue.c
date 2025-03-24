@@ -255,51 +255,6 @@ out:
 	mutex_unlock(&stream->mutex);
 }
 
-static int ipu6_isys_link_fmt_validate(struct ipu_isys_queue *aq)
-{
-	struct v4l2_mbus_framefmt format;
-	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
-	struct device *dev = isys_to_dev(av->isys);
-	struct media_pad *remote_pad =
-		media_pad_remote_pad_first(av->vdev.entity.pads);
-	struct v4l2_subdev *sd;
-	u32 r_stream, code, data_fmt;
-	int ret;
-
-	if (!remote_pad)
-		return -ENOTCONN;
-
-	sd = media_entity_to_v4l2_subdev(remote_pad->entity);
-	r_stream = ipu_isys_get_src_stream_by_src_pad(sd, remote_pad->index);
-
-	ret = ipu_isys_get_stream_pad_fmt(sd, remote_pad->index, r_stream,
-					   &format);
-
-	if (ret) {
-		dev_dbg(dev, "failed to get %s: pad %d, stream:%d format\n",
-			sd->entity.name, remote_pad->index, r_stream);
-		return ret;
-	}
-
-	if (format.width != ipu_isys_get_frame_width(av) ||
-	    format.height != ipu_isys_get_frame_height(av)) {
-		dev_dbg(dev, "wrong width or height %ux%u (%ux%u expected)\n",
-			ipu_isys_get_frame_width(av),
-			ipu_isys_get_frame_height(av), format.width,
-			format.height);
-		return -EINVAL;
-	}
-
-	data_fmt = ipu_isys_get_format(av);
-	code = ipu_isys_get_isys_format(av->isys, data_fmt, 0)->code;
-	if (format.code != code) {
-		dev_dbg(dev, "wrong mbus code 0x%8.8x (0x%8.8x expected)\n",
-			code, format.code);
-		return -EINVAL;
-	}
-
-	return 0;
-}
 
 static void return_buffers(struct ipu_isys_queue *aq,
 			   enum vb2_buffer_state state)
@@ -384,7 +339,7 @@ static int start_streaming(struct vb2_queue *q, unsigned int count)
 		goto out_return_buffers;
 	}
 
-	ret = ipu6_isys_link_fmt_validate(aq);
+	ret = ipu_isys_link_fmt_validate(aq);
 	if (ret) {
 		dev_dbg(dev,
 			"%s: link format validation failed (%d)\n",

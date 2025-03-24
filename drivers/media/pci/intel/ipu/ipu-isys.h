@@ -316,5 +316,7 @@ static inline u32 ipu_isys_get_frame_height(struct ipu_isys_video *av)
 }
 
 int ipu_isys_buf_prepare(struct vb2_buffer *vb);
-
+int ipu_isys_queue_setup(struct vb2_queue *q, unsigned int *num_buffers,
+			 unsigned int *num_planes, unsigned int sizes[],
+			 struct device *alloc_devs[]);
 #endif

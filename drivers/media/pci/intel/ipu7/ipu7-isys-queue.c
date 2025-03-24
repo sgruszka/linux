@@ -57,51 +57,6 @@ static void ipu7_isys_buf_cleanup(struct vb2_buffer *vb)
 	ipu7_dma_unmap_sgtable(isys->ipu.adev, sg, DMA_TO_DEVICE, 0);
 }
 
-static int ipu7_isys_queue_setup(struct vb2_queue *q, unsigned int *num_buffers,
-				 unsigned int *num_planes, unsigned int sizes[],
-				 struct device *alloc_devs[])
-{
-	struct ipu_isys_queue *aq = vb2_queue_to_isys_queue(q);
-	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
-	struct device *dev = isys_to_dev(to_isys7(av));
-	u32 size = ipu_isys_get_data_size(av);
-
-	/* num_planes == 0: we're being called through VIDIOC_REQBUFS */
-	if (!*num_planes) {
-		sizes[0] = size;
-	} else if (sizes[0] < size) {
-		dev_dbg(dev, "%s: queue setup: size %u < %u\n",
-			av->vdev.name, sizes[0], size);
-		return -EINVAL;
-	}
-
-	*num_planes = 1;
-
-	return 0;
-}
-
-static int ipu7_isys_buf_prepare(struct vb2_buffer *vb)
-{
-	struct ipu_isys_queue *aq = vb2_queue_to_isys_queue(vb->vb2_queue);
-	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
-	struct device *dev = isys_to_dev(to_isys7(av));
-	u32 bytesperline = ipu_isys_get_bytes_per_line(av);
-	u32 height = ipu_isys_get_frame_height(av);
-	u32 size = ipu_isys_get_data_size(av);
-
-	dev_dbg(dev, "buffer: %s: configured size %u, buffer size %lu\n",
-		av->vdev.name, size, vb2_plane_size(vb, 0));
-
-	if (size > vb2_plane_size(vb, 0))
-		return -EINVAL;
-
-	dev_dbg(dev, "buffer: %s: bytesperline %u, height %u\n",
-		av->vdev.name, bytesperline, height);
-	vb2_set_plane_payload(vb, 0, bytesperline * height);
-
-	return 0;
-}
-
 /*
  * Queue a buffer list back to incoming or active queues. The buffers
  * are removed from the buffer list.
@@ -798,9 +753,9 @@ void ipu7_isys_queue_buf_ready(struct ipu_isys_stream *stream, void *_info)
 }
 
 static const struct vb2_ops ipu7_isys_queue_ops = {
-	.queue_setup = ipu7_isys_queue_setup,
+	.queue_setup = ipu_isys_queue_setup,
 	.buf_init = ipu7_isys_buf_init,
-	.buf_prepare = ipu7_isys_buf_prepare,
+	.buf_prepare = ipu_isys_buf_prepare,
 	.buf_cleanup = ipu7_isys_buf_cleanup,
 	.start_streaming = start_streaming,
 	.stop_streaming = stop_streaming,

@@ -19,9 +19,6 @@ struct ipu_isys_stream;
 struct ipu7_insys_resp;
 struct ipu7_insys_buffset;
 
-void ipu7_isys_buffer_list_queue(struct ipu_isys_buffer_list *bl,
-				 unsigned long op_flags,
-				 enum vb2_buffer_state state);
 void ipu7_isys_buffer_to_fw_frame_buff(struct ipu7_insys_buffset *set,
 				       struct ipu_isys_stream *stream,
 				       struct ipu_isys_buffer_list *bl);

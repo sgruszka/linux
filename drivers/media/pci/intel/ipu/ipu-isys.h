@@ -319,4 +319,7 @@ int ipu_isys_buf_prepare(struct vb2_buffer *vb);
 int ipu_isys_queue_setup(struct vb2_queue *q, unsigned int *num_buffers,
 			 unsigned int *num_planes, unsigned int sizes[],
 			 struct device *alloc_devs[]);
+void ipu_isys_buffer_list_queue(struct ipu_isys_buffer_list *bl,
+				unsigned long op_flags,
+				enum vb2_buffer_state state);
 #endif

@@ -593,8 +593,7 @@ static int start_stream_firmware(struct ipu_isys_video *av,
 		}
 		buf = &msg->fw_msg.frame;
 		ipu6_isys_buf_to_fw_frame_buf(buf, stream, bl);
-		ipu6_isys_buffer_list_queue(bl,
-					    IPU_ISYS_BUFFER_LIST_FL_ACTIVE, 0);
+		ipu_isys_buffer_list_queue(bl,IPU_ISYS_BUFFER_LIST_FL_ACTIVE, 0);
 	}
 
 	reinit_completion(&stream->stream_start_completion);

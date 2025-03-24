@@ -61,52 +61,6 @@ static void ipu7_isys_buf_cleanup(struct vb2_buffer *vb)
  * Queue a buffer list back to incoming or active queues. The buffers
  * are removed from the buffer list.
  */
-void ipu7_isys_buffer_list_queue(struct ipu_isys_buffer_list *bl,
-				 unsigned long op_flags,
-				 enum vb2_buffer_state state)
-{
-	struct ipu_isys_buffer *ib, *ib_safe;
-	unsigned long flags;
-	bool first = true;
-
-	if (!bl)
-		return;
-
-	WARN_ON_ONCE(!bl->nbufs);
-	WARN_ON_ONCE(op_flags & IPU_ISYS_BUFFER_LIST_FL_ACTIVE &&
-		     op_flags & IPU_ISYS_BUFFER_LIST_FL_INCOMING);
-
-	list_for_each_entry_safe(ib, ib_safe, &bl->head, head) {
-		struct ipu_isys_video *av;
-
-		struct vb2_buffer *vb = ipu_isys_buffer_to_vb2_buffer(ib);
-		struct ipu_isys_queue *aq =
-			vb2_queue_to_isys_queue(vb->vb2_queue);
-
-		av = ipu_isys_queue_to_video(aq);
-		spin_lock_irqsave(&aq->lock, flags);
-		list_del(&ib->head);
-		if (op_flags & IPU_ISYS_BUFFER_LIST_FL_ACTIVE)
-			list_add(&ib->head, &aq->active);
-		else if (op_flags & IPU_ISYS_BUFFER_LIST_FL_INCOMING)
-			list_add_tail(&ib->head, &aq->incoming);
-		spin_unlock_irqrestore(&aq->lock, flags);
-
-		if (op_flags & IPU_ISYS_BUFFER_LIST_FL_SET_STATE)
-			vb2_buffer_done(vb, state);
-
-		if (first) {
-			dev_dbg(isys_to_dev(to_isys7(av)),
-				"queue buf list %p flags %lx, s %d, %d bufs\n",
-				bl, op_flags, state, bl->nbufs);
-			first = false;
-		}
-
-		bl->nbufs--;
-	}
-
-	WARN_ON(bl->nbufs);
-}
 
 /*
  * flush_firmware_streamon_fail() - Flush in cases where requests may
@@ -172,7 +126,7 @@ static int buffer_list_get(struct ipu_isys_stream *stream,
 		if (list_empty(&aq->incoming)) {
 			spin_unlock_irqrestore(&aq->lock, flags);
 			if (!list_empty(&bl->head))
-				ipu7_isys_buffer_list_queue(bl, buf_flag, 0);
+				ipu_isys_buffer_list_queue(bl, buf_flag, 0);
 			return -ENODATA;
 		}
 
@@ -276,8 +230,7 @@ static int ipu7_isys_stream_start(struct ipu_isys_video *av,
 		ipu7_fw_isys_dump_frame_buff_set(dev, buf,
 						 stream->nr_output_pins);
 
-		ipu7_isys_buffer_list_queue(bl, IPU_ISYS_BUFFER_LIST_FL_ACTIVE,
-					    0);
+		ipu_isys_buffer_list_queue(bl, IPU_ISYS_BUFFER_LIST_FL_ACTIVE, 0);
 
 		ret = ipu7_fw_isys_complex_cmd(to_isys7(stream),
 					       stream->stream_handle, buf,
@@ -289,11 +242,11 @@ static int ipu7_isys_stream_start(struct ipu_isys_video *av,
 
 out_requeue:
 	if (bl && bl->nbufs)
-		ipu7_isys_buffer_list_queue(bl,
-					    IPU_ISYS_BUFFER_LIST_FL_INCOMING |
-					    (error ?
-					     IPU_ISYS_BUFFER_LIST_FL_SET_STATE :
-					     0), error ? VB2_BUF_STATE_ERROR :
+		ipu_isys_buffer_list_queue(bl,
+					   IPU_ISYS_BUFFER_LIST_FL_INCOMING |
+					   (error ?
+					    IPU_ISYS_BUFFER_LIST_FL_SET_STATE :
+					    0), error ? VB2_BUF_STATE_ERROR :
 					    VB2_BUF_STATE_QUEUED);
 	flush_firmware_streamon_fail(stream);
 
@@ -377,7 +330,7 @@ static void buf_queue(struct vb2_buffer *vb)
 	 * firmware since we could get a buffer event back before we
 	 * have queued them ourselves to the active queue.
 	 */
-	ipu7_isys_buffer_list_queue(&bl, IPU_ISYS_BUFFER_LIST_FL_ACTIVE, 0);
+	ipu_isys_buffer_list_queue(&bl, IPU_ISYS_BUFFER_LIST_FL_ACTIVE, 0);
 
 	ret = ipu7_fw_isys_complex_cmd(to_isys7(stream), stream->stream_handle,
 				       buf, msg->dma_addr, sizeof(*buf),

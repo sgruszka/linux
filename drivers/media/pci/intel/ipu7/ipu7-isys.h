@@ -139,6 +139,8 @@ struct isys_fw_msgs *ipu7_get_fw_msg_buf(struct ipu_isys_stream *stream);
 void ipu7_put_fw_msg_buf(struct ipu7_isys *isys, uintptr_t data);
 void ipu7_cleanup_fw_msg_bufs(struct ipu7_isys *isys);
 
+void ipu7_isys_setup_pfmts(struct ipu7_isys *isys);
+
 extern const struct v4l2_ioctl_ops ipu7_isys_ioctl_ops;
 
 int isys_isr_one(struct ipu_bus_device *adev);

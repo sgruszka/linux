@@ -95,6 +95,12 @@ const struct ipu_isys_pixelformat ipu7_isys_pfmts[] = {
 	  IPU_INSYS_FRAME_FORMAT_RAW16, true },
 };
 
+void ipu7_isys_setup_pfmts(struct ipu7_isys *isys)
+{
+	isys->ipu.pfmts = ipu7_isys_pfmts;
+	isys->ipu.num_pfmts = ARRAY_SIZE(ipu7_isys_pfmts);
+}
+
 static int video_open(struct file *file)
 {
 	struct ipu_isys_video *av = video_drvdata(file);
@@ -110,33 +116,6 @@ static int video_open(struct file *file)
 	mutex_unlock(&isys->mutex);
 
 	return v4l2_fh_open(file);
-}
-
-const struct ipu_isys_pixelformat *
-ipu7_isys_get_isys_format(u32 pixelformat, u32 type)
-{
-	const struct ipu_isys_pixelformat *default_pfmt = NULL;
-	unsigned int i;
-
-	for (i = 0; i < ARRAY_SIZE(ipu7_isys_pfmts); i++) {
-		const struct ipu_isys_pixelformat *pfmt = &ipu7_isys_pfmts[i];
-
-		if (type && ((!pfmt->is_meta &&
-			      type != V4L2_BUF_TYPE_VIDEO_CAPTURE) ||
-			     (pfmt->is_meta &&
-			      type != V4L2_BUF_TYPE_META_CAPTURE)))
-			continue;
-
-		if (!default_pfmt)
-			default_pfmt = pfmt;
-
-		if (pfmt->pixelformat != pixelformat)
-			continue;
-
-		return pfmt;
-	}
-
-	return default_pfmt;
 }
 
 static int ipu7_isys_vidioc_querycap(struct file *file, void *fh,
@@ -223,7 +202,7 @@ static void ipu7_isys_try_fmt_cap(struct ipu_isys_video *av, u32 type,
 				  u32 *bytesperline, u32 *sizeimage)
 {
 	const struct ipu_isys_pixelformat *pfmt =
-		ipu7_isys_get_isys_format(*format, type);
+		ipu_isys_get_isys_format(to_isys(av), *format, type);
 
 	*format = pfmt->pixelformat;
 	*width = clamp(*width, IPU_ISYS_MIN_WIDTH, IPU_ISYS_MAX_WIDTH);
@@ -364,7 +343,7 @@ static int link_validate(struct media_link *link)
 	struct v4l2_mbus_framefmt *s_fmt;
 	struct v4l2_subdev *s_sd;
 	struct media_pad *s_pad;
-	u32 s_stream, code;
+	u32 s_stream, code, data_fmt;
 	int ret = -EPIPE;
 
 	if (!link->source->entity)
@@ -390,7 +369,8 @@ static int link_validate(struct media_link *link)
 		goto unlock;
 	}
 
-	code = ipu7_isys_get_isys_format(ipu_isys_get_format(av), 0)->code;
+	data_fmt = ipu_isys_get_format(av);
+	code = ipu_isys_get_isys_format(to_isys(av), data_fmt, 0)->code;
 
 	if (s_fmt->width != ipu_isys_get_frame_width(av) ||
 	    s_fmt->height != ipu_isys_get_frame_height(av) ||
@@ -444,7 +424,7 @@ static int ipu7_isys_fw_pin_cfg(struct ipu_isys_video *av,
 	struct v4l2_subdev *sd = media_entity_to_v4l2_subdev(src_pad->entity);
 	struct ipu_isys_stream *stream = av->stream;
 	const struct ipu_isys_pixelformat *pfmt =
-		ipu7_isys_get_isys_format(ipu_isys_get_format(av), 0);
+		ipu_isys_get_isys_format(to_isys(av), ipu_isys_get_format(av), 0);
 	struct ipu7_insys_output_pin *output_pin;
 	struct ipu7_insys_input_pin *input_pin;
 	int input_pins = cfg->nof_input_pins++;
@@ -1043,7 +1023,7 @@ int ipu7_isys_setup_video(struct ipu_isys_video *av,
 			  struct media_entity **source_entity, int *nr_queues)
 {
 	const struct ipu_isys_pixelformat *pfmt =
-		ipu7_isys_get_isys_format(ipu_isys_get_format(av), 0);
+		ipu_isys_get_isys_format(to_isys(av), ipu_isys_get_format(av), 0);
 	struct device *dev = isys_to_dev(to_isys7(av));
 	struct media_pad *source_pad, *remote_pad;
 	struct v4l2_mbus_frame_desc_entry entry;

@@ -753,6 +753,7 @@ static int isys_probe(struct auxiliary_device *auxdev,
 	isys->icache_prefetch = 0;
 	isys->phy_rext_cal = 0;
 
+	ipu7_isys_setup_pfmts(isys);
 	isys_stream_init(isys);
 
 	cpu_latency_qos_add_request(&isys->pm_qos, PM_QOS_DEFAULT_VALUE);

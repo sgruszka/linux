@@ -23,8 +23,6 @@
 
 extern const struct ipu_isys_pixelformat ipu7_isys_pfmts[];
 
-const struct ipu_isys_pixelformat *
-ipu7_isys_get_isys_format(u32 pixelformat, u32 code);
 int ipu7_isys_video_prepare_stream(struct ipu_isys_video *av,
 				   struct media_entity *source_entity,
 				   int nr_queues);

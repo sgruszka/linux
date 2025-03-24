@@ -54,51 +54,6 @@ static void ipu6_isys_buf_cleanup(struct vb2_buffer *vb)
 	ipu6_dma_unmap_sgtable(isys->ipu.adev, sg, DMA_TO_DEVICE, 0);
 }
 
-/*
- * Attempt obtaining a buffer list from the incoming queues, a list of buffers
- * that contains one entry from each video buffer queue. If a buffer can't be
- * obtained from every queue, the buffers are returned back to the queue.
- */
-static int buffer_list_get(struct ipu_isys_stream *stream,
-			   struct ipu_isys_buffer_list *bl)
-{
-	struct device *dev = isys_to_dev(stream->isys);
-	struct ipu_isys_queue *aq;
-	unsigned long flags;
-	unsigned long buf_flag = IPU_ISYS_BUFFER_LIST_FL_INCOMING;
-
-	bl->nbufs = 0;
-	INIT_LIST_HEAD(&bl->head);
-
-	list_for_each_entry(aq, &stream->queues, node) {
-		struct ipu_isys_buffer *ib;
-
-		spin_lock_irqsave(&aq->lock, flags);
-		if (list_empty(&aq->incoming)) {
-			spin_unlock_irqrestore(&aq->lock, flags);
-			if (!list_empty(&bl->head))
-				ipu_isys_buffer_list_queue(bl, buf_flag, 0);
-			return -ENODATA;
-		}
-
-		ib = list_last_entry(&aq->incoming,
-				     struct ipu_isys_buffer, head);
-
-		dev_dbg(dev, "buffer: %s: buffer %u\n",
-			ipu_isys_queue_to_video(aq)->vdev.name,
-			ipu_isys_buffer_to_vb2_buffer(ib)->index);
-		list_del(&ib->head);
-		list_add(&ib->head, &bl->head);
-		spin_unlock_irqrestore(&aq->lock, flags);
-
-		bl->nbufs++;
-	}
-
-	dev_dbg(dev, "get buffer list %p, %u buffers\n", bl, bl->nbufs);
-
-	return 0;
-}
-
 static void
 ipu6_isys_buf_to_fw_frame_buf_pin(struct vb2_buffer *vb,
 				  struct ipu6_fw_isys_frame_buff_set_abi *set)
@@ -116,7 +71,8 @@ ipu6_isys_buf_to_fw_frame_buf_pin(struct vb2_buffer *vb,
  * Convert a buffer list to a isys fw ABI framebuffer set. The
  * buffer list is not modified.
  */
-#define IPU6_ISYS_FRAME_NUM_THRESHOLD  (30)
+#define IPU6_ISYS_FRAME_NUM_THRESHOLD  30
+
 void
 ipu6_isys_buf_to_fw_frame_buf(struct ipu6_fw_isys_frame_buff_set_abi *set,
 			      struct ipu_isys_stream *stream,
@@ -176,7 +132,7 @@ static int ipu6_isys_stream_start(struct ipu6_isys_video *av6,
 		struct isys_fw_msgs *msg;
 		u16 send_type = IPU6_FW_ISYS_SEND_TYPE_STREAM_CAPTURE;
 
-		ret = buffer_list_get(stream, bl);
+		ret = ipu_buffer_list_get(stream, bl);
 		if (ret < 0)
 			break;
 
@@ -258,7 +214,7 @@ static void buf_queue(struct vb2_buffer *vb)
 	 * (above). Let's see whether all queues in the pipeline would
 	 * have a buffer.
 	 */
-	ret = buffer_list_get(stream, &bl);
+	ret = ipu_buffer_list_get(stream, &bl);
 	if (ret < 0) {
 		dev_dbg(dev, "No buffers available\n");
 		goto out;
@@ -460,7 +416,7 @@ static int start_streaming(struct vb2_queue *q, unsigned int count)
 		goto out;
 
 	bl = &__bl;
-	ret = buffer_list_get(stream, bl);
+	ret = ipu_buffer_list_get(stream, bl);
 	if (ret < 0) {
 		dev_warn(dev, "no buffer available, DRIVER BUG?\n");
 		goto out;

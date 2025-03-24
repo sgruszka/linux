@@ -323,4 +323,6 @@ void ipu_isys_buffer_list_queue(struct ipu_isys_buffer_list *bl,
 				unsigned long op_flags,
 				enum vb2_buffer_state state);
 void ipu_flush_firmware_streamon_fail(struct ipu_isys_stream *stream);
+int ipu_buffer_list_get(struct ipu_isys_stream *stream,
+			struct ipu_isys_buffer_list *bl);
 #endif

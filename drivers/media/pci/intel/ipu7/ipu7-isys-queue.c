@@ -57,56 +57,6 @@ static void ipu7_isys_buf_cleanup(struct vb2_buffer *vb)
 	ipu7_dma_unmap_sgtable(isys->ipu.adev, sg, DMA_TO_DEVICE, 0);
 }
 
-/*
- * Queue a buffer list back to incoming or active queues. The buffers
- * are removed from the buffer list.
- */
-
-/*
- * Attempt obtaining a buffer list from the incoming queues, a list of buffers
- * that contains one entry from each video buffer queue. If a buffer can't be
- * obtained from every queue, the buffers are returned back to the queue.
- */
-static int buffer_list_get(struct ipu_isys_stream *stream,
-			   struct ipu_isys_buffer_list *bl)
-{
-	unsigned long buf_flag = IPU_ISYS_BUFFER_LIST_FL_INCOMING;
-	struct device *dev = isys_to_dev(to_isys7(stream));
-	struct ipu_isys_queue *aq;
-	unsigned long flags;
-
-	bl->nbufs = 0;
-	INIT_LIST_HEAD(&bl->head);
-
-	list_for_each_entry(aq, &stream->queues, node) {
-		struct ipu_isys_buffer *ib;
-
-		spin_lock_irqsave(&aq->lock, flags);
-		if (list_empty(&aq->incoming)) {
-			spin_unlock_irqrestore(&aq->lock, flags);
-			if (!list_empty(&bl->head))
-				ipu_isys_buffer_list_queue(bl, buf_flag, 0);
-			return -ENODATA;
-		}
-
-		ib = list_last_entry(&aq->incoming,
-				     struct ipu_isys_buffer, head);
-
-		dev_dbg(dev, "buffer: %s: buffer %u\n",
-			ipu_isys_queue_to_video(aq)->vdev.name,
-			ipu_isys_buffer_to_vb2_buffer(ib)->index);
-		list_del(&ib->head);
-		list_add(&ib->head, &bl->head);
-		spin_unlock_irqrestore(&aq->lock, flags);
-
-		bl->nbufs++;
-	}
-
-	dev_dbg(dev, "get buffer list %p, %u buffers\n", bl, bl->nbufs);
-
-	return 0;
-}
-
 static void ipu7_isys_buf_to_fw_frame_buf_pin(struct vb2_buffer *vb,
 					      struct ipu7_insys_buffset *set)
 {
@@ -123,7 +73,6 @@ static void ipu7_isys_buf_to_fw_frame_buf_pin(struct vb2_buffer *vb,
  * Convert a buffer list to a isys fw ABI framebuffer set. The
  * buffer list is not modified.
  */
-#define IPU_ISYS_FRAME_NUM_THRESHOLD	(30)
 void ipu7_isys_buffer_to_fw_frame_buff(struct ipu7_insys_buffset *set,
 				       struct ipu_isys_stream *stream,
 				       struct ipu_isys_buffer_list *bl)
@@ -173,7 +122,7 @@ static int ipu7_isys_stream_start(struct ipu_isys_video *av,
 		enum ipu7_insys_send_type send_type =
 			IPU_INSYS_SEND_TYPE_STREAM_CAPTURE;
 
-		ret = buffer_list_get(stream, bl);
+		ret = ipu_buffer_list_get(stream, bl);
 		if (ret < 0)
 			break;
 
@@ -257,7 +206,7 @@ static void buf_queue(struct vb2_buffer *vb)
 	 * (above). Let's see whether all queues in the pipeline would
 	 * have a buffer.
 	 */
-	ret = buffer_list_get(stream, &bl);
+	ret = ipu_buffer_list_get(stream, &bl);
 	if (ret < 0) {
 		dev_dbg(dev, "No buffers available\n");
 		goto out;
@@ -452,7 +401,7 @@ static int start_streaming(struct vb2_queue *q, unsigned int count)
 		goto out;
 
 	bl = &__bl;
-	ret = buffer_list_get(stream, bl);
+	ret = ipu_buffer_list_get(stream, bl);
 	if (ret < 0) {
 		dev_warn(dev, "no buffer available, DRIVER BUG?\n");
 		goto out;

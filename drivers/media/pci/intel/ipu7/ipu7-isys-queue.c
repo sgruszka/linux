@@ -203,7 +203,7 @@ static int buffer_list_get(struct ipu7_isys_stream *stream,
 			   struct ipu_isys_buffer_list *bl)
 {
 	unsigned long buf_flag = IPU_ISYS_BUFFER_LIST_FL_INCOMING;
-	struct device *dev = isys_to_dev(stream->isys);
+	struct device *dev = isys_to_dev(to_isys7(stream));
 	struct ipu_isys_queue *aq;
 	unsigned long flags;
 
@@ -284,7 +284,7 @@ static int ipu7_isys_stream_start(struct ipu7_isys_video *av,
 				  struct ipu_isys_buffer_list *bl, bool error)
 {
 	struct ipu7_isys_stream *stream = av->stream;
-	struct device *dev = isys_to_dev(stream->isys);
+	struct device *dev = isys_to_dev(to_isys7(stream));
 	struct ipu_isys_buffer_list __bl;
 	int ret;
 
@@ -651,7 +651,7 @@ get_sof_sequence_by_timestamp(struct ipu7_isys_stream *stream,
 			      struct ipu7_insys_resp *info)
 {
 	u64 time = (u64)info->timestamp[1] << 32 | info->timestamp[0];
-	struct ipu7_isys *isys = stream->isys;
+	struct ipu7_isys *isys = to_isys7(stream);
 	struct device *dev = isys_to_dev(isys);
 	unsigned int i;
 
@@ -738,7 +738,7 @@ void ipu7_isys_queue_buf_ready(struct ipu7_isys_stream *stream,
 			       struct ipu7_insys_resp *info)
 {
 	struct ipu_isys_queue *aq = stream->output_pins[info->pin_id].aq;
-	struct ipu7_isys *isys = stream->isys;
+	struct ipu7_isys *isys = to_isys7(stream);
 	struct device *dev = isys_to_dev(isys);
 	struct ipu_isys_buffer *ib;
 	struct vb2_buffer *vb;

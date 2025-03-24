@@ -146,12 +146,20 @@ struct sensor_async_sd {
 	struct ipu7_isys_csi2_config csi2;
 };
 
-static inline struct device *isys_to_dev(struct ipu7_isys *isys)
+static inline struct device *ipu_isys_to_dev(struct ipu_isys *isys)
+{
+	return &isys->adev->auxdev.dev;
+}
+
+static inline struct device *ipu7_isys_to_dev(struct ipu7_isys *isys)
 {
 	return &isys->ipu.adev->auxdev.dev;
 }
 
-struct isys_fw_msgs *ipu7_get_fw_msg_buf(struct ipu_isys_stream *stream);
+#define isys_to_dev(p)                                  \
+	_Generic(p,                                     \
+		struct ipu_isys *: ipu_isys_to_dev, \
+		struct ipu7_isys *: ipu7_isys_to_dev)(p)
 void ipu7_put_fw_msg_buf(struct ipu7_isys *isys, uintptr_t data);
 void ipu7_cleanup_fw_msg_bufs(struct ipu7_isys *isys);
 

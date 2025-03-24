@@ -34,9 +34,6 @@ struct ipu6_isys_video  {
 	u32 source_stream;
 };
 
-#define ipu_isys_queue_to_video(__aq) \
-	container_of(__aq, struct ipu_isys_video, aq)
-
 extern const struct ipu_isys_pixelformat ipu6_isys_pfmts[];
 extern const struct ipu_isys_pixelformat ipu6_isys_pfmts_packed[];
 

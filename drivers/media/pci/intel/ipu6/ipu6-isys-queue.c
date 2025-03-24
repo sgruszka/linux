@@ -811,8 +811,6 @@ void ipu6_isys_queue_buf_ready(struct ipu_isys_stream *stream, void *_info)
 
 static const struct vb2_ops ipu6_isys_queue_ops = {
 	.queue_setup = ipu6_isys_queue_setup,
-	.wait_prepare = vb2_ops_wait_prepare,
-	.wait_finish = vb2_ops_wait_finish,
 	.buf_init = ipu6_isys_buf_init,
 	.buf_prepare = ipu6_isys_buf_prepare,
 	.buf_cleanup = ipu6_isys_buf_cleanup,
@@ -825,13 +823,14 @@ int ipu6_isys_queue_init(struct ipu_isys_queue *aq)
 {
 	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
 	struct ipu_bus_device *adev = to_isys6(av)->ipu.adev;
+	struct ipu_isys *isys = to_isys(av);
 	int ret;
 
 	/* no support for userptr */
 	if (!aq->vbq.io_modes)
 		aq->vbq.io_modes = VB2_MMAP | VB2_DMABUF;
 
-	aq->vbq.drv_priv = to_isys6(av);
+	aq->vbq.drv_priv = isys;
 	aq->vbq.ops = &ipu6_isys_queue_ops;
 	aq->vbq.lock = &av->mutex;
 	aq->vbq.mem_ops = &vb2_dma_sg_memops;

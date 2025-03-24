@@ -6,7 +6,10 @@
 
 #include <media/videobuf2-v4l2.h>
 #include <media/v4l2-ctrls.h>
+#include <media/v4l2-device.h>
 #include <media/v4l2-subdev.h>
+
+#include "ipu.h"
 
 struct ipu_isys_queue {
 	struct vb2_queue vbq;
@@ -63,6 +66,47 @@ struct ipu_isys_subdev {
 };
 
 #define to_ipu_isys_subdev(__sd) container_of(__sd, struct ipu_isys_subdev, sd)
+
+/*
+ * struct ipu_isys
+ *
+ * @media_dev: Media device
+ * @v4l2_dev: V4L2 device
+ * @adev: ISYS bus device
+ */
+
+struct ipu_isys {
+	struct media_device media_dev;
+	struct v4l2_device v4l2_dev;
+	struct ipu_bus_device *adev;
+};
+
+struct ipu6_isys;
+struct ipu7_isys;
+
+static inline struct device *ipu_isys_to_dev(struct ipu_isys *isys)
+{
+	return &isys->adev->auxdev.dev;
+}
+
+static inline struct device *ipu6_isys_to_dev(struct ipu6_isys *isys)
+{
+	return &((struct ipu_isys *)isys)->adev->auxdev.dev;
+}
+
+static inline struct device *ipu7_isys_to_dev(struct ipu7_isys *isys)
+{
+	return &((struct ipu_isys *)isys)->adev->auxdev.dev;
+}
+
+
+#define isys_to_dev(_isys) \
+	_Generic(_isys, \
+		 struct ipu_isys *  : ipu_isys_to_dev,  \
+		 struct ipu6_isys * : ipu6_isys_to_dev, \
+		 struct ipu7_isys * : ipu7_isys_to_dev  \
+	) (_isys)
+
 
 #define IPU6_ISYS_MIN_WIDTH	2U
 #define IPU6_ISYS_MIN_HEIGHT	2U
@@ -141,6 +185,9 @@ struct ipu_isys_video {
 	struct ipu_isys *isys;
 };
 
+#define ipu_isys_queue_to_video(__aq) \
+	container_of(__aq, struct ipu_isys_video, aq)
+
 static inline struct ipu_isys *ipu_stream_to_isys(struct ipu_isys_stream *stream)
 {
 	return stream->isys;
@@ -154,7 +201,7 @@ static inline struct ipu_isys *ipu_video_to_isys(struct ipu_isys_video *video)
 #define to_isys(p)                                            \
 	_Generic(p,                                           \
 		struct ipu_isys_stream *: ipu_stream_to_isys, \
-		struct ipu_isys_video *: video_to_isys)(_isys)
+		struct ipu_isys_video *: ipu_video_to_isys)(p)
 
 static inline struct ipu6_isys * ipu_stream_to_isys6(struct ipu_isys_stream *stream)
 {
@@ -267,5 +314,7 @@ static inline u32 ipu_isys_get_frame_height(struct ipu_isys_video *av)
 
 	return 0;
 }
+
+int ipu_isys_buf_prepare(struct vb2_buffer *vb);
 
 #endif

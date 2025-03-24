@@ -56,18 +56,6 @@ struct isys_fw_log {
 	u32 count; /* running counter of log */
 	u32 size; /* actual size of log content, in bits */
 };
-/*
- * struct ipu_isys
- *
- * @media_dev: Media device
- * @v4l2_dev: V4L2 device
- * @adev: ISYS bus device
- */
-struct ipu_isys {
-	struct media_device media_dev;
-	struct v4l2_device v4l2_dev;
-	struct ipu_bus_device *adev;
-};
 
 /*
  * struct ipu7_isys
@@ -146,20 +134,6 @@ struct sensor_async_sd {
 	struct ipu7_isys_csi2_config csi2;
 };
 
-static inline struct device *ipu_isys_to_dev(struct ipu_isys *isys)
-{
-	return &isys->adev->auxdev.dev;
-}
-
-static inline struct device *ipu7_isys_to_dev(struct ipu7_isys *isys)
-{
-	return &isys->ipu.adev->auxdev.dev;
-}
-
-#define isys_to_dev(p)                                  \
-	_Generic(p,                                     \
-		struct ipu_isys *: ipu_isys_to_dev, \
-		struct ipu7_isys *: ipu7_isys_to_dev)(p)
 
 struct isys_fw_msgs *ipu7_get_fw_msg_buf(struct ipu_isys_stream *stream);
 void ipu7_put_fw_msg_buf(struct ipu7_isys *isys, uintptr_t data);

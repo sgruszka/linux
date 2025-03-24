@@ -99,19 +99,6 @@ struct sensor_async_sd {
 	struct v4l2_async_connection asc;
 	struct ipu6_isys_csi2_config csi2;
 };
-/*
- * struct ipu_isys
- *
- * @media_dev: Media device
- * @v4l2_dev: V4L2 device
- * @adev: ISYS bus device
- */
-
-struct ipu_isys {
-	struct media_device media_dev;
-	struct v4l2_device v4l2_dev;
-	struct ipu_bus_device *adev;
-};
 
 /*
  * struct ipu6_isys
@@ -184,22 +171,6 @@ struct isys_fw_msgs {
 	struct list_head head;
 	dma_addr_t dma_addr;
 };
-
-static inline struct device *ipu_isys_to_dev(struct ipu_isys *isys)
-{
- 	return &isys->adev->auxdev.dev;
-}
-
-static inline struct device *ipu6_isys_to_dev(struct ipu6_isys *isys)
-{
- 	return &isys->ipu.adev->auxdev.dev;
-}
-
-#define isys_to_dev(_isys) \
-	_Generic(_isys, \
-		 struct ipu_isys *  : ipu_isys_to_dev,  \
-		 struct ipu6_isys * : ipu6_isys_to_dev  \
-	) (_isys)
 
 struct isys_fw_msgs *ipu6_get_fw_msg_buf(struct ipu_isys_stream *stream);
 void ipu6_put_fw_msg_buf(struct ipu6_isys *isys, uintptr_t data);

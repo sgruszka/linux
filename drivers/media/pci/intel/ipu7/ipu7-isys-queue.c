@@ -62,9 +62,9 @@ static int ipu7_isys_queue_setup(struct vb2_queue *q, unsigned int *num_buffers,
 				 struct device *alloc_devs[])
 {
 	struct ipu_isys_queue *aq = vb2_queue_to_isys_queue(q);
-	struct ipu7_isys_video *av = ipu7_isys_queue_to_video(aq);
+	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
 	struct device *dev = isys_to_dev(to_isys7(av));
-	u32 size = ipu7_isys_get_data_size(av);
+	u32 size = ipu_isys_get_data_size(av);
 
 	/* num_planes == 0: we're being called through VIDIOC_REQBUFS */
 	if (!*num_planes) {
@@ -83,11 +83,11 @@ static int ipu7_isys_queue_setup(struct vb2_queue *q, unsigned int *num_buffers,
 static int ipu7_isys_buf_prepare(struct vb2_buffer *vb)
 {
 	struct ipu_isys_queue *aq = vb2_queue_to_isys_queue(vb->vb2_queue);
-	struct ipu7_isys_video *av = ipu7_isys_queue_to_video(aq);
+	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
 	struct device *dev = isys_to_dev(to_isys7(av));
-	u32 bytesperline = ipu7_isys_get_bytes_per_line(av);
-	u32 height = ipu7_isys_get_frame_height(av);
-	u32 size = ipu7_isys_get_data_size(av);
+	u32 bytesperline = ipu_isys_get_bytes_per_line(av);
+	u32 height = ipu_isys_get_frame_height(av);
+	u32 size = ipu_isys_get_data_size(av);
 
 	dev_dbg(dev, "buffer: %s: configured size %u, buffer size %lu\n",
 		av->vdev.name, size, vb2_plane_size(vb, 0));
@@ -122,13 +122,13 @@ void ipu7_isys_buffer_list_queue(struct ipu_isys_buffer_list *bl,
 		     op_flags & IPU_ISYS_BUFFER_LIST_FL_INCOMING);
 
 	list_for_each_entry_safe(ib, ib_safe, &bl->head, head) {
-		struct ipu7_isys_video *av;
+		struct ipu_isys_video *av;
 
 		struct vb2_buffer *vb = ipu_isys_buffer_to_vb2_buffer(ib);
 		struct ipu_isys_queue *aq =
 			vb2_queue_to_isys_queue(vb->vb2_queue);
 
-		av = ipu7_isys_queue_to_video(aq);
+		av = ipu_isys_queue_to_video(aq);
 		spin_lock_irqsave(&aq->lock, flags);
 		list_del(&ib->head);
 		if (op_flags & IPU_ISYS_BUFFER_LIST_FL_ACTIVE)
@@ -166,7 +166,7 @@ static void flush_firmware_streamon_fail(struct ipu_isys_stream *stream)
 	lockdep_assert_held(&stream->mutex);
 
 	list_for_each_entry(aq, &stream->queues, node) {
-		struct ipu7_isys_video *av = ipu7_isys_queue_to_video(aq);
+		struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
 		struct device *dev = isys_to_dev(to_isys7(av));
 		struct ipu_isys_buffer *ib, *ib_safe;
 
@@ -225,7 +225,7 @@ static int buffer_list_get(struct ipu_isys_stream *stream,
 				     struct ipu_isys_buffer, head);
 
 		dev_dbg(dev, "buffer: %s: buffer %u\n",
-			ipu7_isys_queue_to_video(aq)->vdev.name,
+			ipu_isys_queue_to_video(aq)->vdev.name,
 			ipu_isys_buffer_to_vb2_buffer(ib)->index);
 		list_del(&ib->head);
 		list_add(&ib->head, &bl->head);
@@ -281,7 +281,7 @@ void ipu7_isys_buffer_to_fw_frame_buff(struct ipu7_insys_buffset *set,
 }
 
 /* Start streaming for real. The buffer list must be available. */
-static int ipu7_isys_stream_start(struct ipu7_isys_video *av,
+static int ipu7_isys_stream_start(struct ipu_isys_video *av,
 				  struct ipu_isys_buffer_list *bl, bool error)
 {
 	struct ipu_isys_stream *stream = av->stream;
@@ -348,7 +348,7 @@ out_requeue:
 static void buf_queue(struct vb2_buffer *vb)
 {
 	struct ipu_isys_queue *aq = vb2_queue_to_isys_queue(vb->vb2_queue);
-	struct ipu7_isys_video *av = ipu7_isys_queue_to_video(aq);
+	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
 	struct vb2_v4l2_buffer *vvb = to_vb2_v4l2_buffer(vb);
 	struct ipu_isys_video_buffer *ivb =
 		vb2_buffer_to_ipu_isys_video_buffer(vvb);
@@ -436,7 +436,7 @@ out:
 
 static int ipu7_isys_link_fmt_validate(struct ipu_isys_queue *aq)
 {
-	struct ipu7_isys_video *av = ipu7_isys_queue_to_video(aq);
+	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
 	struct device *dev = isys_to_dev(to_isys7(av));
 	struct media_pad *remote_pad =
 		media_pad_remote_pad_first(av->vdev.entity.pads);
@@ -459,16 +459,16 @@ static int ipu7_isys_link_fmt_validate(struct ipu_isys_queue *aq)
 		return ret;
 	}
 
-	if (format.width != ipu7_isys_get_frame_width(av) ||
-	    format.height != ipu7_isys_get_frame_height(av)) {
+	if (format.width != ipu_isys_get_frame_width(av) ||
+	    format.height != ipu_isys_get_frame_height(av)) {
 		dev_err(dev, "wrong width or height %ux%u (%ux%u expected)\n",
-			ipu7_isys_get_frame_width(av),
-			ipu7_isys_get_frame_height(av), format.width,
+			ipu_isys_get_frame_width(av),
+			ipu_isys_get_frame_height(av), format.width,
 			format.height);
 		return -EINVAL;
 	}
 
-	code = ipu7_isys_get_isys_format(ipu7_isys_get_format(av), 0)->code;
+	code = ipu7_isys_get_isys_format(ipu_isys_get_format(av), 0)->code;
 	if (format.code != code) {
 		dev_dbg(dev, "wrong mbus code 0x%8.8x (0x%8.8x expected)\n",
 			code, format.code);
@@ -481,7 +481,7 @@ static int ipu7_isys_link_fmt_validate(struct ipu_isys_queue *aq)
 static void return_buffers(struct ipu_isys_queue *aq,
 			   enum vb2_buffer_state state)
 {
-	struct ipu7_isys_video *av = ipu7_isys_queue_to_video(aq);
+	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
 	struct ipu_isys_buffer *ib;
 	bool need_reset = false;
 	struct vb2_buffer *vb;
@@ -528,7 +528,7 @@ static void return_buffers(struct ipu_isys_queue *aq,
 	}
 }
 
-static void ipu7_isys_stream_cleanup(struct ipu7_isys_video *av)
+static void ipu7_isys_stream_cleanup(struct ipu_isys_video *av)
 {
 	video_device_pipeline_stop(&av->vdev);
 	ipu7_isys_put_stream(av->stream);
@@ -538,18 +538,18 @@ static void ipu7_isys_stream_cleanup(struct ipu7_isys_video *av)
 static int start_streaming(struct vb2_queue *q, unsigned int count)
 {
 	struct ipu_isys_queue *aq = vb2_queue_to_isys_queue(q);
-	struct ipu7_isys_video *av = ipu7_isys_queue_to_video(aq);
+	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
 	struct device *dev = isys_to_dev(to_isys7(av));
 	const struct ipu_isys_pixelformat *pfmt =
-		ipu7_isys_get_isys_format(ipu7_isys_get_format(av), 0);
+		ipu7_isys_get_isys_format(ipu_isys_get_format(av), 0);
 	struct ipu_isys_buffer_list __bl, *bl = NULL;
 	struct ipu_isys_stream *stream;
 	struct media_entity *source_entity = NULL;
 	int nr_queues, ret;
 
 	dev_dbg(dev, "stream: %s: width %u, height %u, css pixelformat %u\n",
-		av->vdev.name, ipu7_isys_get_frame_width(av),
-		ipu7_isys_get_frame_height(av), pfmt->css_pixelformat);
+		av->vdev.name, ipu_isys_get_frame_width(av),
+		ipu_isys_get_frame_height(av), pfmt->css_pixelformat);
 
 	ret = ipu7_isys_setup_video(av, &source_entity, &nr_queues);
 	if (ret < 0) {
@@ -625,7 +625,7 @@ out_return_buffers:
 static void stop_streaming(struct vb2_queue *q)
 {
 	struct ipu_isys_queue *aq = vb2_queue_to_isys_queue(q);
-	struct ipu7_isys_video *av = ipu7_isys_queue_to_video(aq);
+	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
 	struct ipu_isys_stream *stream = av->stream;
 
 	mutex_lock(&stream->mutex);
@@ -679,7 +679,7 @@ get_sof_sequence_by_timestamp(struct ipu_isys_stream *stream,
 	return 0;
 }
 
-static u64 get_sof_ns_delta(struct ipu7_isys_video *av,
+static u64 get_sof_ns_delta(struct ipu_isys_video *av,
 			    struct ipu7_insys_resp *info)
 {
 	struct ipu_bus_device *adev = to_isys7(av)->ipu.adev;
@@ -701,7 +701,7 @@ void ipu7_isys_buf_calc_sequence_time(struct ipu_isys_buffer *ib,
 	struct vb2_buffer *vb = ipu_isys_buffer_to_vb2_buffer(ib);
 	struct vb2_v4l2_buffer *vbuf = to_vb2_v4l2_buffer(vb);
 	struct ipu_isys_queue *aq = vb2_queue_to_isys_queue(vb->vb2_queue);
-	struct ipu7_isys_video *av = ipu7_isys_queue_to_video(aq);
+	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
 	struct device *dev = isys_to_dev(to_isys7(av));
 	struct ipu_isys_stream *stream = av->stream;
 	u64 ns;
@@ -748,7 +748,7 @@ void ipu7_isys_queue_buf_ready(struct ipu_isys_stream *stream, void *_info)
 	struct vb2_v4l2_buffer *buf;
 
 	dev_dbg(dev, "buffer: %s: received buffer %8.8x %d\n",
-		ipu7_isys_queue_to_video(aq)->vdev.name, info->pin.addr,
+		ipu_isys_queue_to_video(aq)->vdev.name, info->pin.addr,
 		info->frame_id);
 
 	spin_lock_irqsave(&aq->lock, flags);
@@ -809,8 +809,8 @@ static const struct vb2_ops ipu7_isys_queue_ops = {
 
 int ipu7_isys_queue_init(struct ipu_isys_queue *aq)
 {
-	struct ipu_isys *isys = ipu7_isys_queue_to_video(aq)->isys;
-	struct ipu7_isys_video *av = ipu7_isys_queue_to_video(aq);
+	struct ipu_isys *isys = ipu_isys_queue_to_video(aq)->isys;
+	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
 	struct ipu_bus_device *adev = isys->adev;
 	int ret;
 

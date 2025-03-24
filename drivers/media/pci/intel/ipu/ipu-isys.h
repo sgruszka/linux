@@ -170,31 +170,7 @@ static inline struct ipu6_isys *ipu_video_to_isys6(struct ipu_isys_video *video)
 	_Generic(p,                                            \
 		struct ipu_isys_stream *: ipu_stream_to_isys6, \
 		struct ipu_isys_video *: ipu_video_to_isys6)(p)
-/*TEMPORARY */
-/*
- * Align with firmware stream. Each stream represents a CSI virtual channel.
- * May map to multiple video devices
- */
-struct ipu7_isys_video {
-	struct ipu_isys_queue aq;
-	/* Serialise access to other fields in the struct. */
-	struct mutex mutex;
-	struct media_pad pad;
-	struct video_device vdev;
-	struct v4l2_pix_format pix_fmt;
-	struct v4l2_meta_format meta_fmt;
 
-	struct ipu_isys *isys;
-	struct ipu_isys_stream *stream;
-	unsigned int streaming;
-	u8 vc;
-	u8 dt;
-};
-
-static inline struct ipu7_isys *to_isys7(struct ipu7_isys_video *iv)
-{
-	return (struct ipu7_isys *) iv->isys;
-}
 
 static inline struct ipu7_isys * ipu_stream_to_isys7(struct ipu_isys_stream *stream)
 {
@@ -206,15 +182,9 @@ static inline struct ipu7_isys *ipu_video_to_isys7(struct ipu_isys_video *video)
 	return (struct ipu7_isys *)video->isys;
 }
 
-static inline struct ipu7_isys *ipu7_video_to_isys7(struct ipu7_isys_video *video)
-{
-	return (struct ipu7_isys *)video->isys;
-}
-
 #define to_isys7(p)                                            \
 	_Generic(p,                                            \
 		struct ipu_isys_stream *: ipu_stream_to_isys7, \
-		struct ipu7_isys_video *: ipu7_video_to_isys7, \
 		struct ipu_isys_video *: ipu_video_to_isys7)(p)
 
 unsigned int ipu_isys_mbus_code_to_bpp(u32 code);

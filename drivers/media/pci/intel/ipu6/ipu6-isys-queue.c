@@ -54,48 +54,6 @@ static void ipu6_isys_buf_cleanup(struct vb2_buffer *vb)
 	ipu6_dma_unmap_sgtable(isys->ipu.adev, sg, DMA_TO_DEVICE, 0);
 }
 
-
-/*
- * flush_firmware_streamon_fail() - Flush in cases where requests may
- * have been queued to firmware and the *firmware streamon fails for a
- * reason or another.
- */
-static void flush_firmware_streamon_fail(struct ipu_isys_stream *stream)
-{
-	struct device *dev = isys_to_dev(stream->isys);
-	struct ipu_isys_queue *aq;
-	unsigned long flags;
-
-	lockdep_assert_held(&stream->mutex);
-
-	list_for_each_entry(aq, &stream->queues, node) {
-		struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
-		struct ipu_isys_buffer *ib, *ib_safe;
-
-		spin_lock_irqsave(&aq->lock, flags);
-		list_for_each_entry_safe(ib, ib_safe, &aq->active, head) {
-			struct vb2_buffer *vb =
-				ipu_isys_buffer_to_vb2_buffer(ib);
-
-			list_del(&ib->head);
-			if (av->streaming) {
-				dev_dbg(dev,
-					"%s: queue buffer %u back to incoming\n",
-					av->vdev.name, vb->index);
-				/* Queue already streaming, return to driver. */
-				list_add(&ib->head, &aq->incoming);
-				continue;
-			}
-			/* Queue not yet streaming, return to user. */
-			dev_dbg(dev, "%s: return %u back to videobuf2\n",
-				av->vdev.name, vb->index);
-			vb2_buffer_done(ipu_isys_buffer_to_vb2_buffer(ib),
-					VB2_BUF_STATE_QUEUED);
-		}
-		spin_unlock_irqrestore(&aq->lock, flags);
-	}
-}
-
 /*
  * Attempt obtaining a buffer list from the incoming queues, a list of buffers
  * that contains one entry from each video buffer queue. If a buffer can't be
@@ -248,7 +206,7 @@ out_requeue:
 					   IPU_ISYS_BUFFER_LIST_FL_SET_STATE :
 					    0), error ? VB2_BUF_STATE_ERROR :
 					   VB2_BUF_STATE_QUEUED);
-	flush_firmware_streamon_fail(stream);
+	ipu_flush_firmware_streamon_fail(stream);
 
 	return ret;
 }

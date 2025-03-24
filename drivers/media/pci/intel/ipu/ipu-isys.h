@@ -322,4 +322,5 @@ int ipu_isys_queue_setup(struct vb2_queue *q, unsigned int *num_buffers,
 void ipu_isys_buffer_list_queue(struct ipu_isys_buffer_list *bl,
 				unsigned long op_flags,
 				enum vb2_buffer_state state);
+void ipu_flush_firmware_streamon_fail(struct ipu_isys_stream *stream);
 #endif

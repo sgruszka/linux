@@ -79,6 +79,9 @@ struct ipu_isys {
 	struct media_device media_dev;
 	struct v4l2_device v4l2_dev;
 	struct ipu_bus_device *adev;
+
+	const struct ipu_isys_pixelformat *pfmts;
+	unsigned int num_pfmts;
 };
 
 struct ipu6_isys;
@@ -314,6 +317,8 @@ static inline u32 ipu_isys_get_frame_height(struct ipu_isys_video *av)
 
 	return 0;
 }
+const struct ipu_isys_pixelformat *
+ipu_isys_get_isys_format(struct ipu_isys *isys, u32 pixelformat, u32 type);
 
 int ipu_isys_buf_prepare(struct vb2_buffer *vb);
 int ipu_isys_queue_setup(struct vb2_queue *q, unsigned int *num_buffers,

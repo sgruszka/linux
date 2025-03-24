@@ -178,6 +178,7 @@ void ipu6_cleanup_fw_msg_bufs(struct ipu6_isys *isys);
 
 extern const struct v4l2_ioctl_ops ipu6_isys_ioctl_ops;
 
+void ipu6_isys_setup_pfmts(struct ipu6_isys *isys);
 void isys_setup_hw(struct ipu6_isys *isys);
 irqreturn_t isys_isr(struct ipu_bus_device *adev);
 void update_watermark_setting(struct ipu6_isys *isys);

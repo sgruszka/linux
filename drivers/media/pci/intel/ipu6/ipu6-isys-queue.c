@@ -263,7 +263,7 @@ static int ipu6_isys_link_fmt_validate(struct ipu_isys_queue *aq)
 	struct media_pad *remote_pad =
 		media_pad_remote_pad_first(av->vdev.entity.pads);
 	struct v4l2_subdev *sd;
-	u32 r_stream, code;
+	u32 r_stream, code, data_fmt;
 	int ret;
 
 	if (!remote_pad)
@@ -290,7 +290,8 @@ static int ipu6_isys_link_fmt_validate(struct ipu_isys_queue *aq)
 		return -EINVAL;
 	}
 
-	code = ipu6_isys_get_isys_format(ipu_isys_get_format(av), 0)->code;
+	data_fmt = ipu_isys_get_format(av);
+	code = ipu_isys_get_isys_format(av->isys, data_fmt, 0)->code;
 	if (format.code != code) {
 		dev_dbg(dev, "wrong mbus code 0x%8.8x (0x%8.8x expected)\n",
 			code, format.code);
@@ -367,7 +368,7 @@ static int start_streaming(struct vb2_queue *q, unsigned int count)
 	struct ipu6_isys_video *av6 = (struct ipu6_isys_video *) av;
 	struct device *dev = isys_to_dev(av->isys);
 	const struct ipu_isys_pixelformat *pfmt =
-		ipu6_isys_get_isys_format(ipu_isys_get_format(av), 0);
+		ipu_isys_get_isys_format(to_isys(av), ipu_isys_get_format(av), 0);
 	struct ipu_isys_buffer_list __bl, *bl = NULL;
 	struct ipu_isys_stream *stream;
 	struct media_entity *source_entity = NULL;

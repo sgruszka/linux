@@ -34,11 +34,9 @@ struct ipu6_isys_video  {
 	u32 source_stream;
 };
 
-extern const struct ipu_isys_pixelformat ipu6_isys_pfmts[];
-extern const struct ipu_isys_pixelformat ipu6_isys_pfmts_packed[];
+// extern const struct ipu_isys_pixelformat ipu6_isys_pfmts[];
+// extern const struct ipu_isys_pixelformat ipu6_isys_pfmts_packed[];
 
-const struct ipu_isys_pixelformat *
-ipu6_isys_get_isys_format(u32 pixelformat, u32 code);
 int ipu6_isys_video_prepare_stream(struct ipu_isys_video *av,
 				   struct media_entity *source_entity,
 				   int nr_queues);

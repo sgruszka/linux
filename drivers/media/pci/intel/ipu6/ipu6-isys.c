@@ -1094,6 +1094,8 @@ static int isys_probe(struct auxiliary_device *auxdev,
 	isys->line_align = IPU6_ISYS_2600_MEM_LINE_ALIGN;
 	isys->icache_prefetch = 0;
 
+	ipu6_isys_setup_pfmts(isys);
+
 	dev_set_drvdata(&auxdev->dev, isys);
 
 	isys_stream_init(isys);

@@ -4,6 +4,7 @@ intel-ipu-common-y := ipu-bus.o
 obj-$(CONFIG_VIDEO_INTEL_IPU_COMMON)	+= intel-ipu-common.o
 
 intel-ipu-isys-y := \
+	ipu-isys.o \
 	ipu-isys-subdev.o \
 	ipu-isys-queue.o
 

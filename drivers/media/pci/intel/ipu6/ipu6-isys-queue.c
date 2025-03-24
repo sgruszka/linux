@@ -117,9 +117,9 @@ static int ipu6_isys_stream_start(struct ipu6_isys_video *av6,
 	struct ipu_isys_buffer_list __bl;
 	int ret;
 
-	mutex_lock(&to_isys6(stream)->stream_mutex);
+	mutex_lock(&to_isys(stream)->stream_mutex);
 	ret = ipu6_isys_video_set_streaming(av6, 1, bl);
-	mutex_unlock(&to_isys6(stream)->stream_mutex);
+	mutex_unlock(&to_isys(stream)->stream_mutex);
 	if (ret)
 		goto out_requeue;
 
@@ -255,60 +255,6 @@ out:
 	mutex_unlock(&stream->mutex);
 }
 
-
-static void return_buffers(struct ipu_isys_queue *aq,
-			   enum vb2_buffer_state state)
-{
-	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
-	struct ipu_isys_buffer *ib;
-	bool need_reset = false;
-	unsigned long flags;
-
-	spin_lock_irqsave(&aq->lock, flags);
-	while (!list_empty(&aq->incoming)) {
-		struct vb2_buffer *vb;
-
-		ib = list_first_entry(&aq->incoming, struct ipu_isys_buffer,
-				      head);
-		vb = ipu_isys_buffer_to_vb2_buffer(ib);
-		list_del(&ib->head);
-		spin_unlock_irqrestore(&aq->lock, flags);
-
-		vb2_buffer_done(vb, state);
-
-		spin_lock_irqsave(&aq->lock, flags);
-	}
-
-	/*
-	 * Something went wrong (FW crash / HW hang / not all buffers
-	 * returned from isys) if there are still buffers queued in active
-	 * queue. We have to clean up places a bit.
-	 */
-	while (!list_empty(&aq->active)) {
-		struct vb2_buffer *vb;
-
-		ib = list_first_entry(&aq->active, struct ipu_isys_buffer,
-				      head);
-		vb = ipu_isys_buffer_to_vb2_buffer(ib);
-
-		list_del(&ib->head);
-		spin_unlock_irqrestore(&aq->lock, flags);
-
-		vb2_buffer_done(vb, state);
-
-		spin_lock_irqsave(&aq->lock, flags);
-		need_reset = true;
-	}
-
-	spin_unlock_irqrestore(&aq->lock, flags);
-
-	if (need_reset) {
-		mutex_lock(&to_isys6(av)->mutex);
-		to_isys6(av)->need_reset = true;
-		mutex_unlock(&to_isys6(av)->mutex);
-	}
-}
-
 static void ipu6_isys_stream_cleanup(struct ipu6_isys_video *av6)
 {
 	video_device_pipeline_stop(&av6->ipu.vdev);
@@ -400,7 +346,7 @@ out_pipeline_stop:
 	ipu6_isys_stream_cleanup(av6);
 
 out_return_buffers:
-	return_buffers(aq, VB2_BUF_STATE_QUEUED);
+	ipu_return_buffers(aq, VB2_BUF_STATE_QUEUED);
 
 	return ret;
 }
@@ -416,10 +362,10 @@ static void stop_streaming(struct vb2_queue *q)
 
 	ipu6_isys_update_stream_watermark(av6, false);
 
-	mutex_lock(&to_isys6(av)->stream_mutex);
+	mutex_lock(&to_isys(av)->stream_mutex);
 	if (stream->nr_streaming == stream->nr_queues && stream->streaming)
 		ipu6_isys_video_set_streaming(av6, 0, NULL);
-	mutex_unlock(&to_isys6(av)->stream_mutex);
+	mutex_unlock(&to_isys(av)->stream_mutex);
 
 	stream->nr_streaming--;
 	list_del(&aq->node);
@@ -428,7 +374,7 @@ static void stop_streaming(struct vb2_queue *q)
 
 	ipu6_isys_stream_cleanup(av6);
 
-	return_buffers(aq, VB2_BUF_STATE_ERROR);
+	ipu_return_buffers(aq, VB2_BUF_STATE_ERROR);
 
 	ipu6_isys_fw_close(to_isys6(av));
 }

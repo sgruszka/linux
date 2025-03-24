@@ -1,7 +1,6 @@
 #include "ipu-isys.h"
 
 int ipu_isys_buf_prepare(struct vb2_buffer *vb)
-
 {
 	struct ipu_isys_queue *aq = vb2_queue_to_isys_queue(vb->vb2_queue);
 	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
@@ -234,3 +233,53 @@ int ipu_isys_link_fmt_validate(struct ipu_isys_queue *aq)
 	return 0;
 }
 EXPORT_SYMBOL_GPL(ipu_isys_link_fmt_validate);
+
+void ipu_return_buffers(struct ipu_isys_queue *aq, enum vb2_buffer_state state)
+{
+	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
+	struct ipu_isys_buffer *ib;
+	bool need_reset = false;
+	struct vb2_buffer *vb;
+	unsigned long flags;
+
+	spin_lock_irqsave(&aq->lock, flags);
+	while (!list_empty(&aq->incoming)) {
+		ib = list_first_entry(&aq->incoming, struct ipu_isys_buffer,
+				      head);
+		vb = ipu_isys_buffer_to_vb2_buffer(ib);
+		list_del(&ib->head);
+		spin_unlock_irqrestore(&aq->lock, flags);
+
+		vb2_buffer_done(vb, state);
+
+		spin_lock_irqsave(&aq->lock, flags);
+	}
+
+	/*
+	 * Something went wrong (FW crash / HW hang / not all buffers
+	 * returned from isys) if there are still buffers queued in active
+	 * queue. We have to clean up places a bit.
+	 */
+	while (!list_empty(&aq->active)) {
+		ib = list_first_entry(&aq->active, struct ipu_isys_buffer,
+				      head);
+		vb = ipu_isys_buffer_to_vb2_buffer(ib);
+
+		list_del(&ib->head);
+		spin_unlock_irqrestore(&aq->lock, flags);
+
+		vb2_buffer_done(vb, state);
+
+		spin_lock_irqsave(&aq->lock, flags);
+		need_reset = true;
+	}
+
+	spin_unlock_irqrestore(&aq->lock, flags);
+
+	if (need_reset) {
+		mutex_lock(&to_isys(av)->mutex);
+		to_isys(av)->need_reset = true;
+		mutex_unlock(&to_isys(av)->mutex);
+	}
+}
+EXPORT_SYMBOL_GPL(ipu_return_buffers);

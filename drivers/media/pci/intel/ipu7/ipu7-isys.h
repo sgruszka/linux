@@ -28,7 +28,6 @@
 #define IPU_ISYS_ENTITY_PREFIX		"Intel IPU7"
 
 /* FW support max 16 streams */
-#define IPU_ISYS_MAX_STREAMS		16
 
 #define IPU_ISYS_2600_MEM_LINE_ALIGN	64
 
@@ -61,41 +60,12 @@ struct isys_fw_log {
  * struct ipu7_isys
  *
  * @ipu: Common ipu isys device
- * @power: Is ISYS powered on or not?
- * @isr_bits: Which bits does the ISR handle?
- * @power_lock: Serialise access to power (power state in general)
- * @csi2_rx_ctrl_cached: cached shared value between all CSI2 receivers
- * @streams_lock: serialise access to streams
- * @streams: streams per firmware stream ID
- * @syscom: fw communication layer context
- * @line_align: line alignment in memory
- * @need_reset: Isys requires d0i0->i3 transition
- * @ref_count: total number of callers fw open
- * @mutex: serialise access isys video open/release related operations
- * @stream_mutex: serialise stream start and stop, queueing requests
+ *
  * @pdata: platform data pointer
  * @csi2: CSI-2 receivers
  */
 struct ipu7_isys {
 	struct ipu_isys ipu;
-
-	int power;
-	spinlock_t power_lock;	/* Serialise access to power */
-	u32 isr_csi2_mask;
-	u32 csi2_rx_ctrl_cached;
-	spinlock_t streams_lock;
-	struct ipu_isys_stream streams[IPU_ISYS_MAX_STREAMS];
-	int streams_ref_count[IPU_ISYS_MAX_STREAMS];
-	unsigned int line_align;
-	u32 phy_rext_cal;
-	bool need_reset;
-	bool icache_prefetch;
-	bool csi2_cse_ipc_not_supported;
-	unsigned int ref_count;
-	unsigned int stream_opened;
-
-	struct mutex mutex;	/* Serialise isys video open/release related */
-	struct mutex stream_mutex;	/* Stream start, stop, queueing reqs */
 
 	struct ipu7_isys_pdata *pdata;
 
@@ -111,6 +81,7 @@ struct ipu7_isys {
 
 	struct ipu7_insys_config *subsys_config;
 	dma_addr_t subsys_config_dma_addr;
+	u32 phy_rext_cal;
 };
 
 struct isys_fw_msgs {

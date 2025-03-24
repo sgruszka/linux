@@ -103,8 +103,8 @@ void ipu6_isys_setup_pfmts(struct ipu6_isys *isys)
 static int video_open(struct file *file)
 {
 	struct ipu_isys_video *av = video_drvdata(file);
-	struct ipu6_isys *isys = to_isys6(av);
-	struct ipu_bus_device *adev = isys->ipu.adev;
+	struct ipu_isys *isys = to_isys(av);
+	struct ipu_bus_device *adev = isys->adev;
 
 	mutex_lock(&isys->mutex);
 	if (isys->need_reset) {
@@ -219,7 +219,7 @@ static void ipu6_isys_try_fmt_cap(struct ipu_isys_video *av, u32 type,
 	else
 		*bytesperline = DIV_ROUND_UP(*width * pfmt->bpp, BITS_PER_BYTE);
 
-	*bytesperline = ALIGN(*bytesperline, to_isys6(av)->line_align);
+	*bytesperline = ALIGN(*bytesperline, to_isys(av)->line_align);
 
 	/*
 	 * (height + 1) * bytesperline due to a hardware issue: the DMA unit
@@ -399,7 +399,7 @@ unlock:
 
 static void get_stream_opened(struct ipu_isys_video *av)
 {
-	struct ipu6_isys *isys = to_isys6(av);
+	struct ipu_isys *isys = to_isys(av);
 	unsigned long flags;
 
 	spin_lock_irqsave(&isys->streams_lock, flags);
@@ -409,7 +409,7 @@ static void get_stream_opened(struct ipu_isys_video *av)
 
 static void put_stream_opened(struct ipu_isys_video *av)
 {
-	struct ipu6_isys *isys = to_isys6(av);
+	struct ipu_isys *isys = to_isys(av);
 	unsigned long flags;
 
 	spin_lock_irqsave(&isys->streams_lock, flags);
@@ -491,9 +491,9 @@ static int ipu6_isys_fw_pin_cfg(struct ipu_isys_video *av,
 
 	output_pin->snoopable = true;
 	output_pin->error_handling_enable = false;
-	output_pin->sensor_type = isys->sensor_type++;
-	if (isys->sensor_type > isys->pdata->ipdata->sensor_type_end)
-		isys->sensor_type = isys->pdata->ipdata->sensor_type_start;
+	output_pin->sensor_type = isys->ipu.sensor_type++;
+	if (isys->ipu.sensor_type > isys->pdata->ipdata->sensor_type_end)
+		isys->ipu.sensor_type = isys->pdata->ipdata->sensor_type_start;
 
 	return 0;
 }
@@ -840,25 +840,25 @@ void ipu6_isys_put_stream(struct ipu_isys_stream *stream)
 
 	dev = isys_to_dev(stream->isys);
 
-	spin_lock_irqsave(&to_isys6(stream)->streams_lock, flags);
+	spin_lock_irqsave(&to_isys(stream)->streams_lock, flags);
 	for (i = 0; i < IPU6_ISYS_MAX_STREAMS; i++) {
-		if (&to_isys6(stream)->streams[i] == stream) {
-			if (to_isys6(stream)->streams_ref_count[i] > 0)
-				to_isys6(stream)->streams_ref_count[i]--;
+		if (&to_isys(stream)->streams[i] == stream) {
+			if (to_isys(stream)->streams_ref_count[i] > 0)
+				to_isys(stream)->streams_ref_count[i]--;
 			else
 				dev_warn(dev, "invalid stream %d\n", i);
 
 			break;
 		}
 	}
-	spin_unlock_irqrestore(&to_isys6(stream)->streams_lock, flags);
+	spin_unlock_irqrestore(&to_isys(stream)->streams_lock, flags);
 }
 
 static struct ipu_isys_stream *
 ipu6_isys_get_stream(struct ipu6_isys_video *av, struct ipu_isys_subdev *asd)
 {
 	struct ipu_isys_stream *stream = NULL;
-	struct ipu6_isys *isys = to_isys6(&av->ipu);
+	struct ipu_isys *isys = to_isys(&av->ipu);
 	unsigned long flags;
 	unsigned int i;
 	u8 vc = av->ipu.vc;
@@ -893,8 +893,9 @@ ipu6_isys_get_stream(struct ipu6_isys_video *av, struct ipu_isys_subdev *asd)
 }
 
 struct ipu_isys_stream *
-ipu6_isys_query_stream_by_handle(struct ipu6_isys *isys, u8 stream_handle)
+ipu6_isys_query_stream_by_handle(struct ipu6_isys *isys6, u8 stream_handle)
 {
+	struct ipu_isys *isys = &isys6->ipu;
 	unsigned long flags;
 	struct ipu_isys_stream *stream = NULL;
 
@@ -918,9 +919,8 @@ ipu6_isys_query_stream_by_handle(struct ipu6_isys *isys, u8 stream_handle)
 }
 
 struct ipu_isys_stream *
-ipu6_isys_query_stream_by_source(struct ipu_isys *_isys, int source, u8 vc)
+ipu6_isys_query_stream_by_source(struct ipu_isys *isys, int source, u8 vc)
 {
-	struct ipu6_isys *isys = (struct ipu6_isys *)_isys;
 	struct ipu_isys_stream *stream = NULL;
 	unsigned long flags;
 	unsigned int i;
@@ -1081,10 +1081,11 @@ static const struct v4l2_file_operations isys_fops = {
 	.release = vb2_fop_release,
 };
 
-int ipu6_isys_fw_open(struct ipu6_isys *isys)
+int ipu6_isys_fw_open(struct ipu6_isys *isys6)
 {
-	struct ipu_bus_device *adev = isys->ipu.adev;
-	const struct ipu6_isys_internal_pdata *ipdata = isys->pdata->ipdata;
+	struct ipu_isys *isys = &isys6->ipu;
+	struct ipu_bus_device *adev = isys->adev;
+	const struct ipu6_isys_internal_pdata *ipdata = isys6->pdata->ipdata;
 	int ret;
 
 	ret = pm_runtime_resume_and_get(&adev->auxdev.dev);
@@ -1097,25 +1098,25 @@ int ipu6_isys_fw_open(struct ipu6_isys *isys)
 		goto unlock;
 
 	ipu6_configure_spc(adev->isp, &ipdata->hw_variant,
-			   IPU6_CPD_PKG_DIR_ISYS_SERVER_IDX, isys->pdata->base,
+			   IPU6_CPD_PKG_DIR_ISYS_SERVER_IDX, isys6->pdata->base,
 			   adev->pkg_dir, adev->pkg_dir_dma_addr);
 
 	/*
 	 * Buffers could have been left to wrong queue at last closure.
 	 * Move them now back to empty buffer queue.
 	 */
-	ipu6_cleanup_fw_msg_bufs(isys);
+	ipu6_cleanup_fw_msg_bufs(isys6);
 
-	if (isys->fwcom) {
+	if (isys6->fwcom) {
 		/*
 		 * Something went wrong in previous shutdown. As we are now
 		 * restarting isys we can safely delete old context.
 		 */
 		dev_warn(&adev->auxdev.dev, "clearing old context\n");
-		ipu6_fw_isys_cleanup(isys);
+		ipu6_fw_isys_cleanup(isys6);
 	}
 
-	ret = ipu6_fw_isys_init(isys, ipdata->num_parallel_streams);
+	ret = ipu6_fw_isys_init(isys6, ipdata->num_parallel_streams);
 	if (ret < 0)
 		goto out;
 
@@ -1132,14 +1133,15 @@ out:
 	return ret;
 }
 
-void ipu6_isys_fw_close(struct ipu6_isys *isys)
+void ipu6_isys_fw_close(struct ipu6_isys *isys6)
 {
+	struct ipu_isys *isys = &isys6->ipu;
 	mutex_lock(&isys->mutex);
 
 	isys->ref_count--;
 	if (!isys->ref_count) {
-		ipu6_fw_isys_close(isys);
-		if (isys->fwcom) {
+		ipu6_fw_isys_close(isys6);
+		if (isys6->fwcom) {
 			isys->need_reset = true;
 			dev_warn(isys_to_dev(isys),
 				 "failed to close fw isys\n");

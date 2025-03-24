@@ -67,50 +67,6 @@ struct ipu_isys_subdev {
 
 #define to_ipu_isys_subdev(__sd) container_of(__sd, struct ipu_isys_subdev, sd)
 
-/*
- * struct ipu_isys
- *
- * @media_dev: Media device
- * @v4l2_dev: V4L2 device
- * @adev: ISYS bus device
- */
-
-struct ipu_isys {
-	struct media_device media_dev;
-	struct v4l2_device v4l2_dev;
-	struct ipu_bus_device *adev;
-
-	const struct ipu_isys_pixelformat *pfmts;
-	unsigned int num_pfmts;
-};
-
-struct ipu6_isys;
-struct ipu7_isys;
-
-static inline struct device *ipu_isys_to_dev(struct ipu_isys *isys)
-{
-	return &isys->adev->auxdev.dev;
-}
-
-static inline struct device *ipu6_isys_to_dev(struct ipu6_isys *isys)
-{
-	return &((struct ipu_isys *)isys)->adev->auxdev.dev;
-}
-
-static inline struct device *ipu7_isys_to_dev(struct ipu7_isys *isys)
-{
-	return &((struct ipu_isys *)isys)->adev->auxdev.dev;
-}
-
-
-#define isys_to_dev(_isys) \
-	_Generic(_isys, \
-		 struct ipu_isys *  : ipu_isys_to_dev,  \
-		 struct ipu6_isys * : ipu6_isys_to_dev, \
-		 struct ipu7_isys * : ipu7_isys_to_dev  \
-	) (_isys)
-
-
 #define IPU6_ISYS_MIN_WIDTH	2U
 #define IPU6_ISYS_MIN_HEIGHT	2U
 #define IPU6_ISYS_MAX_WIDTH	4672U
@@ -237,6 +193,82 @@ static inline struct ipu7_isys *ipu_video_to_isys7(struct ipu_isys_video *video)
 		struct ipu_isys_stream *: ipu_stream_to_isys7, \
 		struct ipu_isys_video *: ipu_video_to_isys7)(p)
 
+#define IPU_ISYS_MAX_STREAMS 16
+
+/*
+ * struct ipu_isys
+ *
+ * @media_dev: Media device
+ * @v4l2_dev: V4L2 device
+ * @adev: ISYS bus device
+ * @power: Is ISYS powered on or not?
+ * @isr_bits: Which bits does the ISR handle?
+ * @power_lock: Serialise access to power (power state in general)
+ * @csi2_rx_ctrl_cached: cached shared value between all CSI2 receivers
+ * @streams_lock: serialise access to streams
+ * @streams: streams per firmware stream ID
+ * @syscom: fw communication layer context
+ * @line_align: line alignment in memory
+ * @need_reset: Isys requires d0i0->i3 transition
+ * @ref_count: total number of callers fw open
+ * @mutex: serialise access isys video open/release related operations
+ * @stream_mutex: serialise stream start and stop, queueing requests
+ */
+
+struct ipu_isys {
+	struct media_device media_dev;
+	struct v4l2_device v4l2_dev;
+	struct ipu_bus_device *adev;
+
+	const struct ipu_isys_pixelformat *pfmts;
+	unsigned int num_pfmts;
+
+	int power;
+	spinlock_t power_lock;
+	u32 isr_csi2_bits;
+	u32 csi2_rx_ctrl_cached;
+	spinlock_t streams_lock;
+	struct ipu_isys_stream streams[IPU_ISYS_MAX_STREAMS];
+	int streams_ref_count[IPU_ISYS_MAX_STREAMS];
+	unsigned int line_align;
+	bool need_reset;
+	bool icache_prefetch;
+	bool csi2_cse_ipc_not_supported;
+	unsigned int ref_count;
+	unsigned int stream_opened;
+	unsigned int sensor_type;
+
+	struct mutex mutex;
+	struct mutex stream_mutex;
+};
+
+struct ipu6_isys;
+struct ipu7_isys;
+
+static inline struct device *ipu_isys_to_dev(struct ipu_isys *isys)
+{
+	return &isys->adev->auxdev.dev;
+}
+
+static inline struct device *ipu6_isys_to_dev(struct ipu6_isys *isys)
+{
+	return &((struct ipu_isys *)isys)->adev->auxdev.dev;
+}
+
+static inline struct device *ipu7_isys_to_dev(struct ipu7_isys *isys)
+{
+	return &((struct ipu_isys *)isys)->adev->auxdev.dev;
+}
+
+
+#define isys_to_dev(_isys) \
+	_Generic(_isys, \
+		 struct ipu_isys *  : ipu_isys_to_dev,  \
+		 struct ipu6_isys * : ipu6_isys_to_dev, \
+		 struct ipu7_isys * : ipu7_isys_to_dev  \
+	) (_isys)
+
+
 unsigned int ipu_isys_mbus_code_to_bpp(u32 code);
 unsigned int ipu_isys_mbus_code_to_mipi(u32 code);
 bool ipu_isys_is_bayer_format(u32 code);
@@ -317,6 +349,7 @@ static inline u32 ipu_isys_get_frame_height(struct ipu_isys_video *av)
 
 	return 0;
 }
+
 const struct ipu_isys_pixelformat *
 ipu_isys_get_isys_format(struct ipu_isys *isys, u32 pixelformat, u32 type);
 
@@ -331,4 +364,5 @@ void ipu_flush_firmware_streamon_fail(struct ipu_isys_stream *stream);
 int ipu_buffer_list_get(struct ipu_isys_stream *stream,
 			struct ipu_isys_buffer_list *bl);
 int ipu_isys_link_fmt_validate(struct ipu_isys_queue *aq);
+void ipu_return_buffers(struct ipu_isys_queue *aq, enum vb2_buffer_state state);
 #endif

@@ -104,8 +104,8 @@ void ipu7_isys_setup_pfmts(struct ipu7_isys *isys)
 static int video_open(struct file *file)
 {
 	struct ipu_isys_video *av = video_drvdata(file);
-	struct ipu7_isys *isys = to_isys7(av);
-	struct ipu_bus_device *adev = isys->ipu.adev;
+	struct ipu_isys *isys = to_isys(av);
+	struct ipu_bus_device *adev = isys->adev;
 
 	mutex_lock(&isys->mutex);
 	if (isys->need_reset) {
@@ -213,7 +213,7 @@ static void ipu7_isys_try_fmt_cap(struct ipu_isys_video *av, u32 type,
 	else
 		*bytesperline = DIV_ROUND_UP(*width * pfmt->bpp, BITS_PER_BYTE);
 
-	*bytesperline = ALIGN(*bytesperline, to_isys7(av)->line_align);
+	*bytesperline = ALIGN(*bytesperline, to_isys(av)->line_align);
 
 	/*
 	 * (height + 1) * bytesperline due to a hardware issue: the DMA unit
@@ -401,20 +401,22 @@ unlock:
 
 static void get_stream_opened(struct ipu_isys_video *av)
 {
+	struct ipu_isys *isys = to_isys(av);
 	unsigned long flags;
 
-	spin_lock_irqsave(&to_isys7(av)->streams_lock, flags);
-	to_isys7(av)->stream_opened++;
-	spin_unlock_irqrestore(&to_isys7(av)->streams_lock, flags);
+	spin_lock_irqsave(&isys->streams_lock, flags);
+	isys->stream_opened++;
+	spin_unlock_irqrestore(&isys->streams_lock, flags);
 }
 
 static void put_stream_opened(struct ipu_isys_video *av)
 {
+	struct ipu_isys *isys = to_isys(av);
 	unsigned long flags;
 
-	spin_lock_irqsave(&to_isys7(av)->streams_lock, flags);
-	to_isys7(av)->stream_opened--;
-	spin_unlock_irqrestore(&to_isys7(av)->streams_lock, flags);
+	spin_lock_irqsave(&isys->streams_lock, flags);
+	isys->stream_opened--;
+	spin_unlock_irqrestore(&isys->streams_lock, flags);
 }
 
 static int ipu7_isys_fw_pin_cfg(struct ipu_isys_video *av,
@@ -733,27 +735,27 @@ void ipu7_isys_put_stream(struct ipu_isys_stream *stream)
 		return;
 	}
 
-	dev = isys_to_dev(to_isys7(stream));
+	dev = isys_to_dev(to_isys(stream));
 
-	spin_lock_irqsave(&to_isys7(stream)->streams_lock, flags);
+	spin_lock_irqsave(&to_isys(stream)->streams_lock, flags);
 	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++) {
-		if (&to_isys7(stream)->streams[i] == stream) {
-			if (to_isys7(stream)->streams_ref_count[i] > 0)
-				to_isys7(stream)->streams_ref_count[i]--;
+		if (&to_isys(stream)->streams[i] == stream) {
+			if (to_isys(stream)->streams_ref_count[i] > 0)
+				to_isys(stream)->streams_ref_count[i]--;
 			else
 				dev_warn(dev, "invalid stream %d\n", i);
 
 			break;
 		}
 	}
-	spin_unlock_irqrestore(&to_isys7(stream)->streams_lock, flags);
+	spin_unlock_irqrestore(&to_isys(stream)->streams_lock, flags);
 }
 
 static struct ipu_isys_stream *
 ipu7_isys_get_stream(struct ipu_isys_video *av, struct ipu_isys_subdev *asd)
 {
 	struct ipu_isys_stream *stream = NULL;
-	struct ipu7_isys *isys = to_isys7(av);
+	struct ipu_isys *isys = to_isys(av);
 	unsigned long flags;
 	unsigned int i;
 	u8 vc = av->vc;
@@ -788,8 +790,9 @@ ipu7_isys_get_stream(struct ipu_isys_video *av, struct ipu_isys_subdev *asd)
 }
 
 struct ipu_isys_stream *
-ipu7_isys_query_stream_by_handle(struct ipu7_isys *isys, u8 stream_handle)
+ipu7_isys_query_stream_by_handle(struct ipu7_isys *isys7, u8 stream_handle)
 {
+	struct ipu_isys *isys = &isys7->ipu; 
 	unsigned long flags;
 	struct ipu_isys_stream *stream = NULL;
 
@@ -813,8 +816,9 @@ ipu7_isys_query_stream_by_handle(struct ipu7_isys *isys, u8 stream_handle)
 }
 
 struct ipu_isys_stream *
-ipu7_isys_query_stream_by_source(struct ipu7_isys *isys, int source, u8 vc)
+ipu7_isys_query_stream_by_source(struct ipu7_isys *isys7, int source, u8 vc)
 {
+	struct ipu_isys *isys = &isys7->ipu;
 	struct ipu_isys_stream *stream = NULL;
 	unsigned long flags;
 	unsigned int i;
@@ -966,9 +970,10 @@ static const struct v4l2_file_operations isys_fops = {
 	.release = vb2_fop_release,
 };
 
-int ipu7_isys_fw_open(struct ipu7_isys *isys)
+int ipu7_isys_fw_open(struct ipu7_isys *isys7)
 {
-	struct ipu_bus_device *adev = isys->ipu.adev;
+	struct ipu_isys *isys = &isys7->ipu;
+	struct ipu_bus_device *adev = isys->adev;
 	int ret;
 
 	ret = pm_runtime_resume_and_get(&adev->auxdev.dev);
@@ -984,9 +989,9 @@ int ipu7_isys_fw_open(struct ipu7_isys *isys)
 	 * Buffers could have been left to wrong queue at last closure.
 	 * Move them now back to empty buffer queue.
 	 */
-	ipu7_cleanup_fw_msg_bufs(isys);
+	ipu7_cleanup_fw_msg_bufs(isys7);
 
-	ret = ipu7_fw_isys_open(isys);
+	ret = ipu7_fw_isys_open(isys7);
 	if (ret < 0)
 		goto out;
 
@@ -1002,14 +1007,15 @@ out:
 	return ret;
 }
 
-void ipu7_isys_fw_close(struct ipu7_isys *isys)
+void ipu7_isys_fw_close(struct ipu7_isys *isys7)
 {
+	struct ipu_isys *isys = &isys7->ipu;
 	mutex_lock(&isys->mutex);
 
 	isys->ref_count--;
 
 	if (!isys->ref_count)
-		ipu7_fw_isys_close(isys);
+		ipu7_fw_isys_close(isys7);
 
 	mutex_unlock(&isys->mutex);
 

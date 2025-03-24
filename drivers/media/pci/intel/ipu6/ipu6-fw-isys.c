@@ -132,8 +132,9 @@ int ipu6_fw_isys_simple_cmd(struct ipu6_isys *isys,
 					send_type);
 }
 
-int ipu6_fw_isys_close(struct ipu6_isys *isys)
+int ipu6_fw_isys_close(struct ipu6_isys *isys6)
 {
+	struct ipu_isys *isys = &isys6->ipu;
 	struct device *dev = isys_to_dev(isys);
 	int retry = IPU6_ISYS_CLOSE_RETRY;
 	unsigned long flags;
@@ -147,9 +148,9 @@ int ipu6_fw_isys_close(struct ipu6_isys *isys)
 	 * spinlock to wait the interrupt handler to be finished
 	 */
 	spin_lock_irqsave(&isys->power_lock, flags);
-	ret = ipu6_fw_com_close(isys->fwcom);
-	fwcom = isys->fwcom;
-	isys->fwcom = NULL;
+	ret = ipu6_fw_com_close(isys6->fwcom);
+	fwcom = isys6->fwcom;
+	isys6->fwcom = NULL;
 	spin_unlock_irqrestore(&isys->power_lock, flags);
 	if (ret)
 		dev_err(dev, "Device close failure: %d\n", ret);
@@ -164,7 +165,7 @@ int ipu6_fw_isys_close(struct ipu6_isys *isys)
 	if (ret) {
 		dev_err(dev, "Device release time out %d\n", ret);
 		spin_lock_irqsave(&isys->power_lock, flags);
-		isys->fwcom = fwcom;
+		isys6->fwcom = fwcom;
 		spin_unlock_irqrestore(&isys->power_lock, flags);
 	}
 
@@ -191,7 +192,7 @@ static void start_sp(struct ipu_bus_device *adev)
 		IPU6_ISYS_SPC_STATUS_RUN |
 		IPU6_ISYS_SPC_STATUS_CTRL_ICACHE_INVALIDATE;
 
-	val |= isys->icache_prefetch ? IPU6_ISYS_SPC_STATUS_ICACHE_PREFETCH : 0;
+	val |= isys->ipu.icache_prefetch ? IPU6_ISYS_SPC_STATUS_ICACHE_PREFETCH : 0;
 
 	writel(val, spc_regs_base + IPU6_ISYS_REG_SPC_STATUS_CTRL);
 }

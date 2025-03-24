@@ -115,7 +115,6 @@ struct sensor_async_sd {
  *         or optional external library private pointer
  * @line_align: line alignment in memory
  * @phy_termcal_val: the termination calibration value, only used for DWC PHY
- * @need_reset: Isys requires d0i0->i3 transition
  * @ref_count: total number of callers fw open
  * @mutex: serialise access isys video open/release related operations
  * @stream_mutex: serialise stream start and stop, queueing requests
@@ -125,25 +124,8 @@ struct sensor_async_sd {
 struct ipu6_isys {
 	struct ipu_isys ipu;
 
-	int power;
-	spinlock_t power_lock;
-	u32 isr_csi2_bits;
-	u32 csi2_rx_ctrl_cached;
-	spinlock_t streams_lock;
-	struct ipu_isys_stream streams[IPU6_ISYS_MAX_STREAMS];
-	int streams_ref_count[IPU6_ISYS_MAX_STREAMS];
 	void *fwcom;
-	unsigned int line_align;
 	u32 phy_termcal_val;
-	bool need_reset;
-	bool icache_prefetch;
-	bool csi2_cse_ipc_not_supported;
-	unsigned int ref_count;
-	unsigned int stream_opened;
-	unsigned int sensor_type;
-
-	struct mutex mutex;
-	struct mutex stream_mutex;
 
 	struct ipu6_isys_pdata *pdata;
 

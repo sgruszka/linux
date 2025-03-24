@@ -753,20 +753,20 @@ void ipu7_isys_put_stream(struct ipu_isys_stream *stream)
 		return;
 	}
 
-	dev = isys_to_dev(stream->isys);
+	dev = isys_to_dev(to_isys7(stream));
 
-	spin_lock_irqsave(&stream->isys->streams_lock, flags);
+	spin_lock_irqsave(&to_isys7(stream)->streams_lock, flags);
 	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++) {
-		if (&stream->isys->streams[i] == stream) {
-			if (stream->isys->streams_ref_count[i] > 0)
-				stream->isys->streams_ref_count[i]--;
+		if (&to_isys7(stream)->streams[i] == stream) {
+			if (to_isys7(stream)->streams_ref_count[i] > 0)
+				to_isys7(stream)->streams_ref_count[i]--;
 			else
 				dev_warn(dev, "invalid stream %d\n", i);
 
 			break;
 		}
 	}
-	spin_unlock_irqrestore(&stream->isys->streams_lock, flags);
+	spin_unlock_irqrestore(&to_isys7(stream)->streams_lock, flags);
 }
 
 static struct ipu_isys_stream *

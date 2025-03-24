@@ -641,7 +641,7 @@ static int alloc_fw_msg_bufs(struct ipu7_isys *isys, int amount)
 struct isys_fw_msgs *ipu7_get_fw_msg_buf(struct ipu_isys_stream *stream)
 {
 	struct device *dev = isys_to_dev(stream->isys);
-	struct ipu_isys *isys = stream->isys;
+	struct ipu7_isys *isys = to_isys7(stream);
 	struct isys_fw_msgs *msg;
 	unsigned long flags;
 	int ret;

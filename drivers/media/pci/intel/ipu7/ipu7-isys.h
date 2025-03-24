@@ -160,6 +160,8 @@ static inline struct device *ipu7_isys_to_dev(struct ipu7_isys *isys)
 	_Generic(p,                                     \
 		struct ipu_isys *: ipu_isys_to_dev, \
 		struct ipu7_isys *: ipu7_isys_to_dev)(p)
+
+struct isys_fw_msgs *ipu7_get_fw_msg_buf(struct ipu_isys_stream *stream);
 void ipu7_put_fw_msg_buf(struct ipu7_isys *isys, uintptr_t data);
 void ipu7_cleanup_fw_msg_bufs(struct ipu7_isys *isys);
 

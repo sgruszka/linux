@@ -101,6 +101,7 @@ struct ipu_isys_stream {
 	struct mutex mutex;
 	struct media_entity *source_entity;
 	atomic_t sequence;
+	atomic_t buf_id; /* IPU7 */
 	unsigned int seq_index;
 	struct ipu_sequence_info seq[IPU_ISYS_MAX_PARALLEL_SOF];
 	int stream_source;

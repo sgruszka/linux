@@ -66,6 +66,7 @@ struct ipu_ipc_buttress_bulk_msg {
 struct ipu_hw_ops {
 	int  (*buttress_powerup) (struct ipu_device *isp, const struct ipu_buttress_ctrl *ctrl);
 	int  (*buttress_powerdown) (struct ipu_device *isp, const struct ipu_buttress_ctrl *ctrl);
+	void  (*buttress_tsc_read) (struct ipu_device *isp, u64 *val);
 };
 
 struct ipu_device {

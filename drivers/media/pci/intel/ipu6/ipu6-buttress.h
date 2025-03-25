@@ -8,9 +8,8 @@
 #include <linux/irqreturn.h>
 #include <linux/list.h>
 #include <linux/mutex.h>
-
-struct device;
-struct firmware;
+#include <linux/firmware.h>
+#include <linux/scatterlist.h>
 
 struct ipu_device;
 struct ipu_bus_device;
@@ -37,9 +36,6 @@ int ipu6_buttress_authenticate(struct ipu_device *isp);
 int ipu6_buttress_reset_authentication(struct ipu_device *isp);
 bool ipu6_buttress_auth_done(struct ipu_device *isp);
 int ipu6_buttress_start_tsc_sync(struct ipu_device *isp);
-void ipu6_buttress_tsc_read(struct ipu_device *isp, u64 *val);
-u64 ipu6_buttress_tsc_ticks_to_ns(u64 ticks, const struct ipu_device *isp);
-
 irqreturn_t ipu6_buttress_isr(int irq, void *isp_ptr);
 irqreturn_t ipu6_buttress_isr_threaded(int irq, void *isp_ptr);
 int ipu6_buttress_init(struct ipu_device *isp);

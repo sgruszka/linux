@@ -782,7 +782,7 @@ int ipu6_buttress_start_tsc_sync(struct ipu_device *isp)
 }
 EXPORT_SYMBOL_NS_GPL(ipu6_buttress_start_tsc_sync, "INTEL_IPU6");
 
-void ipu6_buttress_tsc_read(struct ipu_device *isp, u64 *val)
+static void ipu6_buttress_tsc_read(struct ipu_device *isp, u64 *val)
 {
 	u32 tsc_hi_1, tsc_hi_2, tsc_lo;
 	unsigned long flags;
@@ -802,22 +802,6 @@ void ipu6_buttress_tsc_read(struct ipu_device *isp, u64 *val)
 	}
 	local_irq_restore(flags);
 }
-EXPORT_SYMBOL_NS_GPL(ipu6_buttress_tsc_read, "INTEL_IPU6");
-
-u64 ipu6_buttress_tsc_ticks_to_ns(u64 ticks, const struct ipu_device *isp)
-{
-	u64 ns = ticks * 10000;
-
-	/*
-	 * converting TSC tick count to ns is calculated by:
-	 * Example (TSC clock frequency is 19.2MHz):
-	 * ns = ticks * 1000 000 000 / 19.2Mhz
-	 *    = ticks * 1000 000 000 / 19200000Hz
-	 *    = ticks * 10000 / 192 ns
-	 */
-	return div_u64(ns, isp->buttress.ref_clk);
-}
-EXPORT_SYMBOL_NS_GPL(ipu6_buttress_tsc_ticks_to_ns, "INTEL_IPU6");
 
 void ipu6_buttress_restore(struct ipu_device *isp)
 {
@@ -852,6 +836,7 @@ int ipu6_buttress_init(struct ipu_device *isp)
 
 	isp->hw_ops.buttress_powerup = ipu6_buttress_powerup;
 	isp->hw_ops.buttress_powerdown = ipu6_buttress_powerdown;
+	isp->hw_ops.buttress_tsc_read = ipu6_buttress_tsc_read;
 
 	INIT_LIST_HEAD(&b->constraints);
 

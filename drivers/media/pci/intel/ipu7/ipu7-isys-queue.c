@@ -453,22 +453,18 @@ void ipu7_isys_queue_buf_done(struct ipu_isys_buffer *ib)
 	}
 }
 
-void ipu7_isys_queue_buf_ready(struct ipu_isys_stream *stream, void *_info)
+static void
+ipu7_stream_buf_ready(struct ipu_isys_stream *stream, u8 pin_id, u32 pin_addr,
+		      u64 time, bool error_check)
 {
-	struct ipu7_insys_resp *info = _info;
-	struct ipu_isys_queue *aq = stream->output_pins[info->pin_id].aq;
+	struct ipu_isys_queue *aq = stream->output_pins[pin_id].aq;
 	struct ipu7_isys *isys = to_isys7(stream);
 	struct device *dev = isys_to_dev(isys);
 	struct ipu_isys_buffer *ib;
 	struct vb2_buffer *vb;
 	unsigned long flags;
-	bool first = true;
 	struct vb2_v4l2_buffer *buf;
-	u64 time = (u64)info->timestamp[1] << 32 | info->timestamp[0];
-
-	dev_dbg(dev, "buffer: %s: received buffer %8.8x %d\n",
-		ipu_isys_queue_to_video(aq)->vdev.name, info->pin.addr,
-		info->frame_id);
+	bool first = true;
 
 	spin_lock_irqsave(&aq->lock, flags);
 	if (list_empty(&aq->active)) {
@@ -487,7 +483,7 @@ void ipu7_isys_queue_buf_ready(struct ipu_isys_stream *stream, void *_info)
 		ivb = vb2_buffer_to_ipu_isys_video_buffer(vvb);
 		addr = ivb->dma_addr;
 
-		if (info->pin.addr != addr) {
+		if (pin_addr != addr) {
 			if (first)
 				dev_err(dev, "Unexpected buffer address %pad\n",
 					&addr);
@@ -515,6 +511,21 @@ void ipu7_isys_queue_buf_ready(struct ipu_isys_stream *stream, void *_info)
 
 	spin_unlock_irqrestore(&aq->lock, flags);
 }
+
+void ipu7_isys_queue_buf_ready(struct ipu_isys_stream *stream, void *_info)
+{
+	struct ipu7_insys_resp *info = _info;
+	struct ipu_isys_queue *aq = stream->output_pins[info->pin_id].aq;
+	u64 time = (u64)info->timestamp[1] << 32 | info->timestamp[0];
+
+	dev_dbg(isys_to_dev(to_isys(stream)),
+		"buffer: %s: received buffer %8.8x %d\n",
+		ipu_isys_queue_to_video(aq)->vdev.name,
+		info->pin.addr, info->frame_id);
+
+	ipu7_stream_buf_ready(stream, info->pin_id, info->pin.addr, time, false);
+}
+
 
 static const struct vb2_ops ipu7_isys_queue_ops = {
 	.queue_setup = ipu_isys_queue_setup,

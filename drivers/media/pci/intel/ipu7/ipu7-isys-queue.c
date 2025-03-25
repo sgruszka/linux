@@ -369,10 +369,8 @@ static void stop_streaming(struct vb2_queue *q)
 }
 
 static unsigned int
-get_sof_sequence_by_timestamp(struct ipu_isys_stream *stream,
-			      struct ipu7_insys_resp *info)
+get_sof_sequence_by_timestamp(struct ipu_isys_stream *stream, u64 time)
 {
-	u64 time = (u64)info->timestamp[1] << 32 | info->timestamp[0];
 	struct ipu7_isys *isys = to_isys7(stream);
 	struct device *dev = isys_to_dev(isys);
 	unsigned int i;
@@ -400,8 +398,7 @@ get_sof_sequence_by_timestamp(struct ipu_isys_stream *stream,
 	return 0;
 }
 
-static u64 get_sof_ns_delta(struct ipu_isys_video *av,
-			    struct ipu7_insys_resp *info)
+static u64 get_sof_ns_delta(struct ipu_isys_video *av, u64 timestamp)
 {
 	struct ipu_bus_device *adev = to_isys7(av)->ipu.adev;
 	struct ipu_device *isp = adev->isp;
@@ -411,13 +408,13 @@ static u64 get_sof_ns_delta(struct ipu_isys_video *av,
 	if (!tsc_now)
 		return 0;
 
-	delta = tsc_now - ((u64)info->timestamp[1] << 32 | info->timestamp[0]);
+	delta = tsc_now - timestamp;
 
 	return ipu_buttress_tsc_ticks_to_ns(delta, isp);
 }
 
-void ipu7_isys_buf_calc_sequence_time(struct ipu_isys_buffer *ib,
-				      struct ipu7_insys_resp *info)
+static void
+ipu7_isys_buf_calc_sequence_time(struct ipu_isys_buffer *ib, u64 time)
 {
 	struct vb2_buffer *vb = ipu_isys_buffer_to_vb2_buffer(ib);
 	struct vb2_v4l2_buffer *vbuf = to_vb2_v4l2_buffer(vb);
@@ -428,8 +425,8 @@ void ipu7_isys_buf_calc_sequence_time(struct ipu_isys_buffer *ib,
 	u64 ns;
 	u32 sequence;
 
-	ns = ktime_get_ns() - get_sof_ns_delta(av, info);
-	sequence = get_sof_sequence_by_timestamp(stream, info);
+	ns = ktime_get_ns() - get_sof_ns_delta(av, time);
+	sequence = get_sof_sequence_by_timestamp(stream, time);
 
 	vbuf->vb2_buf.timestamp = ns;
 	vbuf->sequence = sequence;
@@ -467,6 +464,7 @@ void ipu7_isys_queue_buf_ready(struct ipu_isys_stream *stream, void *_info)
 	unsigned long flags;
 	bool first = true;
 	struct vb2_v4l2_buffer *buf;
+	u64 time = (u64)info->timestamp[1] << 32 | info->timestamp[0];
 
 	dev_dbg(dev, "buffer: %s: received buffer %8.8x %d\n",
 		ipu_isys_queue_to_video(aq)->vdev.name, info->pin.addr,
@@ -506,7 +504,7 @@ void ipu7_isys_queue_buf_ready(struct ipu_isys_stream *stream, void *_info)
 		list_del(&ib->head);
 		spin_unlock_irqrestore(&aq->lock, flags);
 
-		ipu7_isys_buf_calc_sequence_time(ib, info);
+		ipu7_isys_buf_calc_sequence_time(ib, time);
 
 		ipu7_isys_queue_buf_done(ib);
 

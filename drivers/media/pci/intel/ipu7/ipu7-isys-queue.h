@@ -23,8 +23,6 @@ void ipu7_isys_buffer_to_fw_frame_buff(struct ipu7_insys_buffset *set,
 				       struct ipu_isys_stream *stream,
 				       struct ipu_isys_buffer_list *bl);
 
-void ipu7_isys_buf_calc_sequence_time(struct ipu_isys_buffer *ib,
-				      struct ipu7_insys_resp *info);
 void ipu7_isys_queue_buf_done(struct ipu_isys_buffer *ib);
 void ipu7_isys_queue_buf_ready(struct ipu_isys_stream *stream, void *info);
 int ipu7_isys_queue_init(struct ipu_isys_queue *aq);

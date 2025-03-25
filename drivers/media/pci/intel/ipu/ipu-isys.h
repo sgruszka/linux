@@ -365,4 +365,6 @@ int ipu_buffer_list_get(struct ipu_isys_stream *stream,
 			struct ipu_isys_buffer_list *bl);
 int ipu_isys_link_fmt_validate(struct ipu_isys_queue *aq);
 void ipu_return_buffers(struct ipu_isys_queue *aq, enum vb2_buffer_state state);
+void ipu_stream_buf_ready(struct ipu_isys_stream *stream, u8 pin_id, u32 pin_addr,
+			  u64 time, bool error_check);
 #endif

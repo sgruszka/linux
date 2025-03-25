@@ -283,3 +283,152 @@ void ipu_return_buffers(struct ipu_isys_queue *aq, enum vb2_buffer_state state)
 	}
 }
 EXPORT_SYMBOL_GPL(ipu_return_buffers);
+
+static unsigned int
+ipu_get_sof_sequence_by_timestamp(struct ipu_isys_stream *stream, u64 time)
+{
+	struct ipu6_isys *isys = to_isys6(stream);
+	struct device *dev = isys_to_dev(isys);
+	unsigned int i;
+
+	/*
+	 * The timestamp is invalid as no TSC in some FPGA platform,
+	 * so get the sequence from pipeline directly in this case.
+	 */
+	if (time == 0)
+		return atomic_read(&stream->sequence) - 1;
+
+	for (i = 0; i < IPU_ISYS_MAX_PARALLEL_SOF; i++)
+		if (time == stream->seq[i].timestamp) {
+			dev_dbg(dev, "sof: using seq nr %u for ts %llu\n",
+				stream->seq[i].sequence, time);
+			return stream->seq[i].sequence;
+		}
+
+	for (i = 0; i < IPU_ISYS_MAX_PARALLEL_SOF; i++)
+		dev_dbg(dev, "sof: sequence %u, timestamp value %llu\n",
+			stream->seq[i].sequence, stream->seq[i].timestamp);
+
+	return 0;
+}
+
+static u64 ipu_get_sof_ns_delta(struct ipu_isys_video *av, u64 timestamp)
+{
+	// struct ipu_bus_device *adev = to_isys(av)->adev;
+	// struct ipu_device *isp = adev->isp;
+	u64 delta, tsc_now = 0;
+
+	//ipu6_buttress_tsc_read(isp, &tsc_now);
+	if (!tsc_now)
+		return 0;
+
+	delta = tsc_now - timestamp;
+
+	return 0; // ipu6_buttress_tsc_ticks_to_ns(delta, isp);
+}
+
+static void ipu_isys_buf_calc_sequence_time(struct ipu_isys_buffer *ib, u64 time)
+{
+	struct vb2_buffer *vb = ipu_isys_buffer_to_vb2_buffer(ib);
+	struct vb2_v4l2_buffer *vbuf = to_vb2_v4l2_buffer(vb);
+	struct ipu_isys_queue *aq = vb2_queue_to_isys_queue(vb->vb2_queue);
+	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
+	struct device *dev = isys_to_dev(av->isys);
+	struct ipu_isys_stream *stream = av->stream;
+	u64 ns;
+	u32 sequence;
+
+	ns = ktime_get_ns() - ipu_get_sof_ns_delta(av, time);
+	sequence = ipu_get_sof_sequence_by_timestamp(stream, time);
+
+	vbuf->vb2_buf.timestamp = ns;
+	vbuf->sequence = sequence;
+
+	dev_dbg(dev, "buf: %s: buffer done, CPU-timestamp:%lld, sequence:%d\n",
+		av->vdev.name, ktime_get_ns(), sequence);
+	dev_dbg(dev, "index:%d, vbuf timestamp:%lld\n", vb->index,
+		vbuf->vb2_buf.timestamp);
+}
+
+static void ipu_isys_queue_buf_done(struct ipu_isys_buffer *ib)
+{
+	struct vb2_buffer *vb = ipu_isys_buffer_to_vb2_buffer(ib);
+
+	if (atomic_read(&ib->str2mmio_flag)) {
+		vb2_buffer_done(vb, VB2_BUF_STATE_ERROR);
+		/*
+		 * Operation on buffer is ended with error and will be reported
+		 * to the userspace when it is de-queued
+		 */
+		atomic_set(&ib->str2mmio_flag, 0);
+	} else {
+		vb2_buffer_done(vb, VB2_BUF_STATE_DONE);
+	}
+}
+
+void
+ipu_stream_buf_ready(struct ipu_isys_stream *stream, u8 pin_id, u32 pin_addr,
+		     u64 time, bool error_check)
+{
+	struct ipu_isys_queue *aq = stream->output_pins[pin_id].aq;
+	struct ipu6_isys *isys = to_isys6(stream);
+	struct device *dev = isys_to_dev(isys);
+	struct ipu_isys_buffer *ib;
+	struct vb2_buffer *vb;
+	unsigned long flags;
+	bool first = true;
+	struct vb2_v4l2_buffer *buf;
+
+	spin_lock_irqsave(&aq->lock, flags);
+	if (list_empty(&aq->active)) {
+		spin_unlock_irqrestore(&aq->lock, flags);
+		dev_err(dev, "active queue empty\n");
+		return;
+	}
+
+	list_for_each_entry_reverse(ib, &aq->active, head) {
+		struct ipu_isys_video_buffer *ivb;
+		struct vb2_v4l2_buffer *vvb;
+		dma_addr_t addr;
+
+		vb = ipu_isys_buffer_to_vb2_buffer(ib);
+		vvb = to_vb2_v4l2_buffer(vb);
+		ivb = vb2_buffer_to_ipu_isys_video_buffer(vvb);
+		addr = ivb->dma_addr;
+
+		if (pin_addr != addr) {
+			if (first)
+				dev_err(dev, "Unexpected buffer address %pad\n",
+					&addr);
+			first = false;
+			continue;
+		}
+
+		if (error_check) {
+			/*
+			 * Check for error message:
+			 * 'IPU6_FW_ISYS_ERROR_HW_REPORTED_STR2MMIO'
+			 */
+			atomic_set(&ib->str2mmio_flag, 1);
+		}
+		dev_dbg(dev, "buffer: found buffer %pad\n", &addr);
+
+		buf = to_vb2_v4l2_buffer(vb);
+		buf->field = V4L2_FIELD_NONE;
+
+		list_del(&ib->head);
+		spin_unlock_irqrestore(&aq->lock, flags);
+
+		ipu_isys_buf_calc_sequence_time(ib, time);
+
+		ipu_isys_queue_buf_done(ib);
+
+		return;
+	}
+
+	dev_err(dev, "Failed to find a matching video buffer");
+
+	spin_unlock_irqrestore(&aq->lock, flags);
+}
+EXPORT_SYMBOL_GPL(ipu_stream_buf_ready);
+

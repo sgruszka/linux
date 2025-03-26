@@ -724,70 +724,7 @@ int ipu7_isys_video_prepare_stream(struct ipu_isys_video *av,
 	return 0;
 }
 
-void ipu7_isys_put_stream(struct ipu_isys_stream *stream)
-{
-	unsigned long flags;
-	struct device *dev;
-	unsigned int i;
 
-	if (!stream) {
-		pr_err("ipu7-isys: no available stream\n");
-		return;
-	}
-
-	dev = isys_to_dev(to_isys(stream));
-
-	spin_lock_irqsave(&to_isys(stream)->streams_lock, flags);
-	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++) {
-		if (&to_isys(stream)->streams[i] == stream) {
-			if (to_isys(stream)->streams_ref_count[i] > 0)
-				to_isys(stream)->streams_ref_count[i]--;
-			else
-				dev_warn(dev, "invalid stream %d\n", i);
-
-			break;
-		}
-	}
-	spin_unlock_irqrestore(&to_isys(stream)->streams_lock, flags);
-}
-
-static struct ipu_isys_stream *
-ipu7_isys_get_stream(struct ipu_isys_video *av, struct ipu_isys_subdev *asd)
-{
-	struct ipu_isys_stream *stream = NULL;
-	struct ipu_isys *isys = to_isys(av);
-	unsigned long flags;
-	unsigned int i;
-	u8 vc = av->vc;
-
-	if (!isys)
-		return NULL;
-
-	spin_lock_irqsave(&isys->streams_lock, flags);
-	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++) {
-		if (isys->streams_ref_count[i] && isys->streams[i].vc == vc &&
-		    isys->streams[i].asd == asd) {
-			isys->streams_ref_count[i]++;
-			stream = &isys->streams[i];
-			break;
-		}
-	}
-
-	if (!stream) {
-		for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++) {
-			if (!isys->streams_ref_count[i]) {
-				isys->streams_ref_count[i]++;
-				stream = &isys->streams[i];
-				stream->vc = vc;
-				stream->asd = asd;
-				break;
-			}
-		}
-	}
-	spin_unlock_irqrestore(&isys->streams_lock, flags);
-
-	return stream;
-}
 
 struct ipu_isys_stream *
 ipu7_isys_query_stream_by_handle(struct ipu7_isys *isys7, u8 stream_handle)
@@ -1104,7 +1041,7 @@ int ipu7_isys_setup_video(struct ipu_isys_video *av,
 		return ret;
 	}
 
-	av->stream = ipu7_isys_get_stream(av, asd);
+	av->stream = ipu_isys_get_stream(av, asd);
 	if (!av->stream) {
 		video_device_pipeline_stop(&av->vdev);
 		dev_err(dev, "no available stream for firmware\n");

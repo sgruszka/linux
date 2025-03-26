@@ -23,8 +23,6 @@
 #include "../ipu/ipu.h"
 
 #define IPU6_ISYS_ENTITY_PREFIX		"Intel IPU6"
-/* FW support max 16 streams */
-#define IPU6_ISYS_MAX_STREAMS		16
 #define ISYS_UNISPART_IRQS	(IPU6_ISYS_UNISPART_IRQ_SW |	\
 				 IPU6_ISYS_UNISPART_IRQ_CSI0 |	\
 				 IPU6_ISYS_UNISPART_IRQ_CSI1)

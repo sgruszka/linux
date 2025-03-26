@@ -146,7 +146,7 @@ static void isys_stream_init(struct ipu6_isys *isys6)
 	struct ipu_isys *isys = &isys6->ipu;
 	u32 i;
 
-	for (i = 0; i < IPU6_ISYS_MAX_STREAMS; i++) {
+	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++) {
 		mutex_init(&isys->streams[i].mutex);
 		init_completion(&isys->streams[i].stream_open_completion);
 		init_completion(&isys->streams[i].stream_close_completion);
@@ -1154,7 +1154,7 @@ release_firmware:
 	if (!isp->secure_mode)
 		release_firmware(adev->fw);
 
-	for (i = 0; i < IPU6_ISYS_MAX_STREAMS; i++)
+	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++)
 		mutex_destroy(&isys->streams[i].mutex);
 
 	mutex_destroy(&isys->mutex);
@@ -1185,7 +1185,7 @@ static void isys_remove(struct auxiliary_device *auxdev)
 		release_firmware(adev->fw);
 	}
 
-	for (i = 0; i < IPU6_ISYS_MAX_STREAMS; i++)
+	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++)
 		mutex_destroy(&isys->ipu.streams[i].mutex);
 
 	isys_iwake_watermark_cleanup(isys);
@@ -1263,7 +1263,7 @@ static int isys_isr_one(struct ipu_bus_device *adev)
 			"FW error resp error %d, details %d\n",
 			resp->error_info.error, resp->error_info.error_details);
 
-	if (resp->stream_handle >= IPU6_ISYS_MAX_STREAMS) {
+	if (resp->stream_handle >= IPU_ISYS_MAX_STREAMS) {
 		dev_err(&adev->auxdev.dev, "bad stream handle %u\n",
 			resp->stream_handle);
 		goto leave;

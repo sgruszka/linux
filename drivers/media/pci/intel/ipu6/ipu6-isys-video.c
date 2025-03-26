@@ -837,7 +837,7 @@ ipu6_isys_query_stream_by_handle(struct ipu6_isys *isys6, u8 stream_handle)
 	if (!isys)
 		return NULL;
 
-	if (stream_handle >= IPU6_ISYS_MAX_STREAMS) {
+	if (stream_handle >= IPU_ISYS_MAX_STREAMS) {
 		dev_err(isys_to_dev(isys),
 			"stream_handle %d is invalid\n", stream_handle);
 		return NULL;
@@ -870,7 +870,7 @@ ipu6_isys_query_stream_by_source(struct ipu_isys *isys, int source, u8 vc)
 	}
 
 	spin_lock_irqsave(&isys->streams_lock, flags);
-	for (i = 0; i < IPU6_ISYS_MAX_STREAMS; i++) {
+	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++) {
 		if (!isys->streams_ref_count[i])
 			continue;
 

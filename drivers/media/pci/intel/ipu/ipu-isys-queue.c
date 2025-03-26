@@ -287,7 +287,7 @@ EXPORT_SYMBOL_GPL(ipu_return_buffers);
 static unsigned int
 ipu_get_sof_sequence_by_timestamp(struct ipu_isys_stream *stream, u64 time)
 {
-	struct ipu6_isys *isys = to_isys6(stream);
+	struct ipu_isys *isys = to_isys(stream);
 	struct device *dev = isys_to_dev(isys);
 	unsigned int i;
 
@@ -319,19 +319,19 @@ static u64 ipu_get_sof_ns_delta(struct ipu_isys_video *av, u64 timestamp)
 	u64 delta_ns, delta, tsc_now = 0;
 
 	isp->hw_ops.buttress_tsc_read(isp, &tsc_now);
-	if (!tsc_now)
+	if (tsc_now == 0 || timestamp > tsc_now)
 		return 0;
 
 	delta = tsc_now - timestamp;
-	delta_ns = delta * 10000;
 
 	/*
 	 * converting TSC tick count to ns is calculated by:
 	 * Example (TSC clock frequency is 19.2MHz):
-	 * ns = ticks * 1000 000 000 / 19.2Mhz
-	 *    = ticks * 1000 000 000 / 19200000Hz
+	 * ns = ticks * 1 000 000 000 / 19.2Mhz
+	 *    = ticks * 1 000 000 000 / 19 200 000 Hz
 	 *    = ticks * 10000 / 192 ns
 	 */
+	delta_ns = delta * 10000;
 	return div_u64(delta_ns, isp->buttress.ref_clk);
 }
 

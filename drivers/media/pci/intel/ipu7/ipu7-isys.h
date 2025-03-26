@@ -27,8 +27,6 @@
 
 #define IPU_ISYS_ENTITY_PREFIX		"Intel IPU7"
 
-/* FW support max 16 streams */
-
 #define IPU_ISYS_2600_MEM_LINE_ALIGN	64
 
 /*

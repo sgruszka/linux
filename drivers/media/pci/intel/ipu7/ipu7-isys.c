@@ -93,9 +93,8 @@ skip_unregister_subdev:
 	return ret;
 }
 
-static void isys_stream_init(struct ipu7_isys *isys7)
+static void isys_streams_init(struct ipu_isys *isys)
 {
-	struct ipu_isys *isys = &isys7->ipu;
 	unsigned int i;
 
 	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++) {
@@ -105,10 +104,18 @@ static void isys_stream_init(struct ipu7_isys *isys7)
 		init_completion(&isys->streams[i].stream_start_completion);
 		init_completion(&isys->streams[i].stream_stop_completion);
 		INIT_LIST_HEAD(&isys->streams[i].queues);
-		isys->streams[i].isys = (struct ipu_isys *) isys;
+		isys->streams[i].isys = isys;
 		isys->streams[i].stream_handle = i;
 		isys->streams[i].vc = INVALID_VC_ID;
 	}
+}
+
+static void isys_streams_cleanup(struct ipu_isys *isys)
+{
+	unsigned int i;
+
+	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++)
+		mutex_destroy(&isys->streams[i].mutex);
 }
 
 static int isys_fw_log_init(struct ipu7_isys *isys)
@@ -700,6 +707,29 @@ void ipu7_put_fw_msg_buf(struct ipu7_isys *isys, uintptr_t data)
 	spin_unlock_irqrestore(&isys->listlock, flags);
 }
 
+static void ipu_isys_init(struct ipu_isys *isys)
+{
+	spin_lock_init(&isys->streams_lock);
+	spin_lock_init(&isys->power_lock);
+
+	mutex_init(&isys->mutex);
+	mutex_init(&isys->stream_mutex);
+
+	isys->power = 0;
+	isys->line_align = IPU_ISYS_2600_MEM_LINE_ALIGN; //TODO remove
+	isys->icache_prefetch = 0;
+
+	isys_streams_init(isys);
+}
+
+static void ipu_isys_cleanup(struct ipu_isys *isys)
+{
+	isys_streams_cleanup(isys);
+
+	mutex_destroy(&isys->mutex);
+	mutex_destroy(&isys->stream_mutex);
+}
+
 static int isys_probe(struct auxiliary_device *auxdev,
 		      const struct auxiliary_device_id *auxdev_id)
 {
@@ -707,7 +737,6 @@ static int isys_probe(struct auxiliary_device *auxdev,
 	struct ipu_bus_device *adev = auxdev_to_adev(auxdev);
 	struct ipu_device *isp = adev->isp;
 	struct ipu7_isys *isys7;
-	struct ipu_isys *isys;
 	int ret = 0;
 
 	if (!isp->bus_ready_to_probe)
@@ -716,7 +745,6 @@ static int isys_probe(struct auxiliary_device *auxdev,
 	isys7 = devm_kzalloc(&auxdev->dev, sizeof(*isys7), GFP_KERNEL);
 	if (!isys7)
 		return -ENOMEM;
-	isys = &isys7->ipu;
 
 	ret = pm_runtime_resume_and_get(&auxdev->dev);
 	if (ret < 0)
@@ -725,8 +753,12 @@ static int isys_probe(struct auxiliary_device *auxdev,
 	adev->auxdrv_data =
 		(const struct ipu_auxdrv_data *)auxdev_id->driver_data;
 	adev->auxdrv = to_auxiliary_drv(auxdev->dev.driver);
-	isys->adev = adev;
+
+	isys7->ipu.adev = adev;
 	isys7->pdata = adev->pdata;
+	isys7->phy_rext_cal = 0;
+
+	ipu_isys_init(&isys7->ipu);
 
 	INIT_LIST_HEAD(&isys7->requests);
 	csi2_pdata = &isys7->pdata->ipdata->csi2;
@@ -742,25 +774,13 @@ static int isys_probe(struct auxiliary_device *auxdev,
 	if (ret)
 		goto out_runtime_put;
 
-	spin_lock_init(&isys->streams_lock);
-	spin_lock_init(&isys->power_lock);
-	isys->power = 0;
-
-	mutex_init(&isys->mutex);
-	mutex_init(&isys->stream_mutex);
-
 	spin_lock_init(&isys7->listlock);
 	INIT_LIST_HEAD(&isys7->framebuflist);
 	INIT_LIST_HEAD(&isys7->framebuflist_fw);
 
-	dev_set_drvdata(&auxdev->dev, isys);
-
-	isys->line_align = IPU_ISYS_2600_MEM_LINE_ALIGN;
-	isys->icache_prefetch = 0;
-	isys7->phy_rext_cal = 0;
+	dev_set_drvdata(&auxdev->dev, isys7);
 
 	ipu7_isys_setup_pfmts(isys7);
-	isys_stream_init(isys7);
 
 	cpu_latency_qos_add_request(&isys7->pm_qos, PM_QOS_DEFAULT_VALUE);
 	alloc_fw_msg_bufs(isys7, 20);
@@ -788,16 +808,11 @@ out_cleanup_fw:
 	ipu7_fw_isys_release(isys7);
 
 out_cleanup_mmu:
-	for (unsigned int i = 0; i < IPU_ISYS_MAX_STREAMS; i++)
-		mutex_destroy(&isys->streams[i].mutex);
-
-	mutex_destroy(&isys->mutex);
-	mutex_destroy(&isys->stream_mutex);
-
 	ipu7_mmu_hw_cleanup(adev->mmu);
 
 out_runtime_put:
 	pm_runtime_put(&auxdev->dev);
+	ipu_isys_cleanup(&isys7->ipu);
 
 	return ret;
 }

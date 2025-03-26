@@ -367,4 +367,8 @@ int ipu_isys_link_fmt_validate(struct ipu_isys_queue *aq);
 void ipu_return_buffers(struct ipu_isys_queue *aq, enum vb2_buffer_state state);
 void ipu_stream_buf_ready(struct ipu_isys_stream *stream, u8 pin_id, u32 pin_addr,
 			  u64 time, bool error_check);
+
+void ipu_isys_put_stream(struct ipu_isys_stream *stream);
+static struct ipu_isys_stream *
+ipu_isys_get_stream(struct ipu_isys_video *av, struct ipu_isys_subdev *asd);
 #endif

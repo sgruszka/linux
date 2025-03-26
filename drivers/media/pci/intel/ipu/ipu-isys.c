@@ -26,3 +26,70 @@ ipu_isys_get_isys_format(struct ipu_isys *isys, u32 pixelformat, u32 type)
 	return default_pfmt;
 }
 EXPORT_SYMBOL_GPL(ipu_isys_get_isys_format);
+
+struct ipu_isys_stream *
+ipu_isys_get_stream(struct ipu_isys_video *av, struct ipu_isys_subdev *asd)
+{
+	struct ipu_isys_stream *stream = NULL;
+	struct ipu_isys *isys = to_isys(av);
+	unsigned long flags;
+	unsigned int i;
+	u8 vc = av->vc;
+
+	if (!isys)
+		return NULL;
+
+	spin_lock_irqsave(&isys->streams_lock, flags);
+	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++) {
+		if (isys->streams_ref_count[i] && isys->streams[i].vc == vc &&
+		    isys->streams[i].asd == asd) {
+			isys->streams_ref_count[i]++;
+			stream = &isys->streams[i];
+			break;
+		}
+	}
+
+	if (!stream) {
+		for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++) {
+			if (!isys->streams_ref_count[i]) {
+				isys->streams_ref_count[i]++;
+				stream = &isys->streams[i];
+				stream->vc = vc;
+				stream->asd = asd;
+				break;
+			}
+		}
+	}
+	spin_unlock_irqrestore(&isys->streams_lock, flags);
+
+	return stream;
+}
+EXPORT_SYMBOL_GPL(ipu_isys_get_stream);
+
+void ipu_isys_put_stream(struct ipu_isys_stream *stream)
+{
+	struct ipu_isys *isys = to_isys(stream);
+	struct device *dev = isys_to_dev(isys);
+	unsigned int i;
+	unsigned long flags;
+
+	if (!stream) {
+		dev_err(dev, "ipu6-isys: no available stream\n");
+		return;
+	}
+
+	dev = isys_to_dev(stream->isys);
+
+	spin_lock_irqsave(&isys->streams_lock, flags);
+	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++) {
+		if (&isys->streams[i] == stream) {
+			if (isys->streams_ref_count[i] > 0)
+				isys->streams_ref_count[i]--;
+			else
+				dev_warn(dev, "invalid stream %d\n", i);
+			break;
+		}
+	}
+	spin_unlock_irqrestore(&isys->streams_lock, flags);
+}
+EXPORT_SYMBOL_GPL(ipu_isys_put_stream);

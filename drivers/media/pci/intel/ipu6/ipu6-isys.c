@@ -326,7 +326,7 @@ static void ipu6_isys_csi2_isr(struct ipu6_isys_csi2 *csi2_6)
 								  source, i);
 			if (stream) {
 				ipu6_isys_csi2_sof_event_by_stream(stream);
-				ipu6_isys_put_stream(stream);
+				ipu_isys_put_stream(stream);
 			}
 		}
 
@@ -335,7 +335,7 @@ static void ipu6_isys_csi2_isr(struct ipu6_isys_csi2 *csi2_6)
 								  source, i);
 			if (stream) {
 				ipu6_isys_csi2_eof_event_by_stream(stream);
-				ipu6_isys_put_stream(stream);
+				ipu_isys_put_stream(stream);
 			}
 		}
 	}
@@ -1349,7 +1349,7 @@ static int isys_isr_one(struct ipu_bus_device *adev)
 		break;
 	}
 
-	ipu6_isys_put_stream(stream);
+	ipu_isys_put_stream(stream);
 leave:
 	ipu6_fw_isys_put_resp(isys->fwcom, IPU6_BASE_MSG_RECV_QUEUES);
 	return 0;

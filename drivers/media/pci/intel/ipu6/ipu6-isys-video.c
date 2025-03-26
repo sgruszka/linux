@@ -827,71 +827,6 @@ void ipu6_isys_update_stream_watermark(struct ipu6_isys_video *av6, bool state)
 	update_watermark_setting(to_isys6(av));
 }
 
-void ipu6_isys_put_stream(struct ipu_isys_stream *stream)
-{
-	struct device *dev;
-	unsigned int i;
-	unsigned long flags;
-
-	if (!stream) {
-		pr_err("ipu6-isys: no available stream\n");
-		return;
-	}
-
-	dev = isys_to_dev(stream->isys);
-
-	spin_lock_irqsave(&to_isys(stream)->streams_lock, flags);
-	for (i = 0; i < IPU6_ISYS_MAX_STREAMS; i++) {
-		if (&to_isys(stream)->streams[i] == stream) {
-			if (to_isys(stream)->streams_ref_count[i] > 0)
-				to_isys(stream)->streams_ref_count[i]--;
-			else
-				dev_warn(dev, "invalid stream %d\n", i);
-
-			break;
-		}
-	}
-	spin_unlock_irqrestore(&to_isys(stream)->streams_lock, flags);
-}
-
-static struct ipu_isys_stream *
-ipu6_isys_get_stream(struct ipu6_isys_video *av, struct ipu_isys_subdev *asd)
-{
-	struct ipu_isys_stream *stream = NULL;
-	struct ipu_isys *isys = to_isys(&av->ipu);
-	unsigned long flags;
-	unsigned int i;
-	u8 vc = av->ipu.vc;
-
-	if (!isys)
-		return NULL;
-
-	spin_lock_irqsave(&isys->streams_lock, flags);
-	for (i = 0; i < IPU6_ISYS_MAX_STREAMS; i++) {
-		if (isys->streams_ref_count[i] && isys->streams[i].vc == vc &&
-		    isys->streams[i].asd == asd) {
-			isys->streams_ref_count[i]++;
-			stream = &isys->streams[i];
-			break;
-		}
-	}
-
-	if (!stream) {
-		for (i = 0; i < IPU6_ISYS_MAX_STREAMS; i++) {
-			if (!isys->streams_ref_count[i]) {
-				isys->streams_ref_count[i]++;
-				stream = &isys->streams[i];
-				stream->vc = vc;
-				stream->asd = asd;
-				break;
-			}
-		}
-	}
-	spin_unlock_irqrestore(&isys->streams_lock, flags);
-
-	return stream;
-}
-
 struct ipu_isys_stream *
 ipu6_isys_query_stream_by_handle(struct ipu6_isys *isys6, u8 stream_handle)
 {
@@ -1236,7 +1171,7 @@ int ipu6_isys_setup_video(struct ipu6_isys_video *av6,
 		return ret;
 	}
 
-	av->stream = ipu6_isys_get_stream(av6, asd);
+	av->stream = ipu_isys_get_stream(av, asd);
 	if (!av->stream) {
 		video_device_pipeline_stop(&av->vdev);
 		dev_err(dev, "no available stream for firmware\n");

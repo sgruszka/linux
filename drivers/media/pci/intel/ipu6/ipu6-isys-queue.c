@@ -258,7 +258,7 @@ out:
 static void ipu6_isys_stream_cleanup(struct ipu6_isys_video *av6)
 {
 	video_device_pipeline_stop(&av6->ipu.vdev);
-	ipu6_isys_put_stream(av6->ipu.stream);
+	ipu_isys_put_stream(av6->ipu.stream);
 	av6->ipu.stream = NULL;
 }
 

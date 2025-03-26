@@ -27,7 +27,6 @@ bool ipu_buttress_auth_done(struct ipu_device *isp);
 int ipu_buttress_get_isys_freq(struct ipu_device *isp, u32 *freq);
 int ipu_buttress_get_psys_freq(struct ipu_device *isp, u32 *freq);
 int ipu_buttress_start_tsc_sync(struct ipu_device *isp);
-void ipu_buttress_tsc_read(struct ipu_device *isp, u64 *val);
 u64 ipu_buttress_tsc_ticks_to_ns(u64 ticks, const struct ipu_device *isp);
 
 irqreturn_t ipu_buttress_isr(int irq, void *isp_ptr);

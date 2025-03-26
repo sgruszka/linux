@@ -379,7 +379,7 @@ ipu_stream_buf_ready(struct ipu_isys_stream *stream, u8 pin_id, u32 pin_addr,
 		     u64 time, bool error_check)
 {
 	struct ipu_isys_queue *aq = stream->output_pins[pin_id].aq;
-	struct ipu6_isys *isys = to_isys6(stream);
+	struct ipu_isys *isys = to_isys(stream);
 	struct device *dev = isys_to_dev(isys);
 	struct ipu_isys_buffer *ib;
 	struct vb2_buffer *vb;

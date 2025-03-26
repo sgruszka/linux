@@ -986,7 +986,7 @@ int ipu_buttress_start_tsc_sync(struct ipu_device *isp)
 }
 EXPORT_SYMBOL_NS_GPL(ipu_buttress_start_tsc_sync, "INTEL_IPU7");
 
-void ipu_buttress_tsc_read(struct ipu_device *isp, u64 *val)
+static void ipu_buttress_tsc_read(struct ipu_device *isp, u64 *val)
 {
 	unsigned long flags;
 	u32 tsc_hi, tsc_lo;
@@ -1002,22 +1002,6 @@ void ipu_buttress_tsc_read(struct ipu_device *isp, u64 *val)
 	*val = (u64)tsc_hi << 32 | tsc_lo;
 	local_irq_restore(flags);
 }
-EXPORT_SYMBOL_NS_GPL(ipu_buttress_tsc_read, "INTEL_IPU7");
-
-u64 ipu_buttress_tsc_ticks_to_ns(u64 ticks, const struct ipu_device *isp)
-{
-	u64 ns = ticks * 10000;
-
-	/*
-	 * converting TSC tick count to ns is calculated by:
-	 * Example (TSC clock frequency is 19.2MHz):
-	 * ns = ticks * 1000 000 000 / 19.2Mhz
-	 *    = ticks * 1000 000 000 / 19200000Hz
-	 *    = ticks * 10000 / 192 ns
-	 */
-	return div_u64(ns, isp->buttress.ref_clk);
-}
-EXPORT_SYMBOL_NS_GPL(ipu_buttress_tsc_ticks_to_ns, "INTEL_IPU7");
 
 /* trigger uc control to wakeup fw */
 void ipu_buttress_wakeup_is_uc(const struct ipu_device *isp)
@@ -1129,6 +1113,7 @@ int ipu_buttress_init(struct ipu_device *isp)
 		isp->hw_ops.buttress_powerup = ipu7_buttress_powerup;
 		isp->hw_ops.buttress_powerdown = ipu7_buttress_powerdown;
 	}
+	isp->hw_ops.buttress_tsc_read = ipu_buttress_tsc_read;
 
 	isp->secure_mode = ipu_buttress_get_secure_mode(isp);
 	val = readl(isp->base + BUTTRESS_REG_IPU_SKU);

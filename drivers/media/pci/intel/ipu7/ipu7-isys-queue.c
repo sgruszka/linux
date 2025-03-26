@@ -411,31 +411,5 @@ static const struct vb2_ops ipu7_isys_queue_ops = {
 
 int ipu7_isys_queue_init(struct ipu_isys_queue *aq)
 {
-	struct ipu_isys *isys = ipu_isys_queue_to_video(aq)->isys;
-	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
-	struct ipu_bus_device *adev = isys->adev;
-	int ret;
-
-	if (!aq->vbq.io_modes)
-		aq->vbq.io_modes = VB2_MMAP | VB2_DMABUF;
-
-	aq->vbq.drv_priv = isys;
-	aq->vbq.ops = &ipu7_isys_queue_ops;
-	aq->vbq.lock = &av->mutex;
-	aq->vbq.mem_ops = &vb2_dma_sg_memops;
-	aq->vbq.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	aq->vbq.min_queued_buffers = 1;
-	aq->vbq.timestamp_flags = V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC;
-
-	ret = vb2_queue_init(&aq->vbq);
-	if (ret)
-		return ret;
-
-	aq->dev = &adev->auxdev.dev;
-	aq->vbq.dev = &adev->isp->pdev->dev;
-	spin_lock_init(&aq->lock);
-	INIT_LIST_HEAD(&aq->active);
-	INIT_LIST_HEAD(&aq->incoming);
-
-	return 0;
+	return ipu_isys_queue_init(aq, &ipu7_isys_queue_ops);
 }

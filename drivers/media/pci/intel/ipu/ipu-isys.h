@@ -371,4 +371,6 @@ void ipu_stream_buf_ready(struct ipu_isys_stream *stream, u8 pin_id, u32 pin_add
 void ipu_isys_put_stream(struct ipu_isys_stream *stream);
 struct ipu_isys_stream *ipu_isys_get_stream(struct ipu_isys_video *av,
 					    struct ipu_isys_subdev *asd);
+int ipu_isys_queue_init(struct ipu_isys_queue *aq,
+			const struct vb2_ops *queue_ops);
 #endif

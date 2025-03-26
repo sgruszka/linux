@@ -1,3 +1,5 @@
+#include <media/videobuf2-dma-sg.h>
+
 #include "ipu-isys.h"
 
 int ipu_isys_buf_prepare(struct vb2_buffer *vb)
@@ -440,3 +442,36 @@ ipu_stream_buf_ready(struct ipu_isys_stream *stream, u8 pin_id, u32 pin_addr,
 }
 EXPORT_SYMBOL_GPL(ipu_stream_buf_ready);
 
+int ipu_isys_queue_init(struct ipu_isys_queue *aq,
+			const struct vb2_ops *queue_ops)
+{
+	struct ipu_isys_video *av = ipu_isys_queue_to_video(aq);
+	struct ipu_bus_device *adev = to_isys(av)->adev;
+	struct ipu_isys *isys = to_isys(av);
+	int ret;
+
+	/* no support for userptr */
+	if (!aq->vbq.io_modes)
+		aq->vbq.io_modes = VB2_MMAP | VB2_DMABUF;
+
+	aq->vbq.drv_priv = isys;
+	aq->vbq.ops = queue_ops;
+	aq->vbq.lock = &av->mutex;
+	aq->vbq.mem_ops = &vb2_dma_sg_memops;
+	aq->vbq.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	aq->vbq.min_queued_buffers = 1;
+	aq->vbq.timestamp_flags = V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC;
+
+	ret = vb2_queue_init(&aq->vbq);
+	if (ret)
+		return ret;
+
+	aq->dev = &adev->auxdev.dev;
+	aq->vbq.dev = &adev->isp->pdev->dev;
+	spin_lock_init(&aq->lock);
+	INIT_LIST_HEAD(&aq->active);
+	INIT_LIST_HEAD(&aq->incoming);
+
+	return 0;
+}
+EXPORT_SYMBOL_GPL(ipu_isys_queue_init);

@@ -34,7 +34,6 @@ int ipu7_isys_setup_video(struct ipu_isys_video *av,
 			  struct media_entity **source_entity, int *nr_queues);
 int ipu7_isys_video_init(struct ipu_isys_video *av);
 void ipu7_isys_video_cleanup(struct ipu_isys_video *av);
-void ipu7_isys_put_stream(struct ipu_isys_stream *stream);
 struct ipu_isys_stream *
 ipu7_isys_query_stream_by_handle(struct ipu7_isys *isys,
 				 u8 stream_handle);

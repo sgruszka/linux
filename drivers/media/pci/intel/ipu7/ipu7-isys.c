@@ -994,7 +994,7 @@ int isys_isr_one(struct ipu_bus_device *adev)
 		break;
 	}
 
-	ipu7_isys_put_stream(stream);
+	ipu_isys_put_stream(stream);
 leave:
 	ipu7_fw_isys_put_resp(isys);
 

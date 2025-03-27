@@ -252,7 +252,7 @@ out:
 static void ipu7_isys_stream_cleanup(struct ipu_isys_video *av)
 {
 	video_device_pipeline_stop(&av->vdev);
-	ipu7_isys_put_stream(av->stream);
+	ipu_isys_put_stream(av->stream);
 	av->stream = NULL;
 }
 

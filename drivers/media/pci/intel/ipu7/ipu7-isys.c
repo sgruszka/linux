@@ -93,31 +93,6 @@ skip_unregister_subdev:
 	return ret;
 }
 
-static void isys_streams_init(struct ipu_isys *isys)
-{
-	unsigned int i;
-
-	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++) {
-		mutex_init(&isys->streams[i].mutex);
-		init_completion(&isys->streams[i].stream_open_completion);
-		init_completion(&isys->streams[i].stream_close_completion);
-		init_completion(&isys->streams[i].stream_start_completion);
-		init_completion(&isys->streams[i].stream_stop_completion);
-		INIT_LIST_HEAD(&isys->streams[i].queues);
-		isys->streams[i].isys = isys;
-		isys->streams[i].stream_handle = i;
-		isys->streams[i].vc = INVALID_VC_ID;
-	}
-}
-
-static void isys_streams_cleanup(struct ipu_isys *isys)
-{
-	unsigned int i;
-
-	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++)
-		mutex_destroy(&isys->streams[i].mutex);
-}
-
 static int isys_fw_log_init(struct ipu7_isys *isys)
 {
 	struct device *dev = isys_to_dev(isys);
@@ -705,29 +680,6 @@ void ipu7_put_fw_msg_buf(struct ipu7_isys *isys, uintptr_t data)
 	msg = container_of(ptr, struct isys_fw_msgs, fw_msg.dummy);
 	list_move(&msg->head, &isys->framebuflist);
 	spin_unlock_irqrestore(&isys->listlock, flags);
-}
-
-static void ipu_isys_init(struct ipu_isys *isys)
-{
-	spin_lock_init(&isys->streams_lock);
-	spin_lock_init(&isys->power_lock);
-
-	mutex_init(&isys->mutex);
-	mutex_init(&isys->stream_mutex);
-
-	isys->power = 0;
-	isys->line_align = IPU_ISYS_2600_MEM_LINE_ALIGN; //TODO remove
-	isys->icache_prefetch = 0;
-
-	isys_streams_init(isys);
-}
-
-static void ipu_isys_cleanup(struct ipu_isys *isys)
-{
-	isys_streams_cleanup(isys);
-
-	mutex_destroy(&isys->mutex);
-	mutex_destroy(&isys->stream_mutex);
 }
 
 static int isys_probe(struct auxiliary_device *auxdev,

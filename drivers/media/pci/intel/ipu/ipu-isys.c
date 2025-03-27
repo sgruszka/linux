@@ -93,3 +93,53 @@ void ipu_isys_put_stream(struct ipu_isys_stream *stream)
 	spin_unlock_irqrestore(&isys->streams_lock, flags);
 }
 EXPORT_SYMBOL_GPL(ipu_isys_put_stream);
+
+static void isys_streams_init(struct ipu_isys *isys)
+{
+	unsigned int i;
+
+	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++) {
+		mutex_init(&isys->streams[i].mutex);
+		init_completion(&isys->streams[i].stream_open_completion);
+		init_completion(&isys->streams[i].stream_close_completion);
+		init_completion(&isys->streams[i].stream_start_completion);
+		init_completion(&isys->streams[i].stream_stop_completion);
+		INIT_LIST_HEAD(&isys->streams[i].queues);
+		isys->streams[i].isys = isys;
+		isys->streams[i].stream_handle = i;
+		isys->streams[i].vc = -1; /* invalid */
+	}
+}
+
+static void isys_streams_cleanup(struct ipu_isys *isys)
+{
+	unsigned int i;
+
+	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++)
+		mutex_destroy(&isys->streams[i].mutex);
+}
+
+void ipu_isys_init(struct ipu_isys *isys)
+{
+	spin_lock_init(&isys->streams_lock);
+	spin_lock_init(&isys->power_lock);
+
+	mutex_init(&isys->mutex);
+	mutex_init(&isys->stream_mutex);
+
+	isys->power = 0;
+	isys->line_align = 64; //TODO remove
+	isys->icache_prefetch = 0;
+
+	isys_streams_init(isys);
+}
+EXPORT_SYMBOL_GPL(ipu_isys_init);
+
+void ipu_isys_cleanup(struct ipu_isys *isys)
+{
+	isys_streams_cleanup(isys);
+
+	mutex_destroy(&isys->mutex);
+	mutex_destroy(&isys->stream_mutex);
+}
+EXPORT_SYMBOL_GPL(ipu_isys_cleanup);

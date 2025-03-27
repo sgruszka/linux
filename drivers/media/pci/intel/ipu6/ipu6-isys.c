@@ -141,24 +141,6 @@ unregister_subdev:
 	return ret;
 }
 
-static void isys_stream_init(struct ipu6_isys *isys6)
-{
-	struct ipu_isys *isys = &isys6->ipu;
-	u32 i;
-
-	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++) {
-		mutex_init(&isys->streams[i].mutex);
-		init_completion(&isys->streams[i].stream_open_completion);
-		init_completion(&isys->streams[i].stream_close_completion);
-		init_completion(&isys->streams[i].stream_start_completion);
-		init_completion(&isys->streams[i].stream_stop_completion);
-		INIT_LIST_HEAD(&isys->streams[i].queues);
-		isys->streams[i].isys = (struct ipu_isys *)isys;
-		isys->streams[i].stream_handle = i;
-		isys->streams[i].vc = INVALID_VC_ID;
-	}
-}
-
 static void isys_csi2_unregister_subdevices(struct ipu6_isys *isys)
 {
 	const struct ipu6_isys_internal_csi2_pdata *csi2 =
@@ -1095,8 +1077,6 @@ static int isys_probe(struct auxiliary_device *auxdev,
 	ipu6_isys_setup_pfmts(isys6);
 
 	dev_set_drvdata(&auxdev->dev, isys6);
-
-	isys_stream_init(isys6);
 
 	if (!isp->secure_mode) {
 		fw = isp->cpd_fw;

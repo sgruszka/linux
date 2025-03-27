@@ -1055,23 +1055,25 @@ static int isys_probe(struct auxiliary_device *auxdev,
 	struct ipu_device *isp = adev->isp;
 	const struct firmware *fw;
 	struct ipu6_isys *isys6;
-	struct ipu_isys *isys;
-	unsigned int i;
 	int ret;
 
 	if (!isp->bus_ready_to_probe)
 		return -EPROBE_DEFER;
 
-	isys6 = devm_kzalloc(&auxdev->dev, sizeof(*isys), GFP_KERNEL);
+	isys6 = devm_kzalloc(&auxdev->dev, sizeof(*isys6), GFP_KERNEL);
 	if (!isys6)
 		return -ENOMEM;
-	isys = &isys6->ipu;
 
 	adev->auxdrv_data =
 		(const struct ipu_auxdrv_data *)auxdev_id->driver_data;
 	adev->auxdrv = to_auxiliary_drv(auxdev->dev.driver);
-	isys->adev = adev;
+
+	isys6->ipu.adev = adev;
 	isys6->pdata = adev->pdata;
+	isys6->phy_termcal_val = 0;
+
+	ipu_isys_init(&isys6->ipu);
+
 	csi2_pdata = &isys6->pdata->ipdata->csi2;
 
 	isys6->csi2 = devm_kcalloc(&auxdev->dev, csi2_pdata->nports,
@@ -1084,26 +1086,15 @@ static int isys_probe(struct auxiliary_device *auxdev,
 		return ret;
 
 	/* initial sensor type */
-	isys->sensor_type = isys6->pdata->ipdata->sensor_type_start;
-
-	spin_lock_init(&isys->streams_lock);
-	spin_lock_init(&isys->power_lock);
-	isys->power = 0;
-	isys6->phy_termcal_val = 0;
-
-	mutex_init(&isys->mutex);
-	mutex_init(&isys->stream_mutex);
+	isys6->ipu.sensor_type = isys6->pdata->ipdata->sensor_type_start; // TODO
 
 	spin_lock_init(&isys6->listlock);
 	INIT_LIST_HEAD(&isys6->framebuflist);
 	INIT_LIST_HEAD(&isys6->framebuflist_fw);
 
-	isys->line_align = IPU6_ISYS_2600_MEM_LINE_ALIGN;
-	isys->icache_prefetch = 0;
-
 	ipu6_isys_setup_pfmts(isys6);
 
-	dev_set_drvdata(&auxdev->dev, isys);
+	dev_set_drvdata(&auxdev->dev, isys6);
 
 	isys_stream_init(isys6);
 
@@ -1154,13 +1145,8 @@ release_firmware:
 	if (!isp->secure_mode)
 		release_firmware(adev->fw);
 
-	for (i = 0; i < IPU_ISYS_MAX_STREAMS; i++)
-		mutex_destroy(&isys->streams[i].mutex);
-
-	mutex_destroy(&isys->mutex);
-	mutex_destroy(&isys->stream_mutex);
-
 	ipu6_mmu_hw_cleanup(adev->mmu);
+	ipu_isys_cleanup(&isys6->ipu);
 
 	return ret;
 }
